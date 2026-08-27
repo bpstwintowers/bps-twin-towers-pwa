@@ -42,11 +42,11 @@ const Login: React.FC = () => {
             </div>
           </div>
 
-          {/* Central Architectural Blueprint Showcase */}
+          {/* Central Architectural Building Showcase */}
           <div className="hero-graphic-card">
             <img
-              src="/community-blueprint.png"
-              alt="BPS Twin Towers Community Layout"
+              src="/bps-towers-hero.jpg"
+              alt="BPS Twin Towers High-Rise Architecture"
               className="hero-graphic-image"
             />
           </div>
