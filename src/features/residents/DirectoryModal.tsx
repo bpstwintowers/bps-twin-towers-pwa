@@ -94,11 +94,52 @@ export const DirectoryModal: React.FC<DirectoryModalProps> = ({ isOpen, onClose 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content animate-fade-in" style={{ maxWidth: '640px', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
-        <div className="modal-header">
+    <div
+      className="modal-overlay"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(15, 23, 42, 0.82)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '1rem',
+        zIndex: 9999,
+      }}
+    >
+      <div
+        className="modal-content animate-fade-in"
+        style={{
+          backgroundColor: '#1e293b',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          borderRadius: '16px',
+          width: '100%',
+          maxWidth: '640px',
+          maxHeight: '85vh',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          className="modal-header"
+          style={{
+            padding: '1.25rem 1.5rem',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Community Directory</h3>
+            <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#f8fafc' }}>Community Directory</h3>
             <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               BPS Twin Towers Society Members
             </p>
