@@ -205,17 +205,29 @@ export const AdminPortal: React.FC = () => {
             >
               <ArrowLeft size={18} />
             </button>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Shield size={20} style={{ color: '#f59e0b' }} />
-                <h1 style={{ fontSize: '1.4rem', fontWeight: 700, margin: 0 }}>
-                  Admin Portal
-                </h1>
-                <span className="admin-badge">Admin Access</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <img
+                src="/logo.png"
+                alt="BPS"
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '6px',
+                  objectFit: 'cover',
+                }}
+              />
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Shield size={18} style={{ color: '#f59e0b' }} />
+                  <h1 style={{ fontSize: '1.35rem', fontWeight: 700, margin: 0 }}>
+                    Admin Portal
+                  </h1>
+                  <span className="admin-badge">Admin Access</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  BPS Twin Towers Society Management
+                </p>
               </div>
-              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                BPS Twin Towers Society Management
-              </p>
             </div>
           </div>
           <button

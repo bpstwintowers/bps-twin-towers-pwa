@@ -139,25 +139,19 @@ export const ResidentDashboard: React.FC = () => {
       <header className="dashboard-header">
         <div className="dashboard-header-inner">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div
+            <img
+              src="/logo.png"
+              alt="BPS"
               style={{
                 width: '38px',
                 height: '38px',
-                background: 'linear-gradient(135deg, var(--accent-primary), #8b5cf6)',
-                borderRadius: 'var(--radius-md)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: '0.9rem',
-                color: 'white',
+                borderRadius: '8px',
+                objectFit: 'cover',
               }}
-            >
-              BPS
-            </div>
+            />
             <div>
               <div style={{ fontWeight: 700, fontSize: '0.98rem' }}>BPS Twin Towers</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Community Portal</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Saidabad Community</div>
             </div>
           </div>
 

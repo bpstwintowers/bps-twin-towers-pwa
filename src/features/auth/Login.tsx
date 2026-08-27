@@ -29,12 +29,25 @@ const Login: React.FC = () => {
   return (
     <div className="login-container flex-center">
       <div className="login-card glass-panel animate-fade-in">
-        <div className="login-header">
-          <div className="logo-placeholder">
-            <span>BPS</span>
-          </div>
-          <h1>Welcome to BPS Twin Towers</h1>
-          <p className="subtitle">Sign in to access your community portal</p>
+        <div className="login-header" style={{ textAlign: 'center' }}>
+          <img
+            src="/logo.png"
+            alt="BPS Twin Towers"
+            style={{
+              width: '96px',
+              height: 'auto',
+              borderRadius: '12px',
+              margin: '0 auto 1rem',
+              display: 'block',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
+            }}
+          />
+          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, margin: '0 0 0.35rem' }}>
+            BPS Twin Towers
+          </h1>
+          <p className="subtitle" style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+            Saidabad Community Portal
+          </p>
         </div>
         
         {error && <div className="error-message">{error}</div>}
