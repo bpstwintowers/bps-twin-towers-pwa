@@ -288,7 +288,11 @@ export async function getFlatResidents(flatId: string): Promise<FlatResidentInfo
       .select(`
         id,
         user_id,
+        relationship,
         membership_type,
+        resident_type,
+        full_name,
+        email,
         status,
         profiles (
           id,
@@ -314,13 +318,26 @@ export async function getFlatResidents(flatId: string): Promise<FlatResidentInfo
       return [];
     }
 
-    return data.map((row: any) => ({
-      id: row.id,
-      user_id: row.user_id,
-      full_name: row.profiles?.full_name || 'Verified Resident',
-      resident_type: row.membership_type === 'Primary Resident' ? 'Owner' : (row.membership_type || 'Resident'),
-      masked_email: maskEmail(row.profiles?.email || ''),
-    }));
+    return data.map((row: any) => {
+      const name = row.profiles?.full_name || row.full_name || 'Verified Resident';
+      const email = row.profiles?.email || row.email || '';
+      let displayRole = 'Resident';
+      if (row.membership_type === 'Primary Resident' || row.resident_type === 'Owner') {
+        displayRole = 'Owner';
+      } else if (row.relationship && row.relationship !== 'Self') {
+        displayRole = `${row.relationship}`;
+      } else if (row.membership_type) {
+        displayRole = row.membership_type;
+      }
+
+      return {
+        id: row.id,
+        user_id: row.user_id || '',
+        full_name: name,
+        resident_type: displayRole,
+        masked_email: maskEmail(email),
+      };
+    });
   } catch (err) {
     console.warn('getFlatResidents lookup:', err);
     return [];
