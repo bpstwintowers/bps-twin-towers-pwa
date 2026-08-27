@@ -1,23 +1,23 @@
-/* Resident Dashboard Styles */
+/* Stately Corporate System — Resident Dashboard */
 .dashboard-container {
   min-height: 100vh;
-  background: linear-gradient(160deg, var(--bg-primary) 0%, #171c38 50%, var(--bg-primary) 100%);
+  background: var(--bg-primary);
   color: var(--text-primary);
-  padding-bottom: 2rem;
+  padding-bottom: 3rem;
 }
 
 .dashboard-header {
-  padding: 1rem;
+  padding: 0.85rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 20;
 }
 
 .dashboard-header-inner {
-  max-width: 860px;
+  max-width: 920px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -25,19 +25,31 @@
 }
 
 .dashboard-content {
-  max-width: 860px;
+  max-width: 920px;
   margin: 0 auto;
-  padding: 1.25rem 1rem;
+  padding: 1.75rem 1.25rem;
 }
 
 /* Hero Section */
 .resident-hero-card {
-  padding: 1.5rem;
-  border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  background: #ffffff;
   border: 1px solid var(--border-color);
-  margin-bottom: 1.5rem;
-  box-shadow: var(--shadow-md);
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-ambient);
+  position: relative;
+  overflow: hidden;
+}
+
+.resident-hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
 }
 
 .resident-hero-top {
@@ -46,7 +58,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .resident-user-info {
@@ -58,27 +70,30 @@
 .resident-avatar {
   width: 52px;
   height: 52px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--primary), #273b5e);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.35rem;
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
   font-weight: 700;
-  color: white;
-  box-shadow: var(--shadow-md);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
 }
 
 .resident-greeting h1 {
-  font-size: 1.35rem;
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
   font-weight: 700;
+  color: var(--primary);
   margin: 0;
 }
 
 .resident-greeting p {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 /* Flat summary pills */
@@ -93,19 +108,23 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.4rem 0.85rem;
-  background: rgba(59, 130, 246, 0.12);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  border-radius: 9999px;
-  font-size: 0.85rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
   font-weight: 600;
-  color: var(--accent-primary);
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 /* Quick Action Tiles */
 .section-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-  margin-bottom: 0.85rem;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -113,78 +132,85 @@
 
 .action-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.85rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 .action-tile {
-  background: rgba(255, 255, 255, 0.03);
+  background: #ffffff;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 1.2rem 1rem;
+  border-radius: var(--radius-md);
+  padding: 1.35rem 1.15rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.5rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   text-align: left;
   width: 100%;
+  box-shadow: var(--shadow-sm);
 }
 
 .action-tile:hover {
-  background: rgba(59, 130, 246, 0.08);
-  border-color: var(--accent-primary);
+  background: #ffffff;
+  border-color: var(--secondary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .action-tile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
+  background-color: var(--bg-secondary);
+  color: var(--primary);
 }
 
 .action-tile-title {
+  font-family: var(--font-sans);
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
 }
 
 .action-tile-desc {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  line-height: 1.3;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
 }
 
 /* Household card */
 .household-summary-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: #ffffff;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .household-member-list {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  margin-top: 0.75rem;
+  margin-top: 1rem;
 }
 
 .household-member-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.65rem 0.85rem;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   font-size: 0.88rem;
 }
 

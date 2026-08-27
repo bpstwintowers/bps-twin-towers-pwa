@@ -1,23 +1,23 @@
-/* Complaints Styles */
+/* Stately Corporate System — Complaints & Helpdesk */
 .complaints-container {
   min-height: 100vh;
-  background: linear-gradient(160deg, var(--bg-primary) 0%, #151838 50%, var(--bg-primary) 100%);
+  background: var(--bg-primary);
   color: var(--text-primary);
   padding-bottom: 3rem;
 }
 
 .complaints-header {
-  padding: 1rem;
+  padding: 0.85rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 20;
 }
 
 .complaints-header-inner {
-  max-width: 860px;
+  max-width: 920px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -25,32 +25,33 @@
 }
 
 .complaints-content {
-  max-width: 860px;
+  max-width: 920px;
   margin: 0 auto;
-  padding: 1.25rem 1rem;
+  padding: 1.75rem 1.25rem;
 }
 
 .complaint-ticket-badge {
-  background: rgba(99, 102, 241, 0.15);
-  color: #a5b4fc;
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  padding: 0.2rem 0.5rem;
+  background: var(--bg-secondary);
+  color: var(--primary);
+  border: 1px solid var(--border-color);
+  padding: 0.25rem 0.6rem;
   border-radius: var(--radius-sm);
-  font-family: monospace;
+  font-family: var(--font-sans);
   font-size: 0.82rem;
   font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 .complaint-timeline {
   position: relative;
   padding-left: 1.5rem;
-  margin: 1rem 0;
-  border-left: 2px solid rgba(255, 255, 255, 0.1);
+  margin: 1.5rem 0;
+  border-left: 2px solid var(--border-color);
 }
 
 .timeline-item {
   position: relative;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .timeline-dot {
@@ -60,18 +61,21 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--accent-primary);
+  background: var(--primary);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px var(--border-color);
 }
 
 .comment-bubble {
-  background: rgba(255, 255, 255, 0.03);
+  background: #ffffff;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 0.75rem 1rem;
-  margin-bottom: 0.65rem;
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .comment-bubble.internal {
-  background: rgba(245, 158, 11, 0.05);
-  border-color: rgba(245, 158, 11, 0.3);
+  background: var(--warning-light);
+  border-color: rgba(180, 83, 9, 0.3);
 }

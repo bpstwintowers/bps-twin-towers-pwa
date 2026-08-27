@@ -1,32 +1,35 @@
-/* Community Announcements Styles */
+/* Stately Corporate System — Community Announcements */
 .announcements-container {
   min-height: 100vh;
-  background: linear-gradient(160deg, var(--bg-primary) 0%, #151838 50%, var(--bg-primary) 100%);
+  background: var(--bg-primary);
   color: var(--text-primary);
   padding-bottom: 3rem;
 }
 
 .announcement-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: #ffffff;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-xl);
-  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1rem;
 }
 
 .announcement-card:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--secondary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .announcement-card.urgent {
-  background: rgba(239, 68, 68, 0.08);
-  border-color: rgba(239, 68, 68, 0.4);
+  background: #ffffff;
+  border-left: 4px solid var(--danger);
 }
 
 .announcement-card.high {
-  background: rgba(245, 158, 11, 0.06);
-  border-color: rgba(245, 158, 11, 0.35);
+  background: #ffffff;
+  border-left: 4px solid var(--warning);
 }

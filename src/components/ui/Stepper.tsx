@@ -20,24 +20,24 @@ export const Stepper: React.FC<StepperProps> = ({ steps, currentStep }) => {
                 style={{
                   width: '32px',
                   height: '32px',
-                  borderRadius: '50%',
+                  borderRadius: '4px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: '0.8rem',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   transition: 'all 0.3s ease',
                   background: isCompleted
-                    ? 'var(--success)'
+                    ? 'var(--primary)'
                     : isActive
-                      ? 'var(--accent-primary)'
-                      : 'var(--bg-tertiary)',
-                  color: isCompleted || isActive ? '#fff' : 'var(--text-muted)',
+                      ? 'var(--secondary)'
+                      : 'var(--bg-secondary)',
+                  color: isCompleted || isActive ? '#ffffff' : 'var(--text-muted)',
                   border: isActive
-                    ? '2px solid var(--accent-primary)'
-                    : '2px solid transparent',
+                    ? '1px solid var(--secondary)'
+                    : '1px solid var(--border-color)',
                   boxShadow: isActive
-                    ? '0 0 12px rgba(59, 130, 246, 0.4)'
+                    ? 'var(--shadow-gold)'
                     : 'none',
                 }}
               >
@@ -45,13 +45,15 @@ export const Stepper: React.FC<StepperProps> = ({ steps, currentStep }) => {
               </div>
               <span
                 style={{
-                  fontSize: '0.65rem',
-                  fontWeight: isActive ? 600 : 400,
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
-                  marginTop: '0.375rem',
+                  fontSize: '0.68rem',
+                  fontWeight: isActive ? 700 : 500,
+                  color: isActive ? 'var(--primary)' : 'var(--text-muted)',
+                  marginTop: '0.4rem',
                   textAlign: 'center',
                   lineHeight: 1.2,
-                  maxWidth: '72px',
+                  maxWidth: '76px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
                   transition: 'color 0.3s ease',
                 }}
               >
@@ -66,8 +68,8 @@ export const Stepper: React.FC<StepperProps> = ({ steps, currentStep }) => {
                   minWidth: '20px',
                   maxWidth: '48px',
                   background: index < currentStep
-                    ? 'var(--success)'
-                    : 'var(--bg-tertiary)',
+                    ? 'var(--primary)'
+                    : 'var(--border-color)',
                   borderRadius: '1px',
                   transition: 'background 0.3s ease',
                   marginBottom: '1.25rem',
