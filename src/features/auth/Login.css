@@ -52,39 +52,16 @@
   bottom: 0;
   background: linear-gradient(
     180deg,
-    rgba(15, 23, 42, 0.45) 0%,
-    rgba(15, 23, 42, 0.72) 40%,
-    rgba(15, 23, 42, 0.92) 100%
+    rgba(15, 23, 42, 0.15) 0%,
+    rgba(15, 23, 42, 0.25) 40%,
+    rgba(15, 23, 42, 0.6) 100%
   );
   z-index: 2;
 }
 
-/* Ambient Floating Particles */
+/* Ambient Floating Particles (Subtle refined glow) */
 .ambient-particles {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 3;
-  pointer-events: none;
-}
-
-.particle {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(197, 155, 39, 0.8) 0%, rgba(197, 155, 39, 0) 70%);
-  animation: floatParticle 8s infinite ease-in-out;
-}
-
-.p1 { width: 140px; height: 140px; top: 15%; left: 10%; animation-duration: 9s; opacity: 0.35; }
-.p2 { width: 180px; height: 180px; top: 60%; right: 15%; animation-duration: 12s; opacity: 0.25; animation-delay: 2s; }
-.p3 { width: 100px; height: 100px; bottom: 20%; left: 30%; animation-duration: 7s; opacity: 0.3; animation-delay: 4s; }
-.p4 { width: 80px; height: 80px; top: 35%; right: 30%; animation-duration: 10s; opacity: 0.2; animation-delay: 1s; }
-
-@keyframes floatParticle {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-25px) scale(1.08); }
+  display: none; /* Removed heavy blurred blobs to keep building image sharp and clear */
 }
 
 /* Hero Content */
@@ -186,13 +163,15 @@
   color: #ffffff;
   letter-spacing: -0.015em;
   margin: 0;
+  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.9);
 }
 
 .hero-luxury-subtext {
   font-size: 1rem;
   line-height: 1.6;
-  color: #cbd5e1;
+  color: #f1f5f9;
   margin: 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
 }
 
 /* Bottom Social Proof */
