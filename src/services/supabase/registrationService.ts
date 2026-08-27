@@ -272,6 +272,7 @@ export interface FlatResidentInfo {
   full_name: string;
   resident_type: string;
   masked_email: string;
+  status?: 'active' | 'pending';
 }
 
 export function maskEmail(email: string): string {
@@ -305,6 +306,7 @@ export async function getFlatResidents(flatId: string): Promise<FlatResidentInfo
           full_name: row.full_name || 'Verified Resident',
           resident_type: displayRole,
           masked_email: row.masked_email || 'm***@gmail.com',
+          status: row.status || 'active',
         };
       });
     }
@@ -318,6 +320,7 @@ export async function getFlatResidents(flatId: string): Promise<FlatResidentInfo
         full_name: 'Flat Owner',
         resident_type: 'Owner',
         masked_email: maskEmail(ownerInfo.owner_email),
+        status: 'active',
       }];
     }
     return [];

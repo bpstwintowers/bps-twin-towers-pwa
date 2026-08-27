@@ -348,113 +348,160 @@ const Login: React.FC = () => {
           </div>
 
           {/* ================================================================
-              STEP 2: RECOGNIZED FLAT RESIDENTS (Clickable Pills)
+              STEP 2: RECOGNIZED FLAT RESIDENTS / STATUS (Clickable Pills)
               ================================================================ */}
           {selectedFlat && (
             <div className="recognized-flat-section animate-fade-in">
               <div className="recognized-flat-header">
                 <span className="recognized-flat-title">
-                  Residents of <strong>{selectedFlat.flat_number}</strong>
+                  Flat <strong>{selectedFlat.flat_number}</strong>
                 </span>
                 {selectedFlat.bhk && <span className="recognized-bhk">{selectedFlat.bhk}</span>}
               </div>
 
               {isLoadingResidents ? (
-                <div className="residents-skeleton-loader">Loading verified residents...</div>
-              ) : flatResidents.length > 0 ? (
-                <div className="resident-pills-list">
-                  {flatResidents.map((resident) => (
-                    <button
-                      key={resident.id}
-                      className="resident-login-pill-btn"
-                      onClick={() => handleGoogleLogin(resident.masked_email)}
-                      disabled={googleLoading}
-                    >
-                      <div className="resident-pill-left">
-                        <div className="resident-avatar-circle">
-                          {resident.full_name.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="resident-info-block">
-                          <div className="resident-name-row">
-                            <span className="resident-name-text">{resident.full_name}</span>
-                            <span className={`role-badge ${resident.resident_type.toLowerCase()}`}>
-                              {resident.resident_type}
+                <div className="residents-skeleton-loader">Loading flat status...</div>
+              ) : (
+                (() => {
+                  const activeResidents = flatResidents.filter((r) => r.status !== 'pending');
+                  const pendingResidents = flatResidents.filter((r) => r.status === 'pending');
+
+                  // Case 1: Active Registered Residents exist
+                  if (activeResidents.length > 0) {
+                    return (
+                      <div className="resident-pills-list">
+                        {activeResidents.map((resident) => (
+                          <button
+                            key={resident.id}
+                            className="resident-login-pill-btn"
+                            onClick={() => handleGoogleLogin(resident.masked_email)}
+                            disabled={googleLoading}
+                          >
+                            <div className="resident-pill-left">
+                              <div className="resident-avatar-circle">
+                                {resident.full_name.charAt(0).toUpperCase()}
+                              </div>
+                              <div className="resident-info-block">
+                                <div className="resident-name-row">
+                                  <span className="resident-name-text">{resident.full_name}</span>
+                                  <span className={`role-badge ${resident.resident_type.toLowerCase()}`}>
+                                    {resident.resident_type}
+                                  </span>
+                                </div>
+                                <span className="resident-email-masked">
+                                  Log in as {resident.masked_email}
+                                </span>
+                              </div>
+                            </div>
+                            <ChevronRight size={18} className="pill-arrow-icon" />
+                          </button>
+                        ))}
+                      </div>
+                    );
+                  }
+
+                  // Case 2: Registration is Pending (not yet active)
+                  if (pendingResidents.length > 0) {
+                    return (
+                      <div className="flat-pending-callout animate-fade-in">
+                        <div className="pending-status-header">
+                          <div className="pending-badge-icon">
+                            <Clock size={22} className="clock-amber-icon" />
+                          </div>
+                          <div className="pending-header-text">
+                            <h3 className="pending-status-title">Registration Pending</h3>
+                            <span className="pending-applicant-email">
+                              Applicant: <strong>{pendingResidents[0].masked_email}</strong>
                             </span>
                           </div>
-                          <span className="resident-email-masked">
-                            Log in as {resident.masked_email}
-                          </span>
                         </div>
+                        <p className="pending-status-desc">
+                          Your registration is under review. Our admin team will verify your details and approve your account shortly.
+                        </p>
                       </div>
-                      <ChevronRight size={18} className="pill-arrow-icon" />
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="flat-no-residents-callout">
-                  <p>No resident registered yet for {selectedFlat.flat_number}.</p>
-                  <button
-                    type="button"
-                    className="btn-register-flat-cta"
-                    onClick={() => navigate('/register')}
-                  >
-                    <UserPlus size={16} />
-                    <span>Register as new resident of {selectedFlat.flat_number}</span>
-                  </button>
-                </div>
+                    );
+                  }
+
+                  // Case 3: Not Registered Yet
+                  return (
+                    <div className="flat-unregistered-callout animate-fade-in">
+                      <p className="unregistered-text">
+                        No resident registered yet for <strong>{selectedFlat.flat_number}</strong>.
+                      </p>
+                      <button
+                        type="button"
+                        className="google-oauth-pill-btn"
+                        onClick={() => handleGoogleLogin()}
+                        disabled={googleLoading}
+                      >
+                        <svg className="google-g-svg" viewBox="0 0 24 24">
+                          <path
+                            fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                          />
+                        </svg>
+                        <span>{googleLoading ? 'Connecting Google Account...' : 'Continue with Google'}</span>
+                      </button>
+                    </div>
+                  );
+                })()
               )}
             </div>
           )}
 
           {/* ================================================================
-              NEW TO BPS TWIN TOWERS? ONBOARDING & STATUS SECTION
+              DEFAULT STATE ONLY (When no flat is selected)
               ================================================================ */}
-          <div className="new-resident-action-wrapper">
-            <div className="action-divider-row">
-              <span className="divider-line" />
-              <span className="divider-tag">NEW TO BPS TWIN TOWERS?</span>
-              <span className="divider-line" />
-            </div>
-
-            {/* 1. Continue with Google */}
-            <div className="universal-oauth-container">
-              <button
-                type="button"
-                className="google-oauth-pill-btn"
-                onClick={() => handleGoogleLogin()}
-                disabled={googleLoading}
-              >
-                <svg className="google-g-svg" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                  />
-                </svg>
-                <span>{googleLoading ? 'Connecting Google Account...' : 'Continue with Google'}</span>
-              </button>
-            </div>
-
-            {/* 2. Track Application Status */}
-            <Link to="/registration-status" className="track-status-secondary-btn">
-              <div className="btn-left-content">
-                <Clock size={17} className="track-clock-icon" />
-                <span>Track Application Status</span>
+          {!selectedFlat && (
+            <div className="new-resident-action-wrapper animate-fade-in">
+              <div className="action-divider-row">
+                <span className="divider-line" />
+                <span className="divider-tag">NEW TO BPS TWIN TOWERS?</span>
+                <span className="divider-line" />
               </div>
-              <ArrowRight size={16} />
-            </Link>
-          </div>
+
+              <div className="universal-oauth-container">
+                <button
+                  type="button"
+                  className="google-oauth-pill-btn"
+                  onClick={() => handleGoogleLogin()}
+                  disabled={googleLoading}
+                >
+                  <svg className="google-g-svg" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                    />
+                  </svg>
+                  <span>{googleLoading ? 'Connecting Google Account...' : 'Continue with Google'}</span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* ================================================================
               TRUST, SECURITY & FOOTER LINKS
