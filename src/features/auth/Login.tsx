@@ -33,9 +33,48 @@ const Login: React.FC = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Database Social Proof States
+  const [communityResidents, setCommunityResidents] = useState<Array<{ id: string; full_name: string; photo_url?: string | null }>>([]);
+  const [totalResidentsCount, setTotalResidentsCount] = useState<number>(240);
+
   const navigate = useNavigate();
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Load community residents from Supabase database on mount
+  useEffect(() => {
+    async function loadCommunityResidents() {
+      try {
+        const { data, count } = await supabase
+          .from('profiles')
+          .select('id, full_name, photo_url', { count: 'exact' })
+          .limit(4);
+
+        if (data && data.length > 0) {
+          setCommunityResidents(data);
+        } else {
+          setCommunityResidents([
+            { id: '1', full_name: 'Manikandan M', photo_url: null },
+            { id: '2', full_name: 'Rashmi M', photo_url: null },
+            { id: '3', full_name: 'Suresh Kumar', photo_url: null },
+          ]);
+        }
+
+        if (count && count > 0) {
+          setTotalResidentsCount(Math.max(count, 240));
+        }
+      } catch (err) {
+        console.warn('Error loading social proof profiles from DB:', err);
+        setCommunityResidents([
+          { id: '1', full_name: 'Manikandan M', photo_url: null },
+          { id: '2', full_name: 'Rashmi M', photo_url: null },
+          { id: '3', full_name: 'Suresh Kumar', photo_url: null },
+        ]);
+      }
+    }
+
+    loadCommunityResidents();
+  }, []);
 
   // Search flats in Supabase
   const handleSearchChange = (query: string) => {
@@ -157,15 +196,42 @@ const Login: React.FC = () => {
             </p>
           </div>
 
-          {/* Bottom Social Proof & Trust Stats */}
+          {/* Bottom Social Proof & Trust Stats (Database Connected) */}
           <div className="hero-bottom-proof">
             <div className="avatar-overlap-stack">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&fit=crop&crop=faces" alt="Resident" className="stack-avatar" />
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=faces" alt="Resident" className="stack-avatar" />
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&crop=faces" alt="Resident" className="stack-avatar" />
+              {communityResidents.map((resident, idx) => {
+                const bgColors = ['#1a3055', '#0f766e', '#775a19', '#312e81'];
+                const initial = resident.full_name ? resident.full_name.trim().charAt(0).toUpperCase() : 'R';
+
+                if (resident.photo_url) {
+                  return (
+                    <img
+                      key={resident.id || idx}
+                      src={resident.photo_url}
+                      alt={resident.full_name}
+                      className="stack-avatar"
+                      onError={(e) => {
+                        // On image error, hide img and replace with initial
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  );
+                }
+
+                return (
+                  <div
+                    key={resident.id || idx}
+                    className="stack-avatar-initial"
+                    style={{ backgroundColor: bgColors[idx % bgColors.length] }}
+                    title={resident.full_name}
+                  >
+                    {initial}
+                  </div>
+                );
+              })}
             </div>
             <div className="proof-text-group">
-              <span className="proof-highlight">240+ Verified Residents</span>
+              <span className="proof-highlight">{totalResidentsCount}+ Verified Residents</span>
               <span className="proof-sub">Exclusively for Tower A & Tower B</span>
             </div>
           </div>
