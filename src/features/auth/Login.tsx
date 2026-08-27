@@ -160,7 +160,7 @@ const Login: React.FC = () => {
       <div className="luxury-hero-side">
         {/* Full-Height Architectural Background */}
         <div className="hero-background-media" />
-        <div className="hero-gradient-overlay" />
+        <div className="hero-gradient-overlay auth-brand-overlay" />
 
         {/* Ambient Floating Particle Lights */}
         <div className="ambient-particles">
