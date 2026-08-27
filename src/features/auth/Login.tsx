@@ -44,75 +44,11 @@ const Login: React.FC = () => {
 
           {/* Central Architectural Blueprint Showcase */}
           <div className="hero-graphic-card">
-            <div className="hero-graphic-isometric">
-              {/* Architectural Blueprint Visual SVG */}
-              <svg viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg" className="blueprint-svg">
-                <defs>
-                  <linearGradient id="towerGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
-                    <stop offset="100%" stopColor="#818cf8" stopOpacity="0.2" />
-                  </linearGradient>
-                  <linearGradient id="towerGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#c5a059" stopOpacity="0.9" />
-                    <stop offset="100%" stopColor="#eab308" stopOpacity="0.3" />
-                  </linearGradient>
-                  <linearGradient id="gridGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.05" />
-                    <stop offset="50%" stopColor="#38bdf8" stopOpacity="0.2" />
-                    <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.05" />
-                  </linearGradient>
-                </defs>
-
-                {/* Ground Isometric Grid */}
-                <path d="M200 20 L380 120 L200 220 L20 120 Z" fill="url(#gridGrad)" stroke="rgba(56, 189, 248, 0.3)" strokeWidth="1.5" />
-                <path d="M110 70 L290 170" stroke="rgba(56, 189, 248, 0.2)" strokeWidth="1" strokeDasharray="3 3" />
-                <path d="M290 70 L110 170" stroke="rgba(56, 189, 248, 0.2)" strokeWidth="1" strokeDasharray="3 3" />
-                <path d="M200 20 L200 220" stroke="rgba(56, 189, 248, 0.2)" strokeWidth="1" strokeDasharray="3 3" />
-                <path d="M20 120 L380 120" stroke="rgba(56, 189, 248, 0.2)" strokeWidth="1" strokeDasharray="3 3" />
-
-                {/* Tower A (Block A) */}
-                <g transform="translate(130, 45)">
-                  {/* Top Roof */}
-                  <path d="M35 0 L70 20 L35 40 L0 20 Z" fill="url(#towerGrad2)" stroke="#c5a059" strokeWidth="1.5" />
-                  {/* Left Facade */}
-                  <path d="M0 20 L35 40 L35 130 L0 110 Z" fill="url(#towerGrad1)" stroke="rgba(56, 189, 248, 0.5)" strokeWidth="1" />
-                  {/* Right Facade */}
-                  <path d="M35 40 L70 20 L70 110 L35 130 Z" fill="rgba(30, 58, 102, 0.7)" stroke="rgba(56, 189, 248, 0.5)" strokeWidth="1" />
-                  {/* Architectural Floor Levels */}
-                  <line x1="0" y1="42" x2="35" y2="62" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
-                  <line x1="35" y1="62" x2="70" y2="42" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8" />
-                  <line x1="0" y1="65" x2="35" y2="85" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
-                  <line x1="35" y1="85" x2="70" y2="65" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8" />
-                  <line x1="0" y1="88" x2="35" y2="108" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
-                  <line x1="35" y1="108" x2="70" y2="88" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8" />
-                </g>
-
-                {/* Tower B (Block B) */}
-                <g transform="translate(205, 55)">
-                  {/* Top Roof */}
-                  <path d="M35 0 L70 20 L35 40 L0 20 Z" fill="url(#towerGrad2)" stroke="#c5a059" strokeWidth="1.5" />
-                  {/* Left Facade */}
-                  <path d="M0 20 L35 40 L35 130 L0 110 Z" fill="url(#towerGrad1)" stroke="rgba(56, 189, 248, 0.5)" strokeWidth="1" />
-                  {/* Right Facade */}
-                  <path d="M35 40 L70 20 L70 110 L35 130 Z" fill="rgba(30, 58, 102, 0.7)" stroke="rgba(56, 189, 248, 0.5)" strokeWidth="1" />
-                  {/* Floor Levels */}
-                  <line x1="0" y1="42" x2="35" y2="62" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
-                  <line x1="35" y1="62" x2="70" y2="42" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8" />
-                  <line x1="0" y1="65" x2="35" y2="85" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
-                  <line x1="35" y1="85" x2="70" y2="65" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8" />
-                  <line x1="0" y1="88" x2="35" y2="108" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
-                  <line x1="35" y1="108" x2="70" y2="88" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8" />
-                </g>
-
-                {/* Glowing Nodes */}
-                <circle cx="200" cy="20" r="4" fill="#38bdf8" />
-                <circle cx="380" cy="120" r="4" fill="#38bdf8" />
-                <circle cx="200" cy="220" r="4" fill="#38bdf8" />
-                <circle cx="20" cy="120" r="4" fill="#38bdf8" />
-                <circle cx="165" cy="45" r="3" fill="#c5a059" />
-                <circle cx="240" cy="55" r="3" fill="#c5a059" />
-              </svg>
-            </div>
+            <img
+              src="/community-blueprint.png"
+              alt="BPS Twin Towers Community Layout"
+              className="hero-graphic-image"
+            />
           </div>
 
           {/* Hero Headlines */}
