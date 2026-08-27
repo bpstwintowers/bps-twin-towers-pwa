@@ -1,0 +1,72 @@
+/* Visitor Management Styles */
+.visitors-container {
+  min-height: 100vh;
+  background: linear-gradient(160deg, var(--bg-primary) 0%, #151838 50%, var(--bg-primary) 100%);
+  color: var(--text-primary);
+  padding-bottom: 3rem;
+}
+
+.visitors-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.visitors-header-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.visitors-content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem;
+}
+
+.visitor-pass-badge {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px dashed rgba(99, 102, 241, 0.4);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-md);
+  font-family: monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.visitor-type-pill {
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.visitor-type-guest {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.visitor-type-delivery {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.visitor-type-cab {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.visitor-type-service {
+  background: rgba(139, 92, 246, 0.15);
+  color: #c4b5fd;
+}

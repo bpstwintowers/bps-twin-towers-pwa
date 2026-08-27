@@ -1,0 +1,137 @@
+/* Security Guard Console Styles */
+.security-container {
+  min-height: 100vh;
+  background: #090d16;
+  color: #f8fafc;
+  padding-bottom: 4rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.security-topbar {
+  background: #111827;
+  border-bottom: 2px solid #1f2937;
+  padding: 0.85rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.security-topbar-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.security-main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem;
+}
+
+.security-stat-banner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.security-stat-box {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  text-align: center;
+}
+
+.security-stat-num {
+  font-size: 1.85rem;
+  font-weight: 900;
+  display: block;
+  line-height: 1.1;
+  margin-bottom: 0.2rem;
+}
+
+.security-stat-lbl {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.security-search-container {
+  background: #1e293b;
+  border: 2px solid #3b82f6;
+  border-radius: var(--radius-xl);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.security-search-input {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 600;
+  width: 100%;
+  outline: none;
+}
+
+.security-search-input::placeholder {
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.security-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: var(--radius-xl);
+  padding: 1.15rem;
+  margin-bottom: 0.85rem;
+  transition: transform 0.15s ease;
+}
+
+.btn-checkin {
+  background: #10b981;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-lg);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-checkin:hover {
+  background: #059669;
+}
+
+.btn-checkout {
+  background: #ef4444;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-lg);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-checkout:hover {
+  background: #dc2626;
+}

@@ -1,0 +1,29 @@
+# Phase 2: Resident Management Tasks
+
+- `[x]` **Database Migrations**
+  - `[x]` Create `audit_logs` table and RLS policies
+  - `[x]` Create `notifications` table and RLS policies
+  - `[x]` Apply migrations via Supabase MCP
+- `[x]` **Frontend: Shared UI Components**
+  - `[x]` Scaffold Card, Table, Tabs, Dialog, Input, Select, Button
+- `[ ]` **Frontend: Resident Flow**
+  - `[ ]` Create Resident Onboarding / Registration Form
+  - `[x]` Create Resident Dashboard
+  - `[ ]` Create Household View (Add/Edit Members)
+  - `[ ]` Create Resident Profile
+  - `[ ]` Create Resident Directory
+- `[ ]` **Frontend: Admin Portal**
+  - `[ ]` Create Admin Dashboard
+  - `[ ]` Create Resident Management (Paginated table)
+  - `[ ]` Create Registration Approvals
+  - `[ ]` Create Flat Management
+- `[ ]` **Routing and Auth Integration**
+  - `[ ]` Update `AppRouter` with new routes
+  - `[ ]` Protect admin routes using `is_admin` or user roles
+- `[ ]` **Testing and Verification**
+  - `[ ]` Test Registration Flow
+  - `[ ]` Test Admin Approval
+  - `[ ]` Test Household Management
+  - `[ ]` Test RLS Restrictions
+- `[ ]` **Documentation**
+  - `[ ]` Update docs as per requirements

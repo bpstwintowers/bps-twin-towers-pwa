@@ -1,0 +1,77 @@
+/* Complaints Styles */
+.complaints-container {
+  min-height: 100vh;
+  background: linear-gradient(160deg, var(--bg-primary) 0%, #151838 50%, var(--bg-primary) 100%);
+  color: var(--text-primary);
+  padding-bottom: 3rem;
+}
+
+.complaints-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.complaints-header-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.complaints-content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem;
+}
+
+.complaint-ticket-badge {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.complaint-timeline {
+  position: relative;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+  border-left: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -1.9rem;
+  top: 0.2rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+}
+
+.comment-bubble {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.65rem;
+}
+
+.comment-bubble.internal {
+  background: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.3);
+}

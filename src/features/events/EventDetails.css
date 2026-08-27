@@ -1,0 +1,119 @@
+/* Event Details Styles */
+.event-details-container {
+  min-height: 100vh;
+  background: linear-gradient(160deg, var(--bg-primary) 0%, #171c38 50%, var(--bg-primary) 100%);
+  color: var(--text-primary);
+  padding-bottom: 3rem;
+}
+
+.event-hero-banner {
+  height: 220px;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-hero-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.event-details-content {
+  max-width: 800px;
+  margin: -40px auto 0;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+.event-main-card {
+  background: rgba(30, 41, 59, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 1.5rem;
+}
+
+.event-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-lg);
+  margin: 1.25rem 0;
+}
+
+.event-meta-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.event-meta-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.event-capacity-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.event-capacity-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), #10b981);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.registration-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.participant-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.participant-option {
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.participant-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.participant-option.selected {
+  border-color: var(--accent-primary);
+  background: rgba(59, 130, 246, 0.15);
+}
