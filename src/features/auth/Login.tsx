@@ -267,11 +267,11 @@ const Login: React.FC = () => {
                   <Mail size={17} />
                 </a>
                 <a
-                  href="https://instagram.com/bpstwintowers"
+                  href="https://www.instagram.com/bpsnamishreetwintowers"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="social-edge-btn"
-                  title="Official Instagram Community"
+                  title="Official Instagram (@bpsnamishreetwintowers)"
                   aria-label="Instagram Community"
                 >
                   <InstagramIcon size={17} />
@@ -469,6 +469,16 @@ const Login: React.FC = () => {
               <a href="mailto:bpstwintowers.society@gmail.com" className="support-link">
                 <Mail size={13} />
                 <span>bpstwintowers.society@gmail.com</span>
+              </a>
+              <span className="link-separator">•</span>
+              <a
+                href="https://www.instagram.com/bpsnamishreetwintowers"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="support-link"
+              >
+                <InstagramIcon size={13} />
+                <span>@bpsnamishreetwintowers</span>
               </a>
               <span className="link-separator">•</span>
               <Link to="/registration-status" className="support-link">
