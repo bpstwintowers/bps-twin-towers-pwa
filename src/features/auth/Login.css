@@ -130,9 +130,15 @@
   margin: 2px 0 0 0;
 }
 
-/* Center Callout */
+/* Bottom Hero Content Group (Callout + Divider + Social Proof) */
+.hero-bottom-group {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Callout */
 .hero-center-callout {
-  /* max-width: 500px; */
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -183,9 +189,47 @@
 .hero-bottom-proof {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 20px;
+  border-top: 1.5px solid #c59b27;
+  border-image: linear-gradient(90deg, #c59b27 0%, #eab308 45%, rgba(197, 155, 39, 0.15) 100%) 1;
+}
+
+.proof-left-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hero-social-edge-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.social-edge-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1.5px solid rgba(197, 155, 39, 0.5);
+  color: #fef08a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.social-edge-btn:hover {
+  background: #c59b27;
+  color: #0f172a;
+  border-color: #fef08a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(197, 155, 39, 0.4);
 }
 
 .avatar-overlap-stack {
