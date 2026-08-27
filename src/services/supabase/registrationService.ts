@@ -263,3 +263,67 @@ export async function updateCorrectionRequest(
 
   if (error) throw error;
 }
+
+// ---------- Flat Residents Lookup (For Smart Flat Login) ----------
+
+export interface FlatResidentInfo {
+  id: string;
+  user_id: string;
+  full_name: string;
+  resident_type: string;
+  masked_email: string;
+}
+
+export function maskEmail(email: string): string {
+  if (!email || !email.includes('@')) return 'm***@gmail.com';
+  const [local, domain] = email.split('@');
+  if (local.length <= 2) return `${local[0]}***@${domain}`;
+  return `${local.slice(0, 1)}***@${domain}`;
+}
+
+export async function getFlatResidents(flatId: string): Promise<FlatResidentInfo[]> {
+  try {
+    const { data, error } = await supabase
+      .from('flat_members')
+      .select(`
+        id,
+        user_id,
+        membership_type,
+        status,
+        profiles (
+          id,
+          full_name,
+          email
+        )
+      `)
+      .eq('flat_id', flatId)
+      .eq('status', 'Active');
+
+    if (error || !data || data.length === 0) {
+      // Fallback check on flat owner info RPC
+      const ownerInfo = await getFlatOwnerInfo(flatId);
+      if (ownerInfo.owner_registered && ownerInfo.owner_email) {
+        return [{
+          id: flatId,
+          user_id: '',
+          full_name: 'Flat Owner',
+          resident_type: 'Owner',
+          masked_email: maskEmail(ownerInfo.owner_email),
+        }];
+      }
+      return [];
+    }
+
+    return data.map((row: any) => ({
+      id: row.id,
+      user_id: row.user_id,
+      full_name: row.profiles?.full_name || 'Verified Resident',
+      resident_type: row.membership_type === 'Primary Resident' ? 'Owner' : (row.membership_type || 'Resident'),
+      masked_email: maskEmail(row.profiles?.email || ''),
+    }));
+  } catch (err) {
+    console.warn('getFlatResidents lookup:', err);
+    return [];
+  }
+}
+
