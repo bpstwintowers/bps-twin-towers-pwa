@@ -22,6 +22,23 @@ import {
 } from 'lucide-react';
 import './Login.css';
 
+const InstagramIcon: React.FC<{ size?: number }> = ({ size = 17 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+  </svg>
+);
+
 const Login: React.FC = () => {
   const [flatQuery, setFlatQuery] = useState('');
   const [flatResults, setFlatResults] = useState<FlatSearchResult[]>([]);
@@ -183,59 +200,78 @@ const Login: React.FC = () => {
             </div>
           </div>
 
-          {/* Bottom Group (Callout Text + Social Proof) */}
-          <div className="hero-bottom-group">
-            {/* Center Luxury Callout */}
-            <div className="hero-center-callout">
-              <div className="gold-accent-bar" />
-              <span className="hero-welcome-badge">
-                <Sparkles size={14} className="gold-sparkle-icon" />
-                Welcome Home
-              </span>
-              <h1 className="hero-luxury-headline">Your community. Your home. Connected.</h1>
-              <p className="hero-luxury-subtext">
-                Experience seamless residential management, instant visitor authorizations, verified gate clearances, and amenity reservations.
-              </p>
+          {/* Center Luxury Callout */}
+          <div className="hero-center-callout">
+            <div className="gold-accent-bar" />
+            <span className="hero-welcome-badge">
+              <Sparkles size={14} className="gold-sparkle-icon" />
+              Welcome Home
+            </span>
+            <h1 className="hero-luxury-headline">Your community. Your home. Connected.</h1>
+            <p className="hero-luxury-subtext">
+              Experience seamless residential management, instant visitor authorizations, verified gate clearances, and amenity reservations.
+            </p>
+          </div>
+
+          {/* Bottom Social Proof & Trust Stats (Database Connected) */}
+          <div className="hero-bottom-proof">
+            <div className="avatar-overlap-stack">
+              {communityResidents.map((resident, idx) => {
+                const bgColors = ['#1a3055', '#0f766e', '#775a19', '#312e81'];
+                const initial = resident.full_name ? resident.full_name.trim().charAt(0).toUpperCase() : 'R';
+
+                if (resident.photo_url) {
+                  return (
+                    <img
+                      key={resident.id || idx}
+                      src={resident.photo_url}
+                      alt={resident.full_name}
+                      className="stack-avatar"
+                      onError={(e) => {
+                        // On image error, hide img and replace with initial
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  );
+                }
+
+                return (
+                  <div
+                    key={resident.id || idx}
+                    className="stack-avatar-initial"
+                    style={{ backgroundColor: bgColors[idx % bgColors.length] }}
+                    title={resident.full_name}
+                  >
+                    {initial}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="proof-text-group">
+              <span className="proof-highlight">{totalResidentsCount}+ Verified Residents</span>
+              <span className="proof-sub">Exclusively for Tower A & Tower B</span>
             </div>
 
-            {/* Bottom Social Proof & Trust Stats (Database Connected) */}
-            <div className="hero-bottom-proof">
-              <div className="avatar-overlap-stack">
-                {communityResidents.map((resident, idx) => {
-                  const bgColors = ['#1a3055', '#0f766e', '#775a19', '#312e81'];
-                  const initial = resident.full_name ? resident.full_name.trim().charAt(0).toUpperCase() : 'R';
-
-                  if (resident.photo_url) {
-                    return (
-                      <img
-                        key={resident.id || idx}
-                        src={resident.photo_url}
-                        alt={resident.full_name}
-                        className="stack-avatar"
-                        onError={(e) => {
-                          // On image error, hide img and replace with initial
-                          (e.target as HTMLElement).style.display = 'none';
-                        }}
-                      />
-                    );
-                  }
-
-                  return (
-                    <div
-                      key={resident.id || idx}
-                      className="stack-avatar-initial"
-                      style={{ backgroundColor: bgColors[idx % bgColors.length] }}
-                      title={resident.full_name}
-                    >
-                      {initial}
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="proof-text-group">
-                <span className="proof-highlight">{totalResidentsCount}+ Verified Residents</span>
-                <span className="proof-sub">Exclusively for Tower A & Tower B</span>
-              </div>
+            {/* Right Edge Mailbox & Instagram Links */}
+            <div className="hero-social-edge-links">
+              <a
+                href="mailto:bpstwintowers.society@gmail.com"
+                className="social-edge-btn"
+                title="Contact Support (bpstwintowers.society@gmail.com)"
+                aria-label="Mail Support"
+              >
+                <Mail size={17} />
+              </a>
+              <a
+                href="https://instagram.com/bpstwintowers"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-edge-btn"
+                title="Official Instagram Community"
+                aria-label="Instagram Community"
+              >
+                <InstagramIcon size={17} />
+              </a>
             </div>
           </div>
         </div>
