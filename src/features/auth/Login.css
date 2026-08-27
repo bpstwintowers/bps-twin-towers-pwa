@@ -8,49 +8,32 @@
 }
 
 /* ==========================================================================
-   LEFT HERO PANEL
+   LEFT HERO PANEL (FIGMA SPEC)
    ========================================================================== */
 .login-hero-panel {
   flex: 1.1;
-  background: linear-gradient(155deg, #09172e 0%, #1a3055 50%, #0c2040 100%);
+  min-width: 540px;
+  background: linear-gradient(90deg, #0F766E 0%, #0284C7 100%);
   color: #ffffff;
-  padding: 3rem 3.5rem;
+  padding: 64px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
   position: relative;
   overflow: hidden;
-}
-
-.login-hero-panel::before {
-  content: '';
-  position: absolute;
-  top: -100px;
-  right: -100px;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(56, 189, 248, 0) 70%);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.login-hero-panel::after {
-  content: '';
-  position: absolute;
-  bottom: -80px;
-  left: -80px;
-  width: 320px;
-  height: 320px;
-  background: radial-gradient(circle, rgba(197, 160, 89, 0.12) 0%, rgba(197, 160, 89, 0) 70%);
-  border-radius: 50%;
-  pointer-events: none;
+  box-sizing: border-box;
 }
 
 .hero-panel-inner {
-  max-width: 520px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 560px;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: 2rem;
   position: relative;
   z-index: 2;
