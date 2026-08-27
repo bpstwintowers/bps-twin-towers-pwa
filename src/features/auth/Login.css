@@ -196,8 +196,9 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 20px;
+  border-top: 1.5px solid #c59b27;
+  border-image: linear-gradient(90deg, #c59b27 0%, #eab308 45%, rgba(197, 155, 39, 0.15) 100%) 1;
 }
 
 .avatar-overlap-stack {
