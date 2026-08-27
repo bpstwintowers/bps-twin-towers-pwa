@@ -446,16 +446,7 @@ const Login: React.FC = () => {
               </button>
             </div>
 
-            {/* 2. Register as new resident */}
-            <Link to="/register" className="register-resident-secondary-btn">
-              <div className="btn-left-content">
-                <UserPlus size={18} className="user-plus-icon" />
-                <span>Register as new resident</span>
-              </div>
-              <ArrowRight size={16} />
-            </Link>
-
-            {/* 3. Track Application Status */}
+            {/* 2. Track Application Status */}
             <Link to="/registration-status" className="track-status-secondary-btn">
               <div className="btn-left-content">
                 <Clock size={17} className="track-clock-icon" />
