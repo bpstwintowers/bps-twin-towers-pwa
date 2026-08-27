@@ -387,22 +387,49 @@
   height: 20px;
 }
 
-/* Registration Note Footer */
-.auth-footer-note {
-  text-align: center;
-  font-size: 0.9rem;
+/* Quick Secondary Links */
+.login-quick-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.88rem;
   color: #64748b;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
-.register-highlight-link {
+.quick-link-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: #0284c7;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
+  transition: color 0.15s ease;
 }
 
-.register-highlight-link:hover {
+.quick-link-item:hover {
+  color: #0369a1;
   text-decoration: underline;
+}
+
+.quick-link-dot {
+  color: #cbd5e1;
+}
+
+/* Security Badge */
+.login-security-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: #94a3b8;
+  margin-top: 6px;
+}
+
+.login-security-badge .security-icon {
+  color: #0d9488;
 }
 
 /* ==========================================================================

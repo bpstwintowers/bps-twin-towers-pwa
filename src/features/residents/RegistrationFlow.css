@@ -280,6 +280,113 @@
   color: #475569;
 }
 
+/* Role Selector Pills */
+.role-selector-pills {
+  display: flex;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.role-pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.role-pill:hover {
+  border-color: #cbd5e1;
+  background: #ffffff;
+}
+
+.role-pill.active {
+  background: #f0f9ff;
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+/* Flat Autocomplete Dropdown */
+.flat-autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 50;
+}
+
+.flat-autocomplete-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.flat-autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.flat-autocomplete-item:hover {
+  background-color: #f0f9ff;
+}
+
+.flat-item-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flat-item-number {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.flat-item-bhk {
+  font-size: 0.75rem;
+  background: #e2e8f0;
+  color: #475569;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.flat-item-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.flat-item-badge.available {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.flat-item-badge.occupied {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
 /* Agreement Checkbox */
 .reg-checkbox-container {
   display: flex;

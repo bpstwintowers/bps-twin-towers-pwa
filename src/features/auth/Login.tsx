@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../../services/supabase/client';
-import { Mail, Lock, Eye, EyeOff, Shield, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ShieldCheck, UserPlus, FileCheck2 } from 'lucide-react';
 import './Login.css';
 
 const Login: React.FC = () => {
@@ -29,14 +29,11 @@ const Login: React.FC = () => {
       setLoading(true);
       setError(null);
       const { error: authError } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       });
 
-      if (authError) {
-        // If password login fails, offer fallback message
-        throw authError;
-      }
+      if (authError) throw authError;
       navigate('/');
     } catch (err: any) {
       console.error('Email login error:', err.message);
@@ -97,16 +94,16 @@ const Login: React.FC = () => {
         {/* Bottom Social Proof */}
         <div className="hero-social-row">
           <div className="avatar-group">
-            <span className="user-avatar" style={{ background: '#38bdf8' }}>M</span>
-            <span className="user-avatar" style={{ background: '#34d399' }}>R</span>
-            <span className="user-avatar" style={{ background: '#fbbf24' }}>S</span>
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&fit=crop&crop=faces" alt="Resident" className="photo-avatar" />
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=faces" alt="Resident" className="photo-avatar" />
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&crop=faces" alt="Resident" className="photo-avatar" />
           </div>
           <span className="social-proof-label">Join over 240+ verified active residents</span>
         </div>
       </div>
 
       {/* ====================================================================
-          RIGHT AUTHENTICATION PANEL (Matching Reference)
+          RIGHT AUTHENTICATION PANEL (Matching Reference + Real Database Flow)
           ==================================================================== */}
       <div className="right-auth-panel">
         <div className="auth-card-wrapper animate-fade-in">
@@ -175,7 +172,7 @@ const Login: React.FC = () => {
               <button
                 type="button"
                 className="forgot-link"
-                onClick={() => setError('For password reset, please sign in with Google or contact society administration.')}
+                onClick={() => setError('To reset password, please sign in via Google OAuth or contact the admin.')}
               >
                 Forgot password?
               </button>
@@ -198,7 +195,7 @@ const Login: React.FC = () => {
             <span className="divider-line"></span>
           </div>
 
-          {/* Google SSO / NFC Pass */}
+          {/* Google SSO */}
           <button
             type="button"
             className="btn-nfc-pass"
@@ -223,15 +220,26 @@ const Login: React.FC = () => {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
               />
             </svg>
-            <span>{googleLoading ? 'Connecting Google...' : 'Sign in with Google Workspace'}</span>
+            <span>{googleLoading ? 'Connecting...' : 'Sign in with Google Workspace'}</span>
           </button>
 
-          {/* Registration Footer */}
-          <div className="auth-footer-note">
-            <span>Don't have an account? </span>
-            <Link to="/register" className="register-highlight-link">
-              Register Flat
+          {/* Quick Secondary Links */}
+          <div className="login-quick-links">
+            <Link to="/register" className="quick-link-item">
+              <UserPlus size={15} />
+              <span>Register New Flat</span>
             </Link>
+            <span className="quick-link-dot">•</span>
+            <Link to="/registration-status" className="quick-link-item">
+              <FileCheck2 size={15} />
+              <span>Check Application Status</span>
+            </Link>
+          </div>
+
+          {/* Security & RLS Notice */}
+          <div className="login-security-badge">
+            <ShieldCheck size={14} className="security-icon" />
+            <span>Protected by Supabase Row-Level Security</span>
           </div>
         </div>
       </div>
