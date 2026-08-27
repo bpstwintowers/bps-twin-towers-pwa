@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, RefreshCw } from 'lucide-react';
-import { StatusBadge } from '../../components/ui/StatusBadge';
+import { Clock, CheckCircle2, ArrowRight, RefreshCw, Mail } from 'lucide-react';
+import { supabase } from '../../services/supabase/client';
 import { getUserRegistrations, type RegistrationRequest } from '../../services/supabase/registrationService';
 import './RegistrationFlow.css';
 
@@ -18,8 +18,9 @@ export const RegistrationStatus: React.FC = () => {
       const data = await getUserRegistrations();
       setRegistrations(data);
     } catch (err: any) {
-      console.error('Error fetching registrations:', err);
-      setError('Failed to load registration requests.');
+      console.warn('Error fetching registrations:', err);
+      // For anonymous users viewing status or initial check
+      setRegistrations([]);
     } finally {
       setLoading(false);
     }
@@ -29,129 +30,107 @@ export const RegistrationStatus: React.FC = () => {
     fetchRegistrations();
   }, []);
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
-
-  const getMembershipLabel = (type: string) => {
-    switch (type) {
-      case 'Primary Resident': return 'Owner';
-      case 'Family Member': return 'Family Member';
-      case 'Tenant': return 'Tenant';
-      case 'Staff': return 'Staff';
-      default: return type;
-    }
-  };
-
   if (loading) {
     return (
-      <div className="status-container">
-        <div className="registration-loading">
+      <div className="status-screen-wrapper">
+        <div className="status-loading-spinner">
           <div className="spinner" />
-          <span>Loading registrations...</span>
+          <span>Verifying registration status...</span>
         </div>
       </div>
     );
   }
 
+  // Check latest registration status
+  const latestReg = registrations[0];
+  const isApproved = latestReg?.status === 'Approved';
+
   return (
-    <div className="status-container">
-      <div className="status-card glass-panel animate-fade-in">
-        <div className="status-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button
-              className="btn-outline"
-              onClick={() => navigate('/')}
-              style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)' }}
-            >
-              <ArrowLeft size={18} />
-            </button>
-            <h2>My Registrations</h2>
-          </div>
-          <button
-            className="btn-outline"
-            onClick={fetchRegistrations}
-            style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)' }}
-            title="Refresh"
-          >
-            <RefreshCw size={16} />
-          </button>
+    <div className="status-screen-wrapper">
+      <div className="registration-pending-card animate-fade-in">
+        {/* Top Status Icon */}
+        <div className={`status-icon-circle ${isApproved ? 'approved' : 'pending'}`}>
+          {isApproved ? (
+            <CheckCircle2 size={36} className="status-icon-approved" />
+          ) : (
+            <Clock size={36} className="status-icon-pending" />
+          )}
         </div>
 
-        {error && (
-          <div className="form-error">
-            <span>{error}</span>
+        {/* Title & Subtitle */}
+        <h1 className="pending-card-title">
+          {isApproved ? 'Registration Approved!' : 'Registration Pending'}
+        </h1>
+        <p className="pending-card-description">
+          {isApproved
+            ? `Your flat access for ${latestReg?.flat_number || 'your flat'} has been verified and approved by the BPS Twin Towers management committee.`
+            : 'Your registration is under review. Our admin team will verify your details and approve your account shortly.'}
+        </p>
+
+        {/* Flat Details Pill (if available) */}
+        {latestReg && (
+          <div className="pending-flat-badge">
+            <span>
+              Flat: <strong>{latestReg.flat_number || 'Selected Flat'}</strong>
+              {latestReg.block_name ? ` • Block ${latestReg.block_name}` : ''}
+            </span>
+            <span className={`status-tag ${latestReg.status.toLowerCase().replace(/\s+/g, '-')}`}>
+              {latestReg.status}
+            </span>
           </div>
         )}
 
-        {registrations.length === 0 && !error && (
-          <div style={{ textAlign: 'center', padding: '2rem 0', color: 'var(--text-muted)' }}>
-            <Clock size={32} style={{ marginBottom: '0.75rem', opacity: 0.5 }} />
-            <p>No registration requests found.</p>
+        {/* What Happens Next Card */}
+        <div className="what-happens-next-card">
+          <h3 className="next-steps-title">What happens next?</h3>
+
+          <div className="next-steps-list">
+            <div className="step-item">
+              <span className="step-num-badge">1</span>
+              <p className="step-text">Admin reviews your details to match you with resident archives.</p>
+            </div>
+
+            <div className="step-item">
+              <span className="step-num-badge">2</span>
+              <p className="step-text">You'll receive an email notification once approval is complete.</p>
+            </div>
+
+            <div className="step-item">
+              <span className="step-num-badge">3</span>
+              <p className="step-text">Log in to explore and unlock access to all hub community features.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Primary CTA Button */}
+        <div className="pending-card-actions">
+          {isApproved ? (
             <button
-              className="btn-primary"
-              onClick={() => navigate('/register')}
-              style={{ marginTop: '1rem' }}
+              type="button"
+              className="btn-pending-primary"
+              onClick={() => navigate('/')}
             >
-              Register Now
+              <span>Enter Community Dashboard</span>
+              <ArrowRight size={18} />
             </button>
-          </div>
-        )}
+          ) : (
+            <button
+              type="button"
+              className="btn-pending-primary"
+              onClick={() => navigate('/login')}
+            >
+              <span>Back to Login</span>
+            </button>
+          )}
+        </div>
 
-        {registrations.map((reg) => (
-          <div key={reg.id} className="request-card">
-            <div className="request-card-header">
-              <span className="request-flat-name">
-                {reg.flat_number || 'Flat'}
-                {reg.block_name ? ` (Block ${reg.block_name})` : ''}
-              </span>
-              <StatusBadge status={reg.status} />
-            </div>
-            <div className="request-card-details">
-              <span className="request-detail-label">Type</span>
-              <span className="request-detail-value">{getMembershipLabel(reg.requested_membership_type)}</span>
-
-              <span className="request-detail-label">Relationship</span>
-              <span className="request-detail-value">{reg.relationship}</span>
-
-              <span className="request-detail-label">Submitted</span>
-              <span className="request-detail-value">{formatDate(reg.created_at)}</span>
-
-              {reg.reviewed_at && (
-                <>
-                  <span className="request-detail-label">Reviewed</span>
-                  <span className="request-detail-value">{formatDate(reg.reviewed_at)}</span>
-                </>
-              )}
-            </div>
-
-            {reg.status === 'Correction Required' && reg.correction_message && (
-              <div className="correction-banner">
-                <strong>Correction Required:</strong> {reg.correction_message}
-              </div>
-            )}
-
-            {reg.status === 'Rejected' && reg.rejection_reason && (
-              <div className="rejection-banner">
-                <strong>Rejected:</strong> {reg.rejection_reason}
-              </div>
-            )}
-          </div>
-        ))}
-
-        {registrations.length > 0 && !registrations.some(r => r.status === 'Pending' || r.status === 'Approved') && (
-          <button
-            className="btn-primary"
-            onClick={() => navigate('/register')}
-            style={{ width: '100%', marginTop: '0.75rem' }}
-          >
-            Submit New Registration
-          </button>
-        )}
+        {/* Support Footer */}
+        <div className="pending-card-footer">
+          <span>Need assistance? Contact </span>
+          <a href="mailto:bpstwintowers.society@gmail.com" className="pending-support-link">
+            bpstwintowers.society@gmail.com
+          </a>
+        </div>
       </div>
     </div>
   );

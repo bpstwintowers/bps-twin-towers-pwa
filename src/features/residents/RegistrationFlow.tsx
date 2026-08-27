@@ -204,6 +204,21 @@ export const RegistrationFlow: React.FC = () => {
         activeUserId = authData.user?.id;
       }
 
+      // If user is already authenticated with Google/OAuth, ensure profile has details
+      if (currentUser?.id) {
+        try {
+          await supabase.from('profiles').upsert({
+            id: currentUser.id,
+            full_name: fullName.trim(),
+            mobile_number: mobileNumber.trim(),
+            photo_url: currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || null,
+            updated_at: new Date().toISOString(),
+          });
+        } catch (profileErr) {
+          console.warn('Could not update profile:', profileErr);
+        }
+      }
+
       // Submit registration request into database
       if (targetFlatId) {
         await submitRegistration({
@@ -216,7 +231,8 @@ export const RegistrationFlow: React.FC = () => {
         });
       }
 
-      setSuccess(true);
+      // Immediately navigate to the Registration Pending status screen
+      navigate('/registration-status');
     } catch (err: any) {
       console.error('Registration error:', err.message);
       setError(err.message || 'Failed to submit registration. Please check your details.');
