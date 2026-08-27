@@ -1,9 +1,15 @@
-/* Split-Screen Corporate Login Layout */
+/* ==========================================================================
+   LOGIN ROOT (FIGMA SPEC)
+   ========================================================================== */
 .split-login-wrapper {
   display: flex;
-  min-height: 100vh;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  position: relative;
   width: 100vw;
-  background-color: #ffffff;
+  min-height: 100vh;
+  background: #F5F5F7;
   overflow-x: hidden;
 }
 
