@@ -136,9 +136,15 @@
   margin: 2px 0 0 0;
 }
 
-/* Center Callout */
+/* Bottom Hero Content Group (Callout + Social Proof) */
+.hero-bottom-group {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Callout */
 .hero-center-callout {
-  /* max-width: 500px; */
   display: flex;
   flex-direction: column;
   gap: 14px;
