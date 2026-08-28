@@ -33,9 +33,23 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,svg,webmanifest}'],
         navigateFallbackDenylist: [/^\/auth/, /^https:\/\/.*\.supabase\.co/],
         runtimeCaching: [
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|webp|ico)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'bps-images-cache',
+              expiration: {
+                maxEntries: 40,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
