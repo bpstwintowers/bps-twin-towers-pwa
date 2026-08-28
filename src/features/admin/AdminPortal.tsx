@@ -510,84 +510,86 @@ export const AdminPortal: React.FC = () => {
           </div>
         )}
 
-        {/* Luxury KPI Metrics Stat Cards Grid */}
-        <div className="admin-stats-grid">
-          {/* 1. Pending Approvals */}
-          <div className="stat-card pending">
-            <div className="stat-card-top">
-              <div className="stat-icon-wrapper amber">
-                <FileCheck size={20} />
+        {/* Luxury KPI Metrics Stat Cards Grid (Registration / Flats / Residents) */}
+        {(activeTab === 'registrations' || activeTab === 'residents' || activeTab === 'flats') && (
+          <div className="admin-stats-grid">
+            {/* 1. Pending Approvals */}
+            <div className="stat-card pending">
+              <div className="stat-card-top">
+                <div className="stat-icon-wrapper amber">
+                  <FileCheck size={20} />
+                </div>
+                <span className="stat-trend-pill amber">
+                  {(stats?.pendingCount ?? 0) > 0 ? '● Action Required' : '✓ Cleared'}
+                </span>
               </div>
-              <span className="stat-trend-pill amber">
-                {(stats?.pendingCount ?? 0) > 0 ? '● Action Required' : '✓ Cleared'}
-              </span>
+              <div>
+                <div className="stat-number">{stats?.pendingCount ?? 0}</div>
+                <div className="stat-label">Pending Registrations</div>
+              </div>
             </div>
-            <div>
-              <div className="stat-number">{stats?.pendingCount ?? 0}</div>
-              <div className="stat-label">Pending Registrations</div>
-            </div>
-          </div>
 
-          {/* 2. Corrections Required */}
-          <div className="stat-card action">
-            <div className="stat-card-top">
-              <div className="stat-icon-wrapper red">
-                <AlertTriangle size={20} />
+            {/* 2. Corrections Required */}
+            <div className="stat-card action">
+              <div className="stat-card-top">
+                <div className="stat-icon-wrapper red">
+                  <AlertTriangle size={20} />
+                </div>
+                <span className="stat-trend-pill">Awaiting Edit</span>
               </div>
-              <span className="stat-trend-pill">Awaiting Edit</span>
+              <div>
+                <div className="stat-number">{stats?.correctionCount ?? 0}</div>
+                <div className="stat-label">Resident Corrections</div>
+              </div>
             </div>
-            <div>
-              <div className="stat-number">{stats?.correctionCount ?? 0}</div>
-              <div className="stat-label">Resident Corrections</div>
-            </div>
-          </div>
 
-          {/* 3. Approved Registrations */}
-          <div className="stat-card occupancy">
-            <div className="stat-card-top">
-              <div className="stat-icon-wrapper emerald">
-                <CheckCircle size={20} />
+            {/* 3. Approved Registrations */}
+            <div className="stat-card occupancy">
+              <div className="stat-card-top">
+                <div className="stat-icon-wrapper emerald">
+                  <CheckCircle size={20} />
+                </div>
+                <span className="stat-trend-pill green">Verified</span>
               </div>
-              <span className="stat-trend-pill green">Verified</span>
+              <div>
+                <div className="stat-number">{stats?.approvedCount ?? 0}</div>
+                <div className="stat-label">Approved Members</div>
+              </div>
             </div>
-            <div>
-              <div className="stat-number">{stats?.approvedCount ?? 0}</div>
-              <div className="stat-label">Approved Members</div>
-            </div>
-          </div>
 
-          {/* 4. Active Residents */}
-          <div className="stat-card residents">
-            <div className="stat-card-top">
-              <div className="stat-icon-wrapper blue">
-                <Users size={20} />
+            {/* 4. Active Residents */}
+            <div className="stat-card residents">
+              <div className="stat-card-top">
+                <div className="stat-icon-wrapper blue">
+                  <Users size={20} />
+                </div>
+                <span className="stat-trend-pill">Directory</span>
               </div>
-              <span className="stat-trend-pill">Directory</span>
+              <div>
+                <div className="stat-number">{stats?.totalResidents ?? 0}</div>
+                <div className="stat-label">Total Residents</div>
+              </div>
             </div>
-            <div>
-              <div className="stat-number">{stats?.totalResidents ?? 0}</div>
-              <div className="stat-label">Total Residents</div>
-            </div>
-          </div>
 
-          {/* 5. Flat Inventory & Occupancy */}
-          <div className="stat-card flats">
-            <div className="stat-card-top">
-              <div className="stat-icon-wrapper teal">
-                <Building size={20} />
+            {/* 5. Flat Inventory & Occupancy */}
+            <div className="stat-card flats">
+              <div className="stat-card-top">
+                <div className="stat-icon-wrapper teal">
+                  <Building size={20} />
+                </div>
+                <span className="stat-trend-pill green">
+                  {Math.round(((stats?.occupiedFlats ?? 0) / (stats?.totalFlats || 504)) * 100)}% Occupied
+                </span>
               </div>
-              <span className="stat-trend-pill green">
-                {Math.round(((stats?.occupiedFlats ?? 0) / (stats?.totalFlats || 504)) * 100)}% Occupied
-              </span>
-            </div>
-            <div>
-              <div className="stat-number">
-                {stats?.occupiedFlats ?? 0} <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ {stats?.totalFlats ?? 504}</span>
+              <div>
+                <div className="stat-number">
+                  {stats?.occupiedFlats ?? 0} <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ {stats?.totalFlats ?? 504}</span>
+                </div>
+                <div className="stat-label">Occupied Flat Inventory</div>
               </div>
-              <div className="stat-label">Occupied Flat Inventory</div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Search & Filter Bar (Only for Registrations, Residents, Flats) */}
         {activeTab !== 'events' && activeTab !== 'finance' && activeTab !== 'volunteers' && activeTab !== 'sponsors' && activeTab !== 'communications' && activeTab !== 'visitors' && activeTab !== 'facilities' && activeTab !== 'complaints' && (

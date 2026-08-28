@@ -110,6 +110,37 @@ export const AdminEvents: React.FC = () => {
 
   return (
     <div className="animate-fade-in">
+      {/* Events KPI Cards */}
+      <div className="admin-stats-grid" style={{ marginBottom: '1.5rem' }}>
+        <div className="admin-stat-card">
+          <span className="stat-value" style={{ color: '#10b981' }}>
+            {events.filter((e) => e.status === 'Published').length}
+          </span>
+          <span className="stat-label">Published / Live Events</span>
+        </div>
+
+        <div className="admin-stat-card">
+          <span className="stat-value" style={{ color: '#f59e0b' }}>
+            {events.filter((e) => e.status === 'Draft' || e.status === 'Pending Approval').length}
+          </span>
+          <span className="stat-label">Drafts & In Review</span>
+        </div>
+
+        <div className="admin-stat-card">
+          <span className="stat-value" style={{ color: '#3b82f6' }}>
+            {events.filter((e) => e.category === 'Festival' || e.category === 'Cultural').length}
+          </span>
+          <span className="stat-label">Festivals & Celebrations</span>
+        </div>
+
+        <div className="admin-stat-card">
+          <span className="stat-value" style={{ color: '#8b5cf6' }}>
+            {events.length}
+          </span>
+          <span className="stat-label">Total Society Events</span>
+        </div>
+      </div>
+
       {/* Top Controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
