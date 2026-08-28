@@ -632,7 +632,8 @@ export const RegistrationFlow: React.FC = () => {
       // Trigger Fast Google OAuth Flow with login_hint
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: {\n          redirectTo: `${window.location.origin}/register`,
+        options: {
+          redirectTo: `${window.location.origin}/register`,
           queryParams: {
             login_hint: email.trim().toLowerCase(),
           },
@@ -657,34 +658,34 @@ export const RegistrationFlow: React.FC = () => {
           <div className="oauth-redirect-card animate-scale-in">
             <div className="oauth-spinner-ring" />
             <div className="oauth-redirect-icon-wrap">
-              <svg width=\"26\" height=\"26\" viewBox=\"0 0 24 24\">
+              <svg width="26" height="26" viewBox="0 0 24 24">
                 <path
-                  fill=\"#4285F4\"
-                  d=\"M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z\"
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                 />
                 <path
-                  fill=\"#34A853\"
-                  d=\"M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z\"
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
                 />
                 <path
-                  fill=\"#FBBC05\"
-                  d=\"M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z\"
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
                 />
                 <path
-                  fill=\"#EA4335\"
-                  d=\"M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z\"
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                 />
               </svg>
             </div>
-            <h3 className=\"oauth-redirect-title\">
+            <h3 className="oauth-redirect-title">
               {isProcessingOAuthReturn ? 'Finalizing Registration...' : 'Connecting to Google...'}
             </h3>
-            <p className=\"oauth-redirect-desc\">
+            <p className="oauth-redirect-desc">
               {isProcessingOAuthReturn
                 ? 'Saving your verified flat ownership and setting up your resident profile.'
                 : `Redirecting to Google Secure Authentication for ${email || 'your account'}.`}
             </p>
-            <span className=\"oauth-redirect-sub\">Please hold on for a moment...</span>
+            <span className="oauth-redirect-sub">Please hold on for a moment...</span>
           </div>
         </div>
       )}
@@ -692,50 +693,50 @@ export const RegistrationFlow: React.FC = () => {
       {/* ====================================================================
           LEFT HERO PANEL (Consistent Luxury Showcase Matching Login Page)
           ==================================================================== */}
-      <div className=\"left-hero-panel\">
-        <div className=\"hero-background-media\" />
-        <div className=\"hero-gradient-overlay\" />
+      <div className="left-hero-panel">
+        <div className="hero-background-media" />
+        <div className="hero-gradient-overlay" />
 
-        <div className=\"hero-content-wrapper\">
+        <div className="hero-content-wrapper">
           {/* Header Brand */}
-          <div className=\"hero-brand-header\">
-            <div className=\"brand-logo-badge\">
+          <div className="hero-brand-header">
+            <div className="brand-logo-badge">
               <img
-                src=\"/logo.png\"
-                alt=\"BPS Twin Towers Logo\"
-                className=\"brand-logo-img\"
+                src="/logo.png"
+                alt="BPS Twin Towers Logo"
+                className="brand-logo-img"
               />
             </div>
-            <div className=\"brand-text-block\">
-              <span className=\"brand-super-title\">Saidabad • Hyderabad</span>
-              <h1 className=\"brand-name-title\">BPS TWIN TOWERS</h1>
+            <div className="brand-text-block">
+              <span className="brand-super-title">Saidabad • Hyderabad</span>
+              <h1 className="brand-name-title">BPS TWIN TOWERS</h1>
             </div>
           </div>
 
           {/* Center Callout */}
-          <div className=\"hero-bottom-group\">
-            <div className=\"hero-center-callout\">
-              <div className=\"gold-accent-bar\" />
-              <div className=\"hero-welcome-badge\">
-                <Sparkles size={13} className=\"gold-sparkle-icon\" />
+          <div className="hero-bottom-group">
+            <div className="hero-center-callout">
+              <div className="gold-accent-bar" />
+              <div className="hero-welcome-badge">
+                <Sparkles size={13} className="gold-sparkle-icon" />
                 <span>Verified Resident Onboarding</span>
               </div>
-              <h2 className=\"hero-luxury-headline\">
+              <h2 className="hero-luxury-headline">
                 Your community.
                 <br />
                 Your home.
                 <br />
                 Connected.
               </h2>
-              <p className=\"hero-luxury-subtext\">
+              <p className="hero-luxury-subtext">
                 Register your flat ownership securely to access digital maintenance, smart visitor approvals, facility reservations, and community notices.
               </p>
             </div>
 
             {/* Social Proof & Trust Counter */}
-            <div className=\"hero-bottom-proof\">
-              <div className=\"proof-left-group\">
-                <div className=\"avatar-overlap-stack\">
+            <div className="hero-bottom-proof">
+              <div className="proof-left-group">
+                <div className="avatar-overlap-stack">
                   {communityResidents.length > 0 ? (
                     communityResidents.slice(0, 4).map((r, i) =>
                       r.photo_url ? (
@@ -743,54 +744,53 @@ export const RegistrationFlow: React.FC = () => {
                           key={r.id || i}
                           src={r.photo_url}
                           alt={r.full_name}
-                          className=\"stack-avatar\"
+                          className="stack-avatar"
                         />
                       ) : (
                         <div
                           key={r.id || i}
-                          className=\"stack-avatar-initial\"
+                          className="stack-avatar-initial"
                           style={{
                             backgroundColor: i % 2 === 0 ? '#00685f' : '#0284c7',
                           }}
                         >
-                          {r.full_name ? r.full_name.charAt(0).toUpperCase() : 'R'}
-                        </div>
+                          {r.full_name ? r.full_name.charAt(0).toUpperCase() : 'R'}\n                        </div>
                       )
                     )
                   ) : (
                     <>
-                      <div className=\"stack-avatar-initial\" style={{ backgroundColor: '#00685f' }}>R</div>
-                      <div className=\"stack-avatar-initial\" style={{ backgroundColor: '#0284c7' }}>M</div>
-                      <div className=\"stack-avatar-initial\" style={{ backgroundColor: '#0d9488' }}>S</div>
+                      <div className="stack-avatar-initial" style={{ backgroundColor: '#00685f' }}>R</div>
+                      <div className="stack-avatar-initial" style={{ backgroundColor: '#0284c7' }}>M</div>
+                      <div className="stack-avatar-initial" style={{ backgroundColor: '#0d9488' }}>S</div>
                     </>
                   )}
                 </div>
-                <div className=\"proof-text-group\">
-                  <span className=\"proof-highlight\">{totalResidentsCount} Registered Residents</span>
-                  <span className=\"proof-sub\">Tower A & Tower B</span>
+                <div className="proof-text-group">
+                  <span className="proof-highlight">{totalResidentsCount} Registered Residents</span>
+                  <span className="proof-sub">Tower A & Tower B</span>
                 </div>
               </div>
 
               {/* Social Action Links */}
-              <div className=\"hero-social-edge-links\">
+              <div className="hero-social-edge-links">
                 <a
-                  href=\"mailto:bpstwintowers.society@gmail.com\"
-                  className=\"social-edge-btn\"
-                  title=\"Contact Support\"
+                  href="mailto:bpstwintowers.society@gmail.com"
+                  className="social-edge-btn"
+                  title="Contact Support"
                 >
                   <Mail size={16} />
                 </a>
                 <a
-                  href=\"https://instagram.com\"
-                  target=\"_blank\"
-                  rel=\"noreferrer\"
-                  className=\"social-edge-btn\"
-                  title=\"Instagram\"
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="social-edge-btn"
+                  title="Instagram"
                 >
-                  <svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"2\">
-                    <rect x=\"2\" y=\"2\" width=\"20\" height=\"20\" rx=\"5\" ry=\"5\" />
-                    <path d=\"M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z\" />
-                    <line x1=\"17.5\" y1=\"6.5\" x2=\"17.51\" y2=\"6.5\" />
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                   </svg>
                 </a>
               </div>
@@ -802,27 +802,27 @@ export const RegistrationFlow: React.FC = () => {
       {/* ====================================================================
           RIGHT REGISTRATION WORKSPACE (Section-Wise Clean Wizard)
           ==================================================================== */}
-      <div className=\"right-register-panel\">
-        <div className=\"register-card-wrapper animate-fade-in\">
+      <div className="right-register-panel">
+        <div className="register-card-wrapper animate-fade-in">
           {/* Header */}
-          <div className=\"register-header\">
-            <h2 className=\"register-title\">Welcome to Your Home</h2>
-            <p className=\"register-subtitle\">Complete your flat registration in {totalSteps} easy steps.</p>
+          <div className="register-header">
+            <h2 className="register-title">Welcome to Your Home</h2>
+            <p className="register-subtitle">Complete your flat registration in {totalSteps} easy steps.</p>
           </div>
 
           {/* Wizard Step Progress Tracker */}
-          <div className=\"wizard-step-tracker\">
+          <div className="wizard-step-tracker">
             {/* Step 1: Flat */}
             <div className={`step-item ${currentStep >= 1 ? 'active' : ''} ${currentStep > 1 ? 'completed' : ''}`}>
-              <div className=\"step-badge\">{currentStep > 1 ? <CheckCircle2 size={15} /> : <span>1</span>}</div>
-              <span className=\"step-name\">Flat</span>
+              <div className="step-badge">{currentStep > 1 ? <CheckCircle2 size={15} /> : <span>1</span>}</div>
+              <span className="step-name">Flat</span>
             </div>
             <div className={`step-line ${currentStep >= 2 ? 'active' : ''}`} />
 
             {/* Step 2: Owner, Family & Parking */}
             <div className={`step-item ${currentStep >= 2 ? 'active' : ''} ${currentStep > 2 ? 'completed' : ''}`}>
-              <div className=\"step-badge\">{currentStep > 2 ? <CheckCircle2 size={15} /> : <span>2</span>}</div>
-              <span className=\"step-name\">Owner & Details</span>
+              <div className="step-badge">{currentStep > 2 ? <CheckCircle2 size={15} /> : <span>2</span>}</div>
+              <span className="step-name">Owner & Details</span>
             </div>
             <div className={`step-line ${currentStep >= 3 ? 'active' : ''}`} />
 
@@ -830,8 +830,8 @@ export const RegistrationFlow: React.FC = () => {
             {isRented && (
               <>
                 <div className={`step-item ${currentStep >= 3 ? 'active' : ''} ${currentStep > 3 ? 'completed' : ''}`}>
-                  <div className=\"step-badge\">{currentStep > 3 ? <CheckCircle2 size={15} /> : <span>3</span>}</div>
-                  <span className=\"step-name\">Tenant</span>
+                  <div className="step-badge">{currentStep > 3 ? <CheckCircle2 size={15} /> : <span>3</span>}</div>
+                  <span className="step-name">Tenant</span>
                 </div>
                 <div className={`step-line ${currentStep >= 4 ? 'active' : ''}`} />
               </>
@@ -839,13 +839,13 @@ export const RegistrationFlow: React.FC = () => {
 
             {/* Final Step: Confirm */}
             <div className={`step-item ${currentStep === finalConfirmationStep ? 'active' : ''}`}>
-              <div className=\"step-badge\"><span>{finalConfirmationStep}</span></div>
-              <span className=\"step-name\">Confirm</span>
+              <div className="step-badge"><span>{finalConfirmationStep}</span></div>
+              <span className="step-name">Confirm</span>
             </div>
           </div>
 
           {error && (
-            <div className=\"register-error-alert animate-fade-in\">
+            <div className="register-error-alert animate-fade-in">
               <AlertCircle size={18} style={{ flexShrink: 0 }} />
               <span>{error}</span>
             </div>
@@ -853,32 +853,32 @@ export const RegistrationFlow: React.FC = () => {
 
           {/* STEP 1: FLAT SELECTION & OCCUPANCY STATUS */}
           {currentStep === 1 && (
-            <div className=\"wizard-step-content animate-fade-in\">
-              <div className=\"form-group-full\">
-                <label className=\"reg-label\">Select Your Flat / Apartment Number</label>
+            <div className="wizard-step-content animate-fade-in">
+              <div className="form-group-full">
+                <label className="reg-label">Select Your Flat / Apartment Number</label>
 
                 {selectedFlat ? (
                   selectedFlat.owner_registered ? (
-                    <div className=\"selected-flat-card registered-conflict animate-fade-in\">
-                      <div className=\"selected-flat-header-row\">
-                        <div className=\"selected-flat-left\">
-                          <div className=\"selected-flat-icon-badge conflict\">
-                            <AlertCircle size={22} className=\"selected-flat-icon\" />
+                    <div className="selected-flat-card registered-conflict animate-fade-in">
+                      <div className="selected-flat-header-row">
+                        <div className="selected-flat-left">
+                          <div className="selected-flat-icon-badge conflict">
+                            <AlertCircle size={22} className="selected-flat-icon" />
                           </div>
-                          <div className=\"selected-flat-info\">
-                            <div className=\"selected-flat-title-row\">
-                              <span className=\"selected-flat-num\">{selectedFlat.flat_number}</span>
-                              {selectedFlat.bhk && <span className=\"selected-flat-bhk\">{selectedFlat.bhk}</span>}
-                              <span className=\"selected-flat-conflict-tag\">Already Registered</span>
+                          <div className="selected-flat-info">
+                            <div className="selected-flat-title-row">
+                              <span className="selected-flat-num">{selectedFlat.flat_number}</span>
+                              {selectedFlat.bhk && <span className="selected-flat-bhk">{selectedFlat.bhk}</span>}
+                              <span className="selected-flat-conflict-tag">Already Registered</span>
                             </div>
-                            <span className=\"selected-flat-tower-name\">
+                            <span className="selected-flat-tower-name">
                               {selectedFlat.flat_number.toUpperCase().startsWith('B-') ? 'Tower B (Block B)' : 'Tower A (Block A)'} • Active Owner on Record
                             </span>
                           </div>
                         </div>
                         <button
-                          type=\"button\"
-                          className=\"btn-change-flat\"
+                          type="button"
+                          className="btn-change-flat"
                           onClick={() => {
                             setSelectedFlat(null);
                             setFlatQuery('');
@@ -889,13 +889,13 @@ export const RegistrationFlow: React.FC = () => {
                         </button>
                       </div>
 
-                      <div className=\"flat-conflict-banner\">
-                        <p className=\"conflict-text\">
+                      <div className="flat-conflict-banner">
+                        <p className="conflict-text">
                           This flat is already registered. If any mismatch or ownership transfer, please contact society administration:
                         </p>
                         <a
                           href={`mailto:bpstwintowers.society@gmail.com?subject=Flat%20${selectedFlat.flat_number}%20Registration%20Mismatch`}
-                          className=\"btn-conflict-contact\"
+                          className="btn-conflict-contact"
                         >
                           <Mail size={16} />
                           <span>bpstwintowers.society@gmail.com</span>
@@ -903,26 +903,26 @@ export const RegistrationFlow: React.FC = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className=\"selected-flat-card animate-fade-in\">
-                      <div className=\"selected-flat-header-row\">
-                        <div className=\"selected-flat-left\">
-                          <div className=\"selected-flat-icon-badge\">
-                            <Building2 size={22} className=\"selected-flat-icon\" />
+                    <div className="selected-flat-card animate-fade-in">
+                      <div className="selected-flat-header-row">
+                        <div className="selected-flat-left">
+                          <div className="selected-flat-icon-badge">
+                            <Building2 size={22} className="selected-flat-icon" />
                           </div>
-                          <div className=\"selected-flat-info\">
-                            <div className=\"selected-flat-title-row\">
-                              <span className=\"selected-flat-num\">{selectedFlat.flat_number}</span>
-                              {selectedFlat.bhk && <span className=\"selected-flat-bhk\">{selectedFlat.bhk}</span>}
-                              <span className=\"selected-flat-verified-tag\">✓ Available to Register</span>
+                          <div className="selected-flat-info">
+                            <div className="selected-flat-title-row">
+                              <span className="selected-flat-num">{selectedFlat.flat_number}</span>
+                              {selectedFlat.bhk && <span className="selected-flat-bhk">{selectedFlat.bhk}</span>}
+                              <span className="selected-flat-verified-tag">✓ Available to Register</span>
                             </div>
-                            <span className=\"selected-flat-tower-name\">
+                            <span className="selected-flat-tower-name">
                               {selectedFlat.flat_number.toUpperCase().startsWith('B-') ? 'Tower B (Block B)' : 'Tower A (Block A)'} • BPS Twin Towers
                             </span>
                           </div>
                         </div>
                         <button
-                          type=\"button\"
-                          className=\"btn-change-flat\"
+                          type="button"
+                          className="btn-change-flat"
                           onClick={() => {
                             setSelectedFlat(null);
                             setFlatQuery('');
@@ -935,20 +935,20 @@ export const RegistrationFlow: React.FC = () => {
                     </div>
                   )
                 ) : (
-                  <div className=\"flat-search-autocomplete-container\" ref={flatSearchRef}>
-                    <div className=\"reg-input-wrapper\">
-                      <Home size={18} className=\"reg-input-icon\" />
+                  <div className="flat-search-autocomplete-container" ref={flatSearchRef}>
+                    <div className="reg-input-wrapper">
+                      <Home size={18} className="reg-input-icon" />
                       <input
-                        id=\"reg-flat\"
-                        type=\"text\"
-                        placeholder=\"Search flat (e.g. A-402, B-811)...\"
-                        className=\"reg-text-input reg-flat-hero-input\"
+                        id="reg-flat"
+                        type="text"
+                        placeholder="Search flat (e.g. A-402, B-811)..."
+                        className="reg-text-input reg-flat-hero-input"
                         value={flatQuery}
                         onChange={(e) => handleFlatSearchChange(e.target.value)}
                         onFocus={() => {
                           if (flatResults.length > 0) setShowFlatDropdown(true);
                         }}
-                        autoComplete=\"off\"
+                        autoComplete="off"
                         autoFocus
                       />
                       {isSearchingFlat && (
@@ -957,22 +957,23 @@ export const RegistrationFlow: React.FC = () => {
                         </span>
                       )}
 
-                      {showFlatDropdown && flatResults.length > 0 && (\n                        <div className=\"flat-autocomplete-dropdown animate-fade-in\">
+                      {showFlatDropdown && flatResults.length > 0 && (
+                        <div className="flat-autocomplete-dropdown animate-fade-in">
                           {flatResults.map((flat) => (
                             <button
                               key={flat.flat_id}
-                              type=\"button\"
-                              className=\"flat-autocomplete-item\"
+                              type="button"
+                              className="flat-autocomplete-item"
                               onClick={() => handleSelectFlat(flat)}
                             >
-                              <div className=\"flat-item-main\">
-                                <span className=\"flat-item-number\">{flat.flat_number}</span>
-                                {flat.bhk && <span className=\"flat-item-bhk\">{flat.bhk}</span>}
+                              <div className="flat-item-main">
+                                <span className="flat-item-number">{flat.flat_number}</span>
+                                {flat.bhk && <span className="flat-item-bhk">{flat.bhk}</span>}
                               </div>
                               {flat.owner_registered ? (
-                                <span className=\"badge-registered\">Owner Registered</span>
+                                <span className="badge-registered">Owner Registered</span>
                               ) : (
-                                <span className=\"badge-available\">Available to Register</span>
+                                <span className="badge-available">Available to Register</span>
                               )}
                             </button>
                           ))}
@@ -984,72 +985,72 @@ export const RegistrationFlow: React.FC = () => {
               </div>
 
               {/* Occupancy Status Question */}
-              <div className=\"form-group-full\" style={{ marginTop: '12px' }}>
-                <label className=\"reg-label\">Are you currently staying in this flat?</label>
-                <div className=\"occupancy-options-grid\">
+              <div className="form-group-full" style={{ marginTop: '12px' }}>
+                <label className="reg-label">Are you currently staying in this flat?</label>
+                <div className="occupancy-options-grid">
                   <button
-                    type=\"button\"
+                    type="button"
                     className={`occupancy-option-card ${occupancyStatus === 'Yes, I live here' ? 'selected' : ''}`}
                     onClick={() => setOccupancyStatus('Yes, I live here')}
                   >
-                    <div className=\"occupancy-card-header\">
-                      <div className=\"occupancy-icon-wrap\">
+                    <div className="occupancy-card-header">
+                      <div className="occupancy-icon-wrap">
                         <Home size={18} />
                       </div>
-                      <span className=\"occupancy-title\">Yes, I live here</span>
+                      <span className="occupancy-title">Yes, I live here</span>
                     </div>
-                    <p className=\"occupancy-desc\">Primary resident & staying in this flat</p>
+                    <p className="occupancy-desc">Primary resident & staying in this flat</p>
                   </button>
 
                   <button
-                    type=\"button\"
+                    type="button"
                     className={`occupancy-option-card ${occupancyStatus === 'No, my family lives here' ? 'selected' : ''}`}
                     onClick={() => setOccupancyStatus('No, my family lives here')}
                   >
-                    <div className=\"occupancy-card-header\">
-                      <div className=\"occupancy-icon-wrap\">
+                    <div className="occupancy-card-header">
+                      <div className="occupancy-icon-wrap">
                         <Users size={18} />
                       </div>
-                      <span className=\"occupancy-title\">No, my family lives here</span>
+                      <span className="occupancy-title">No, my family lives here</span>
                     </div>
-                    <p className=\"occupancy-desc\">Owner living elsewhere, family resides</p>
+                    <p className="occupancy-desc">Owner living elsewhere, family resides</p>
                   </button>
 
                   <button
-                    type=\"button\"
+                    type="button"
                     className={`occupancy-option-card ${occupancyStatus === 'No, the flat is rented' ? 'selected' : ''}`}
                     onClick={() => setOccupancyStatus('No, the flat is rented')}
                   >
-                    <div className=\"occupancy-card-header\">
-                      <div className=\"occupancy-icon-wrap\">
+                    <div className="occupancy-card-header">
+                      <div className="occupancy-icon-wrap">
                         <KeyRound size={18} />
                       </div>
-                      <span className=\"occupancy-title\">No, the flat is rented</span>
+                      <span className="occupancy-title">No, the flat is rented</span>
                     </div>
-                    <p className=\"occupancy-desc\">Living elsewhere, leased out to tenant</p>
+                    <p className="occupancy-desc">Living elsewhere, leased out to tenant</p>
                   </button>
 
                   <button
-                    type=\"button\"
+                    type="button"
                     className={`occupancy-option-card ${occupancyStatus === 'No, the flat is currently vacant' ? 'selected' : ''}`}
                     onClick={() => setOccupancyStatus('No, the flat is currently vacant')}
                   >
-                    <div className=\"occupancy-card-header\">
-                      <div className=\"occupancy-icon-wrap\">
+                    <div className="occupancy-card-header">
+                      <div className="occupancy-icon-wrap">
                         <Building size={18} />
                       </div>
-                      <span className=\"occupancy-title\">No, the flat is currently vacant</span>
+                      <span className="occupancy-title">No, the flat is currently vacant</span>
                     </div>
-                    <p className=\"occupancy-desc\">Locked or currently unoccupied</p>
+                    <p className="occupancy-desc">Locked or currently unoccupied</p>
                   </button>
                 </div>
               </div>
 
               {/* Step 1 Actions */}
-              <div className=\"wizard-action-row\">
+              <div className="wizard-action-row">
                 <button
-                  type=\"button\"
-                  className=\"btn-wizard-next\"
+                  type="button"
+                  className="btn-wizard-next"
                   onClick={handleNextToStep2}
                   disabled={!selectedFlat || selectedFlat.owner_registered}
                 >
@@ -1062,526 +1063,631 @@ export const RegistrationFlow: React.FC = () => {
 
           {/* STEP 2: SECTION-WISE OWNER DETAILS, FAMILY MEMBERS & PARKING DETAILS */}
           {currentStep === 2 && (
-            <div className=\"wizard-step-content animate-fade-in\">
+            <div className="wizard-step-content animate-fade-in">
               {/* Owner Role Notice */}
-              <div className=\"owner-role-card\" style={{ marginBottom: '4px' }}>
-                <div className=\"owner-role-badge\">
-                  <ShieldCheck size={20} className=\"owner-role-icon\" />
-                  <div className=\"owner-role-text\">
-                    <span className=\"owner-role-title\">Flat Owner Registration</span>
-                    <p className=\"owner-role-hint\">
-                      Registering as Flat Owner for <strong>{selectedFlat?.flat_number}</strong> ({occupancyStatus}).
-                    </p>
+              <div className="owner-role-card" style={{ marginBottom: '4px' }}>
+                <div className="owner-role-badge">
+                  <ShieldCheck size={20} className="owner-role-icon" />
+                  <div className="owner-role-info">
+                    <span className="owner-role-title">Primary Flat Owner Registration</span>
+                    <span className="owner-role-desc">
+                      Flat {selectedFlat?.flat_number || flatQuery} • Full owner privileges & society access
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* SECTION A: OWNER PERSONAL DETAILS */}
-              <div className=\"form-sub-section-card animate-fade-in\">
-                <div className=\"sub-section-header\">
-                  <User size={18} className=\"sub-section-icon\" />
-                  <div className=\"sub-section-title-wrap\">
-                    <span className=\"sub-section-title\">1. Owner Details</span>
-                    <span className=\"sub-section-subtitle\">Primary flat owner profile and contact information</span>
+              {/* -------------------------------------------------------------
+                  SECTION 1: OWNER PERSONAL INFORMATION
+                  ------------------------------------------------------------- */}
+              <div className="wizard-section-group">
+                <div className="wizard-section-header">
+                  <div className="wizard-section-icon">
+                    <User size={18} />
+                  </div>
+                  <div className="wizard-section-titles">
+                    <h3 className="wizard-section-title">Section 1: Owner Personal Information</h3>
+                    <p className="wizard-section-subtitle">Basic details required for resident records and society communications.</p>
                   </div>
                 </div>
 
-                {/* Full Name */}
-                <div className=\"form-group-full\">
-                  <label htmlFor=\"reg-full-name\" className=\"reg-label\">Owner Full Name *</label>
-                  <div className=\"reg-input-wrapper\">
-                    <User size={18} className=\"reg-input-icon\" />
+                <div className="form-group-full">
+                  <label className="reg-label" htmlFor="reg-name">
+                    Full Name (as per property records) <span className="req-star">*</span>
+                  </label>
+                  <div className="reg-input-wrapper">
+                    <User size={18} className="reg-input-icon" />
                     <input
-                      id=\"reg-full-name\"
-                      type=\"text\"
-                      placeholder=\"e.g. Ramesh Kumar\"
-                      className=\"reg-text-input\"
+                      id="reg-name"
+                      type="text"
+                      placeholder="e.g. Ramesh Kumar"
+                      className="reg-text-input"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
+                      required
                     />
                   </div>
                 </div>
 
-                {/* Gmail & WhatsApp Mobile Grid */}
-                <div className=\"form-grid-2col\">
-                  <div className=\"form-group-col\">
-                    <label htmlFor=\"reg-email\" className=\"reg-label\">Gmail ID (Google Auth) *</label>
-                    <div className=\"reg-input-wrapper\">
-                      <Mail size={18} className=\"reg-input-icon\" />
+                <div className="form-row-2">
+                  <div className="form-col">
+                    <label className="reg-label" htmlFor="reg-email">
+                      Gmail Address <span className="req-star">*</span>
+                    </label>
+                    <div className="reg-input-wrapper">
+                      <Mail size={18} className="reg-input-icon" />
                       <input
-                        id=\"reg-email\"
-                        type=\"email\"
-                        placeholder=\"yourname@gmail.com\"
-                        className=\"reg-text-input\"
+                        id="reg-email"
+                        type="email"
+                        placeholder="yourname@gmail.com"
+                        className="reg-text-input"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        required
                       />
                     </div>
+                    <span className="field-hint-text">Required for 1-click Google authentication</span>
                   </div>
 
-                  <div className=\"form-group-col\">
-                    <label htmlFor=\"reg-mobile\" className=\"reg-label\">WhatsApp Mobile Number *</label>
-                    <div className=\"reg-input-wrapper\">
-                      <Phone size={18} className=\"reg-input-icon\" />
+                  <div className="form-col">
+                    <label className="reg-label" htmlFor="reg-mobile">
+                      Mobile Number (WhatsApp) <span className="req-star">*</span>
+                    </label>
+                    <div className="reg-input-wrapper">
+                      <Phone size={18} className="reg-input-icon" />
                       <input
-                        id=\"reg-mobile\"
-                        type=\"tel\"
-                        placeholder=\"e.g. 9876543210\"
-                        className=\"reg-text-input\"
+                        id="reg-mobile"
+                        type="tel"
+                        placeholder="+91 98765 43210"
+                        className="reg-text-input"
                         value={mobileNumber}
                         onChange={(e) => setMobileNumber(e.target.value)}
+                        required
                       />
                     </div>
+                    <span className="field-hint-text">Used for gate notifications and emergency alerts</span>
                   </div>
                 </div>
 
-                {/* Month/Year of Birth & Blood Group */}
-                <div className=\"form-grid-2col\">
-                  <div className=\"form-group-col\">
-                    <div className=\"dob-label-row\">
-                      <label htmlFor=\"reg-dob\" className=\"reg-label\">Month & Year of Birth</label>
-                      {calculatedOwnerAge !== null && (
-                        <span className=\"calculated-age-badge\">Age: {calculatedOwnerAge} yrs</span>
-                      )}
-                    </div>
-                    <div className=\"reg-input-wrapper\">
-                      <Cake size={18} className=\"reg-input-icon\" />
+                <div className="form-row-2" style={{ marginTop: '10px' }}>
+                  <div className="form-col">
+                    <label className="reg-label" htmlFor="reg-dob">
+                      Date of Birth (Month & Year) <span className="optional-tag">(Optional)</span>
+                    </label>
+                    <div className="reg-input-wrapper">
+                      <Cake size={18} className="reg-input-icon" />
                       <input
-                        id=\"reg-dob\"
-                        type=\"month\"
-                        className=\"reg-text-input\"
+                        id="reg-dob"
+                        type="month"
+                        className="reg-text-input"
                         value={dobMonthYear}
                         onChange={(e) => setDobMonthYear(e.target.value)}
                       />
                     </div>
+                    {calculatedOwnerAge !== null && (
+                      <span className="field-hint-text age-calculated">Calculated Age: {calculatedOwnerAge} years</span>
+                    )}
                   </div>
 
-                  <div className=\"form-group-col\">
-                    <label htmlFor=\"reg-blood\" className=\"reg-label\">Blood Group</label>
-                    <div className=\"reg-input-wrapper\">
-                      <select
-                        id=\"reg-blood\"
-                        className=\"reg-text-input\"
-                        value={bloodGroup}
-                        onChange={(e) => setBloodGroup(e.target.value)}
-                        style={{ paddingLeft: '14px' }}
-                      >
-                        <option value=\"\">Select Blood Group</option>
-                        <option value=\"A+\">A+</option>
-                        <option value=\"A-\">A-</option>
-                        <option value=\"B+\">B+</option>
-                        <option value=\"B-\">B-</option>
-                        <option value=\"O+\">O+</option>
-                        <option value=\"O-\">O-</option>
-                        <option value=\"AB+\">AB+</option>
-                        <option value=\"AB-\">AB-</option>
-                      </select>
-                    </div>
+                  <div className="form-col">
+                    <label className="reg-label" htmlFor="reg-blood">
+                      Blood Group <span className="optional-tag">(Emergency Support)</span>
+                    </label>
+                    <select
+                      id="reg-blood"
+                      className="reg-text-input"
+                      value={bloodGroup}
+                      onChange={(e) => setBloodGroup(e.target.value)}
+                    >
+                      <option value="">Select Blood Group</option>
+                      <option value="A+">A+</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B-">B-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
+                      <option value="AB+">AB+</option>
+                      <option value="AB-">AB-</option>
+                    </select>
                   </div>
                 </div>
               </div>
 
-              {/* SECTION B: FAMILY MEMBERS */}
-              <div className=\"family-section-container animate-fade-in\">
-                <div className=\"family-section-header\">
-                  <div className=\"family-header-title-wrap\">
-                    <Users size={20} className=\"family-section-icon\" />
-                    <div className=\"family-title-block\">
-                      <div className=\"family-title-with-info\">
-                        <span className=\"family-section-title\">2. Residing Family Members</span>
-                        <button
-                          type=\"button\"
-                          className=\"btn-family-info-badge\"
-                          onClick={() => setIsFamilyInfoModalOpen(true)}
-                        >
-                          <Info size={12} />
-                          <span>Why add family?</span>
-                        </button>
-                      </div>
-                      <span className=\"family-section-subtitle\">
-                        Add children, spouse, or parents for entry passes, emergency contacts & festival headcounts
-                      </span>
-                    </div>
+              {/* -------------------------------------------------------------
+                  SECTION 2: RESIDING FAMILY MEMBERS (WITH INFO POPUP)
+                  ------------------------------------------------------------- */}
+              <div className="wizard-section-group">
+                <div className="wizard-section-header">
+                  <div className="wizard-section-icon">
+                    <Users size={18} />
                   </div>
-                  <button
-                    type=\"button\"
-                    className=\"btn-add-family-popup\"
-                    onClick={handleOpenAddFamilyModal}
-                  >
-                    <Plus size={15} />
-                    <span>+ Add Member</span>
-                  </button>
+                  <div className="wizard-section-titles">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h3 className="wizard-section-title">Section 2: Residing Family Members</h3>
+                      <button
+                        type="button"
+                        className="btn-info-circle"
+                        onClick={() => setIsFamilyInfoModalOpen(true)}
+                        title="Why add family members?"
+                      >
+                        <Info size={15} />
+                      </button>
+                    </div>
+                    <p className="wizard-section-subtitle">
+                      {isFamilyLiving
+                        ? 'Since you selected "No, my family lives here", please add at least one residing member.'
+                        : 'Add spouse, children, parents, or residing relatives for amenities and emergency security support.'}
+                    </p>
+                  </div>
                 </div>
 
-                {/* Family Members Chips Grid */}
                 {familyMembers.length > 0 ? (
-                  <div className=\"family-members-chips-grid\">
+                  <div className="family-members-summary-list">
                     {familyMembers.map((member, idx) => (
-                      <div key={idx} className=\"family-member-chip-card animate-fade-in\">
-                        <div className=\"family-chip-left\">
-                          <div className=\"family-chip-avatar\">
-                            {member.full_name ? member.full_name.charAt(0).toUpperCase() : 'F'}
+                      <div key={idx} className="family-member-card animate-fade-in">
+                        <div className="family-member-left">
+                          <div className="family-member-avatar-chip">
+                            {member.full_name.charAt(0).toUpperCase()}
                           </div>
-                          <div className=\"family-chip-info\">
-                            <span className=\"family-chip-name\">{member.full_name}</span>
-                            <span className=\"family-chip-rel\">
-                              {member.relationship}
-                              {member.age ? ` • ${member.age} yrs` : ''}
-                              {member.blood_group ? ` • ${member.blood_group}` : ''}
+                          <div className="family-member-details">
+                            <div className="family-member-name-row">
+                              <span className="family-member-name">{member.full_name}</span>
+                              <span className="family-relationship-badge">{member.relationship}</span>
+                              {member.blood_group && (
+                                <span className="family-blood-badge">{member.blood_group}</span>
+                              )}
+                            </div>
+                            <span className="family-member-sub">
+                              {member.age ? `${member.age} yrs • ` : ''}
+                              {member.mobile ? `${member.mobile} • ` : ''}
+                              {member.email || 'No email registered'}
                             </span>
                           </div>
                         </div>
-                        <div className=\"family-chip-actions\">
+
+                        <div className="family-member-actions">
                           <button
-                            type=\"button\"
-                            className=\"btn-chip-action edit\"
+                            type="button"
+                            className="btn-family-action-icon edit"
                             onClick={() => handleOpenEditFamilyModal(idx)}
-                            title=\"Edit member\"
+                            title="Edit details"
                           >
-                            <Edit2 size={13} />
+                            <Edit2 size={15} />
                           </button>
                           <button
-                            type=\"button\"
-                            className=\"btn-chip-action delete\"
+                            type="button"
+                            className="btn-family-action-icon delete"
                             onClick={() => handleRemoveFamilyMember(idx)}
-                            title=\"Remove member\"
+                            title="Remove member"
                           >
-                            <Trash2 size={13} />
+                            <Trash2 size={15} />
                           </button>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className={`family-empty-placeholder ${isFamilyLiving ? 'mandatory-highlight' : ''}`}>
-                    <Users size={20} className=\"family-empty-icon\" />
-                    <div className=\"family-empty-text\">
-                      <span className=\"family-empty-title\">
-                        {isFamilyLiving ? 'Family member details required' : 'No family members added yet'}
-                      </span>
-                      <span className=\"family-empty-desc\">
+                  <div className="family-empty-state-card">
+                    <Users size={28} className="family-empty-icon" />
+                    <div className="family-empty-text">
+                      <span className="family-empty-title">No Residing Family Members Added</span>
+                      <span className="family-empty-sub">
                         {isFamilyLiving
-                          ? 'Since you selected \"No, my family lives here\", please add at least 1 residing family member.'
-                          : 'Click \"+ Add Member\" above to include family members living in your flat.'}
+                          ? 'Please add family members who reside in Flat ' + (selectedFlat?.flat_number || flatQuery) + '.'
+                          : 'You can add family members now or manage them anytime from your dashboard.'}
                       </span>
                     </div>
                   </div>
                 )}
+
+                <button
+                  type="button"
+                  className="btn-add-family-member"
+                  onClick={handleOpenAddFamilyModal}
+                >
+                  <Plus size={16} />
+                  <span>+ Add Residing Family Member</span>
+                </button>
               </div>
 
-              {/* SECTION C: PARKING DETAILS & ALLOCATED SLOTS */}
-              <div className=\"parking-section-card animate-fade-in\">
-                <div className=\"sub-section-header with-action\">
-                  <div className=\"sub-section-title-left\">
-                    <Car size={18} className=\"sub-section-icon\" />
-                    <div className=\"sub-section-title-wrap\">
-                      <span className=\"sub-section-title\">3. Parking Allocation & Vehicle Details</span>
-                      <span className=\"sub-section-subtitle\">
-                        Register your allocated basement/stilt slots and vehicles for security RFID & gate entry
-                      </span>
-                    </div>
+              {/* -------------------------------------------------------------
+                  SECTION 3: VEHICLE & STRUCTURED PARKING DETAILS
+                  ------------------------------------------------------------- */}
+              <div className="wizard-section-group">
+                <div className="wizard-section-header">
+                  <div className="wizard-section-icon">
+                    <Car size={18} />
                   </div>
-                  <button
-                    type=\"button\"
-                    className=\"btn-add-vehicle-popup\"
-                    onClick={handleOpenAddVehicleModal}
-                  >
-                    <Plus size={15} />
-                    <span>+ Add Vehicle</span>
-                  </button>
+                  <div className="wizard-section-titles">
+                    <h3 className="wizard-section-title">Section 3: Vehicle & Parking Slot Details</h3>
+                    <p className="wizard-section-subtitle">
+                      Register allocated parking slots (Basement 1 / Basement 2) and vehicles for security RFID / Boom Barrier clearance.
+                    </p>
+                  </div>
                 </div>
 
-                {/* Vehicle Chips Grid */}
                 {vehicles.length > 0 ? (
-                  <div className=\"vehicle-chips-grid\">
-                    {vehicles.map((veh, idx) => (
-                      <div key={idx} className=\"vehicle-chip-card animate-fade-in\">
-                        <div className=\"vehicle-chip-left\">
-                          <div className=\"vehicle-chip-icon-badge\">
+                  <div className="vehicles-summary-list">
+                    {vehicles.map((v, idx) => (
+                      <div key={idx} className="vehicle-card-row animate-fade-in">
+                        <div className="vehicle-card-left">
+                          <div className="vehicle-icon-chip">
                             <Car size={16} />
                           </div>
-                          <div className=\"vehicle-chip-info\">
-                            <div className=\"vehicle-chip-top-row\">
-                              <span className=\"vehicle-chip-slot\">Slot: {veh.slot_number || 'TBD'}</span>
-                              <span className=\"vehicle-chip-type-tag\">{veh.vehicle_type}</span>
+                          <div className="vehicle-card-details">
+                            <div className="vehicle-card-title-row">
+                              <span className="vehicle-slot-pill">
+                                {v.slot_number ? `Slot: ${v.slot_number}` : 'Unassigned Slot'}
+                              </span>
+                              <span className="vehicle-type-tag">{v.vehicle_type}</span>
+                              {v.reg_number && <span className="vehicle-reg-tag">{v.reg_number}</span>}
                             </div>
-                            <span className=\"vehicle-chip-model\">
-                              {veh.make_model || 'Vehicle'} {veh.reg_number ? `(${veh.reg_number})` : ''}
+                            <span className="vehicle-card-sub">
+                              {v.make_model ? `${v.make_model} • ` : ''}
+                              {v.colour ? `Colour: ${v.colour}` : ''}
+                              {v.remarks ? ` • Note: ${v.remarks}` : ''}
                             </span>
                           </div>
                         </div>
-                        <div className=\"vehicle-chip-actions\">
+
+                        <div className="vehicle-card-actions">
                           <button
-                            type=\"button\"
-                            className=\"btn-chip-action edit\"
+                            type="button"
+                            className="btn-family-action-icon edit"
                             onClick={() => handleOpenEditVehicleModal(idx)}
-                            title=\"Edit vehicle\"
+                            title="Edit Vehicle"
                           >
-                            <Edit2 size={13} />
+                            <Edit2 size={15} />
                           </button>
                           <button
-                            type=\"button\"
-                            className=\"btn-chip-action delete\"
+                            type="button"
+                            className="btn-family-action-icon delete"
                             onClick={() => handleRemoveVehicle(idx)}
-                            title=\"Remove vehicle\"
+                            title="Remove Vehicle"
                           >
-                            <Trash2 size={13} />
+                            <Trash2 size={15} />
                           </button>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className=\"family-empty-placeholder\">
-                    <Car size={20} className=\"family-empty-icon\" />
-                    <div className=\"family-empty-text\">
-                      <span className=\"family-empty-title\">No vehicles registered yet</span>
-                      <span className=\"family-empty-desc\">
-                        Click \"+ Add Vehicle\" above to register your parking slot and car / two-wheeler details.
-                      </span>
+                  <div className="family-empty-state-card">
+                    <Car size={28} className="family-empty-icon" />
+                    <div className="family-empty-text">
+                      <span className="family-empty-title">No Vehicles Registered Yet</span>
+                      <span className="family-empty-sub">Add parking slot numbers and vehicles for RFID gate pass clearance.</span>
                     </div>
                   </div>
                 )}
+
+                <button
+                  type="button"
+                  className="btn-add-family-member"
+                  onClick={handleOpenAddVehicleModal}
+                >
+                  <Plus size={16} />
+                  <span>+ Add Parking Slot / Vehicle</span>
+                </button>
+
+                {/* Optional Parking Document Upload */}
+                <div className="parking-doc-upload-box" style={{ marginTop: '14px' }}>
+                  <label className="reg-label">
+                    Upload Parking Allotment Letter / Agreement <span className="optional-tag">(Optional)</span>
+                  </label>
+                  <div
+                    className={`file-drop-zone ${parkingDocUrl ? 'uploaded' : ''}`}
+                    onClick={() => parkingFileInputRef.current?.click()}
+                  >
+                    <input
+                      ref={parkingFileInputRef}
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={handleParkingFileChange}
+                      style={{ display: 'none' }}
+                    />
+                    {isUploadingParkingDoc ? (
+                      <div className="file-uploading-indicator">
+                        <UploadCloud size={24} className="upload-spinner" />
+                        <span>Uploading parking document to secure society storage...</span>
+                      </div>
+                    ) : parkingDocUrl ? (
+                      <div className="file-uploaded-success">
+                        <FileCheck size={24} className="file-check-icon" />
+                        <div className="file-info-text">
+                          <span className="file-success-title">✓ Parking Document Uploaded</span>
+                          <span className="file-name-sub">{parkingDocFile?.name || 'parking_allotment.pdf'}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="file-prompt-wrap">
+                        <Paperclip size={20} className="paperclip-icon" />
+                        <span>Click to attach Parking Letter / Slot Agreement (PDF, PNG, JPG &lt; 15MB)</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Step 2 Actions */}
-              <div className=\"wizard-action-row two-buttons\">
+              <div className="wizard-action-row">
                 <button
-                  type=\"button\"
-                  className=\"btn-wizard-back\"
+                  type="button"
+                  className="btn-wizard-back"
                   onClick={() => setCurrentStep(1)}
                 >
                   <ArrowLeft size={16} />
-                  <span>Back</span>
+                  <span>Back to Flat</span>
                 </button>
 
                 <button
-                  type=\"button\"
-                  className=\"btn-wizard-next\"
+                  type="button"
+                  className="btn-wizard-next"
                   onClick={handleNextToStep3}
                 >
-                  <span>{isRented ? 'Continue to Tenant Details' : 'Continue to Confirmation'}</span>
+                  <span>{isRented ? 'Continue to Tenant Details' : 'Continue to Final Confirmation'}</span>
                   <ArrowRight size={18} />
                 </button>
               </div>
             </div>
           )}
 
-          {/* STEP 3 (IF RENTED): TENANT VERIFICATION & RENTAL AGREEMENT */}
+          {/* STEP 3 (IF RENTED): TENANT VERIFICATION & LEASE AGREEMENT */}
           {currentStep === 3 && isRented && (
-            <div className=\"wizard-step-content animate-fade-in\">
-              <div className=\"rental-section-container animate-fade-in\">
-                <div className=\"rental-header-badge\">
-                  <KeyRound size={20} className=\"rental-badge-icon\" />
-                  <div className=\"rental-badge-text\">
-                    <span className=\"rental-badge-title\">Tenant Verification & Rental Agreement</span>
-                    <span className=\"rental-badge-sub\">
-                      Required for security gate passes, digital tenant app onboarding, and bylaws compliance.
-                    </span>
+            <div className="wizard-step-content animate-fade-in">
+              <div className="wizard-section-group">
+                <div className="wizard-section-header">
+                  <div className="wizard-section-icon">
+                    <KeyRound size={18} />
+                  </div>
+                  <div className="wizard-section-titles">
+                    <h3 className="wizard-section-title">Section 3: Tenant Verification & Lease Agreement</h3>
+                    <p className="wizard-section-subtitle">
+                      As per society security rules, tenant details and registered lease agreement are required for flat occupancy.
+                    </p>
                   </div>
                 </div>
 
-                <div className=\"form-group-full\">
-                  <label htmlFor=\"reg-tenant-name\" className=\"reg-label\">Primary Tenant Full Name *</label>
-                  <div className=\"reg-input-wrapper\">
-                    <User size={18} className=\"reg-input-icon\" />
+                <div className="form-group-full">
+                  <label className="reg-label" htmlFor="reg-tenant-name">
+                    Primary Tenant Full Name <span className="req-star">*</span>
+                  </label>
+                  <div className="reg-input-wrapper">
+                    <User size={18} className="reg-input-icon" />
                     <input
-                      id=\"reg-tenant-name\"
-                      type=\"text\"
-                      placeholder=\"e.g. Suresh Varma\"
-                      className=\"reg-text-input\"
+                      id="reg-tenant-name"
+                      type="text"
+                      placeholder="e.g. Siddharth Verma"
+                      className="reg-text-input"
                       value={tenantName}
                       onChange={(e) => setTenantName(e.target.value)}
+                      required
                     />
                   </div>
                 </div>
 
-                <div className=\"form-grid-2col\">
-                  <div className=\"form-group-col\">
-                    <label htmlFor=\"reg-tenant-mobile\" className=\"reg-label\">Tenant Mobile Number *</label>
-                    <div className=\"reg-input-wrapper\">
-                      <Phone size={18} className=\"reg-input-icon\" />
+                <div className="form-row-2">
+                  <div className="form-col">
+                    <label className="reg-label" htmlFor="reg-tenant-email">
+                      Tenant Email Address <span className="optional-tag">(Optional)</span>
+                    </label>
+                    <div className="reg-input-wrapper">
+                      <Mail size={18} className="reg-input-icon" />
                       <input
-                        id=\"reg-tenant-mobile\"
-                        type=\"tel\"
-                        placeholder=\"e.g. 9123456789\"
-                        className=\"reg-text-input\"
-                        value={tenantMobile}
-                        onChange={(e) => setTenantMobile(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className=\"form-group-col\">
-                    <label htmlFor=\"reg-tenant-email\" className=\"reg-label\">Tenant Email Address</label>
-                    <div className=\"reg-input-wrapper\">
-                      <Mail size={18} className=\"reg-input-icon\" />
-                      <input
-                        id=\"reg-tenant-email\"
-                        type=\"email\"
-                        placeholder=\"tenant@gmail.com\"
-                        className=\"reg-text-input\"
+                        id="reg-tenant-email"
+                        type="email"
+                        placeholder="tenant@gmail.com"
+                        className="reg-text-input"
                         value={tenantEmail}
                         onChange={(e) => setTenantEmail(e.target.value)}
                       />
                     </div>
                   </div>
+
+                  <div className="form-col">
+                    <label className="reg-label" htmlFor="reg-tenant-mobile">
+                      Tenant Mobile Number <span className="req-star">*</span>
+                    </label>
+                    <div className="reg-input-wrapper">
+                      <Phone size={18} className="reg-input-icon" />
+                      <input
+                        id="reg-tenant-mobile"
+                        type="tel"
+                        placeholder="+91 98765 43210"
+                        className="reg-text-input"
+                        value={tenantMobile}
+                        onChange={(e) => setTenantMobile(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div className=\"form-group-full\">
-                  <label className=\"reg-label\">Rental Agreement Document (PDF / Image) *</label>
-                  <input
-                    type=\"file\"
-                    ref={rentalFileInputRef}
-                    style={{ display: 'none' }}
-                    accept=\".pdf,.jpg,.jpeg,.png,.webp\"
-                    onChange={handleRentalFileChange}
-                  />
+                <div className="form-row-2" style={{ marginTop: '10px' }}>
+                  <div className="form-col">
+                    <label className="reg-label" htmlFor="reg-lease-start">
+                      Lease Start Date <span className="req-star">*</span>
+                    </label>
+                    <div className="reg-input-wrapper">
+                      <Calendar size={18} className="reg-input-icon" />
+                      <input
+                        id="reg-lease-start"
+                        type="date"
+                        className="reg-text-input"
+                        value={leaseStartDate}
+                        onChange={(e) => setLeaseStartDate(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
 
-                  {rentalAgreementFile || rentalAgreementUrl ? (
-                    <div className=\"uploaded-file-card animate-fade-in\">
-                      <div className=\"uploaded-file-info\">
-                        <FileCheck size={20} className=\"uploaded-file-icon\" />
-                        <div className=\"uploaded-file-details\">
-                          <span className=\"uploaded-file-name\">
-                            {rentalAgreementFile?.name || 'Rental_Agreement_Document.pdf'}
-                          </span>
-                          <span className=\"uploaded-file-size\">
-                            {isUploadingRentalDoc ? 'Uploading document...' : '✓ Document uploaded & attached'}
-                          </span>
+                  <div className="form-col">
+                    <label className="reg-label" htmlFor="reg-lease-end">
+                      Lease End Date <span className="optional-tag">(Optional)</span>
+                    </label>
+                    <div className="reg-input-wrapper">
+                      <Calendar size={18} className="reg-input-icon" />
+                      <input
+                        id="reg-lease-end"
+                        type="date"
+                        className="reg-text-input"
+                        value={leaseEndDate}
+                        onChange={(e) => setLeaseEndDate(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rental Agreement Upload */}
+                <div className="rental-doc-upload-box" style={{ marginTop: '14px' }}>
+                  <label className="reg-label">
+                    Upload Registered Rental Agreement (PDF / Image) <span className="req-star">*</span>
+                  </label>
+                  <div
+                    className={`file-drop-zone ${rentalAgreementUrl ? 'uploaded' : ''}`}
+                    onClick={() => rentalFileInputRef.current?.click()}
+                  >
+                    <input
+                      ref={rentalFileInputRef}
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={handleRentalFileChange}
+                      style={{ display: 'none' }}
+                    />
+                    {isUploadingRentalDoc ? (
+                      <div className="file-uploading-indicator">
+                        <UploadCloud size={24} className="upload-spinner" />
+                        <span>Uploading rental agreement to secure society storage...</span>
+                      </div>
+                    ) : rentalAgreementUrl ? (
+                      <div className="file-uploaded-success">
+                        <FileCheck size={24} className="file-check-icon" />
+                        <div className="file-info-text">
+                          <span className="file-success-title">✓ Rental Agreement Uploaded</span>
+                          <span className="file-name-sub">{rentalAgreementFile?.name || 'rental_agreement.pdf'}</span>
                         </div>
                       </div>
-                      <button
-                        type=\"button\"
-                        className=\"btn-remove-file\"
-                        onClick={() => {
-                          setRentalAgreementFile(null);
-                          setRentalAgreementUrl('');
-                        }}
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      type=\"button\"
-                      className=\"document-upload-dropzone\"
-                      onClick={() => rentalFileInputRef.current?.click()}
-                    >
-                      <UploadCloud size={24} className=\"upload-cloud-icon\" />
-                      <span className=\"upload-dropzone-title\">Click to Browse Agreement Document</span>
-                      <span className=\"upload-dropzone-sub\">PDF, JPG or PNG up to 15MB</span>
-                    </button>
-                  )}
+                    ) : (
+                      <div className="file-prompt-wrap">
+                        <Paperclip size={20} className="paperclip-icon" />
+                        <span>Click to attach Rental Agreement (PDF, PNG, JPG &lt; 15MB)</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Step 3 Actions */}
-              <div className=\"wizard-action-row two-buttons\">
+              <div className="wizard-action-row">
                 <button
-                  type=\"button\"
-                  className=\"btn-wizard-back\"
+                  type="button"
+                  className="btn-wizard-back"
                   onClick={() => setCurrentStep(2)}
                 >
                   <ArrowLeft size={16} />
-                  <span>Back</span>
+                  <span>Back to Owner Details</span>
                 </button>
 
                 <button
-                  type=\"button\"
-                  className=\"btn-wizard-next\"
+                  type="button"
+                  className="btn-wizard-next"
                   onClick={handleNextToStep4}
                 >
-                  <span>Continue to Confirmation</span>
+                  <span>Continue to Final Confirmation</span>
                   <ArrowRight size={18} />
                 </button>
               </div>
             </div>
           )}
 
-          {/* FINAL STEP: SUMMARY CONFIRMATION & GOOGLE OAUTH SUBMISSION */}
+          {/* FINAL CONFIRMATION STEP: REVIEW & 1-CLICK GOOGLE REGISTRATION */}
           {currentStep === finalConfirmationStep && (
-            <div className=\"wizard-step-content animate-fade-in\">
-              <div className=\"summary-overview-card animate-fade-in\">
-                <div className=\"summary-row\">
-                  <span className=\"summary-key\">Flat Number</span>
-                  <span className=\"summary-val\">{selectedFlat?.flat_number || flatQuery}</span>
-                </div>
-                <div className=\"summary-row\">
-                  <span className=\"summary-key\">Owner Name</span>
-                  <span className=\"summary-val\">{fullName}</span>
-                </div>
-                <div className=\"summary-row\">
-                  <span className=\"summary-key\">Google Account</span>
-                  <span className=\"summary-val\">{email}</span>
-                </div>
-                <div className=\"summary-row\">
-                  <span className=\"summary-key\">WhatsApp Mobile</span>
-                  <span className=\"summary-val\">{mobileNumber}</span>
-                </div>
-                {bloodGroup && (
-                  <div className=\"summary-row\">
-                    <span className=\"summary-key\">Blood Group</span>
-                    <span className=\"summary-val\">{bloodGroup}</span>
+            <div className="wizard-step-content animate-fade-in">
+              <div className="confirmation-review-card">
+                <div className="confirmation-header-banner">
+                  <div className="confirmation-badge-icon">
+                    <CheckCircle2 size={24} />
                   </div>
-                )}
-                <div className=\"summary-row\">
-                  <span className=\"summary-key\">Occupancy</span>
-                  <span className=\"summary-val\">{occupancyStatus}</span>
+                  <div className="confirmation-header-text">
+                    <h3 className="confirmation-title">Review & Submit Flat Registration</h3>
+                    <span className="confirmation-sub">
+                      Flat {selectedFlat?.flat_number || flatQuery} • {occupancyStatus}
+                    </span>
+                  </div>
                 </div>
-                <div className=\"summary-row\">
-                  <span className=\"summary-key\">Family Members</span>
-                  <span className=\"summary-val\">{familyMembers.length} member(s)</span>
+
+                <div className="review-details-grid">
+                  <div className="review-item">
+                    <span className="review-label">Owner Full Name</span>
+                    <span className="review-value">{fullName}</span>
+                  </div>
+                  <div className="review-item">
+                    <span className="review-label">Gmail Account</span>
+                    <span className="review-value">{email}</span>
+                  </div>
+                  <div className="review-item">
+                    <span className="review-label">Mobile Number</span>
+                    <span className="review-value">{mobileNumber}</span>
+                  </div>
+                  <div className="review-item">
+                    <span className="review-label">Blood Group</span>
+                    <span className="review-value">{bloodGroup || 'Not specified'}</span>
+                  </div>
+                  <div className="review-item">
+                    <span className="review-label">Residing Family Members</span>
+                    <span className="review-value">{familyMembers.length} member(s) registered</span>
+                  </div>
+                  <div className="review-item">
+                    <span className="review-label">Vehicles & Slots</span>
+                    <span className="review-value">{vehicles.length} vehicle(s) registered</span>
+                  </div>
+                  {isRented && (
+                    <>
+                      <div className="review-item">
+                        <span className="review-label">Primary Tenant</span>
+                        <span className="review-value">{tenantName} ({tenantMobile})</span>
+                      </div>
+                      <div className="review-item">
+                        <span className="review-label">Rental Agreement</span>
+                        <span className="review-value text-success">✓ Document attached</span>
+                      </div>
+                    </>
+                  )}
                 </div>
-                <div className=\"summary-row\">
-                  <span className=\"summary-key\">Registered Vehicles</span>
-                  <span className=\"summary-val\">{vehicles.length} vehicle(s)</span>
+
+                {/* Society Rules Confirmation Note */}
+                <div className="society-confirmation-notice-box">
+                  <div className="notice-icon-circle">
+                    <HeartHandshake size={16} />
+                  </div>
+                  <div className="notice-text-block">
+                    <span className="notice-heading">Society Declaration & Access Terms</span>
+                    <p className="notice-desc">
+                      By proceeding, you certify that all information provided is accurate. Your Google Account ({email}) will be verified and authorized for Flat {selectedFlat?.flat_number || flatQuery} community management and gate access upon admin review.
+                    </p>
+                  </div>
                 </div>
-                {isRented && (
-                  <>
-                    <div className=\"summary-divider\" />
-                    <div className=\"summary-row\">
-                      <span className=\"summary-key\">Tenant Name</span>
-                      <span className=\"summary-val\">{tenantName}</span>
-                    </div>
-                  </>
-                )}
+
+                <div className="form-group-checkbox" style={{ marginTop: '16px' }}>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={agreedToRules}
+                      onChange={(e) => setAgreedToRules(e.target.checked)}
+                      className="custom-checkbox"
+                    />
+                    <span>
+                      I certify that I am the verified owner / resident of <strong>Flat {selectedFlat?.flat_number || flatQuery}</strong> and agree to abide by the BPS Twin Towers Society Bylaws & Maintenance Rules.
+                    </span>
+                  </label>
+                </div>
               </div>
 
-              {/* Society Important Information Banner (Moved from Step 2 to Confirmation) */}
-              <div className=\"family-benefits-banner animate-fade-in\" style={{ marginTop: '4px' }}>
-                <div className=\"family-benefit-item\">
-                  <CheckCircle2 size={16} className=\"benefit-icon\" />
-                  <span className=\"benefit-text\">
-                    <strong>Official Community Records:</strong> Member details assist emergency blood group alerts, security intercoms & accurate event food catering.
-                  </span>
-                </div>
-                <div className=\"family-benefit-item\">
-                  <ShieldCheck size={16} className=\"benefit-icon\" />
-                  <span className=\"benefit-text\">
-                    <strong>Security Verification:</strong> Resident applications are verified by society management before granting full clubhouse access.
-                  </span>
-                </div>
-              </div>
-
-              {/* Bylaws Certification Checkbox */}
-              <label className=\"form-checkbox-row\" style={{ marginTop: '8px' }}>
-                <input
-                  type=\"checkbox\"
-                  className=\"reg-checkbox\"
-                  checked={agreedToRules}
-                  onChange={(e) => setAgreedToRules(e.target.checked)}
-                />
-                <span className=\"reg-checkbox-label\">
-                  I certify that I am the legal owner/resident of <strong>Flat {selectedFlat?.flat_number || flatQuery}</strong> in BPS Twin Towers and agree to abide by the society rules and bylaws.
-                </span>
-              </label>
-
-              {/* Final Submit Button */}
-              <div className=\"wizard-action-row two-buttons\">
+              {/* Step Actions */}
+              <div className="wizard-action-row">
                 <button
-                  type=\"button\"
-                  className=\"btn-wizard-back\"
+                  type="button"
+                  className="btn-wizard-back"
                   onClick={() => setCurrentStep(isRented ? 3 : 2)}
                   disabled={loading}
                 >
@@ -1590,148 +1696,204 @@ export const RegistrationFlow: React.FC = () => {
                 </button>
 
                 <button
-                  type=\"button\"
-                  className=\"btn-primary-register\"
+                  type="button"
+                  className="btn-submit-google-reg"
                   onClick={handleGoogleSubmit}
-                  disabled={loading || !agreedToRules}
+                  disabled={!agreedToRules || loading}
                 >
-                  <span>{loading ? 'Connecting to Google...' : 'Complete Registration with Google'}</span>
+                  <div className="google-btn-inner">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                      <path
+                        fill="#4285F4"
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                      />
+                      <path
+                        fill="#EA4335"
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                      />
+                    </svg>
+                    <span>{loading ? 'Submitting Registration...' : `Register Flat with ${email || 'Google'}`}</span>
+                  </div>
+                  <ArrowRight size={18} />
                 </button>
               </div>
             </div>
           )}
 
-          {/* Footer Navigation Link */}
-          <p className=\"register-footer-text\">
-            Already registered your flat?{' '}
-            <Link to=\"/login\" className=\"register-footer-link\">
-              Sign In to Resident Portal
+          {/* Footer Back to Login Link */}
+          <div className="register-footer-row">
+            <span className="footer-text">Already registered your flat?</span>
+            <Link to="/login" className="footer-link">
+              Sign In to Your Dashboard →
             </Link>
-          </p>
+          </div>
         </div>
       </div>
 
       {/* ====================================================================
-          FAMILY MEMBER MODAL POPUP
+          MODAL POPUP: ADD / EDIT RESIDING FAMILY MEMBER
           ==================================================================== */}
       {isFamilyModalOpen && (
-        <div className=\"family-modal-overlay animate-fade-in\">
-          <div className=\"family-modal-dialog animate-scale-in\">
-            <div className=\"family-modal-header\">
-              <div className=\"family-modal-header-left\">
-                <UserPlus size={20} className=\"family-modal-icon\" />
-                <h3 className=\"family-modal-title\">
-                  {editingFamilyIndex !== null ? 'Edit Family Member' : 'Add Family Member'}
+        <div className="family-modal-overlay animate-fade-in">
+          <div className="family-modal-dialog animate-scale-in">
+            <div className="family-modal-header">
+              <div className="family-modal-header-left">
+                <Users size={20} className="family-modal-icon" />
+                <h3 className="family-modal-title">
+                  {editingFamilyIndex !== null ? 'Edit Family Member' : 'Add Residing Family Member'}
                 </h3>
               </div>
               <button
-                type=\"button\"
-                className=\"btn-modal-close\"
+                type="button"
+                className="btn-modal-close"
                 onClick={() => setIsFamilyModalOpen(false)}
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className=\"family-modal-body\">
-              {famModalError && (
-                <div className=\"register-error-alert animate-fade-in\" style={{ margin: 0 }}>
-                  <AlertCircle size={16} />
-                  <span>{famModalError}</span>
-                </div>
-              )}
+            <div className="family-modal-body">
+              {famModalError && <div className="modal-error-alert">{famModalError}</div>}
 
-              <div className=\"form-group-full\">
-                <label className=\"reg-label\">Full Name *</label>
-                <input
-                  type=\"text\"
-                  placeholder=\"e.g. Priya Sharma\"
-                  className=\"reg-text-input\"
-                  value={famName}
-                  onChange={(e) => setFamName(e.target.value)}
-                  autoFocus
-                />
+              <div className="form-group-full">
+                <label className="reg-label" htmlFor="fam-name">
+                  Full Name <span className="req-star">*</span>
+                </label>
+                <div className="reg-input-wrapper">
+                  <User size={18} className="reg-input-icon" />
+                  <input
+                    id="fam-name"
+                    type="text"
+                    placeholder="e.g. Priya Sharma"
+                    className="reg-text-input"
+                    value={famName}
+                    onChange={(e) => setFamName(e.target.value)}
+                    autoFocus
+                  />
+                </div>
               </div>
 
-              <div className=\"form-grid-2col\">
-                <div className=\"form-group-col\">
-                  <label className=\"reg-label\">Relationship</label>
+              <div className="form-row-2">
+                <div className="form-col">
+                  <label className="reg-label" htmlFor="fam-rel">
+                    Relationship <span className="req-star">*</span>
+                  </label>
                   <select
-                    className=\"reg-text-input\"
+                    id="fam-rel"
+                    className="reg-text-input"
                     value={famRelation}
                     onChange={(e) => setFamRelation(e.target.value)}
                   >
-                    <option value=\"Spouse\">Spouse</option>
-                    <option value=\"Child\">Child (Son / Daughter)</option>
-                    <option value=\"Parent\">Parent (Father / Mother)</option>
-                    <option value=\"Sibling\">Sibling (Brother / Sister)</option>
-                    <option value=\"Relative\">Other Relative</option>
+                    <option value="Spouse">Spouse</option>
+                    <option value="Child">Child (Son / Daughter)</option>
+                    <option value="Parent">Parent (Father / Mother)</option>
+                    <option value="Sibling">Sibling (Brother / Sister)</option>
+                    <option value="In-Law">In-Law</option>
+                    <option value="Relative">Relative</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
 
-                <div className=\"form-group-col\">
-                  <label className=\"reg-label\">Blood Group</label>
+                <div className="form-col">
+                  <label className="reg-label" htmlFor="fam-blood">
+                    Blood Group <span className="optional-tag">(Optional)</span>
+                  </label>
                   <select
-                    className=\"reg-text-input\"
+                    id="fam-blood"
+                    className="reg-text-input"
                     value={famBloodGroup}
                     onChange={(e) => setFamBloodGroup(e.target.value)}
                   >
-                    <option value=\"\">Select Blood Group</option>
-                    <option value=\"A+\">A+</option>
-                    <option value=\"A-\">A-</option>
-                    <option value=\"B+\">B+</option>
-                    <option value=\"B-\">B-</option>
-                    <option value=\"O+\">O+</option>
-                    <option value=\"O-\">O-</option>
-                    <option value=\"AB+\">AB+</option>
-                    <option value=\"AB-\">AB-</option>
+                    <option value="">Select Blood Group</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
                   </select>
                 </div>
               </div>
 
-              <div className=\"form-grid-2col\">
-                <div className=\"form-group-col\">
-                  <div className=\"dob-label-row\">
-                    <label className=\"reg-label\">Month & Year of Birth</label>
-                    {calculatedFamAge !== null && (
-                      <span className=\"calculated-age-badge\">Age: {calculatedFamAge} yrs</span>
-                    )}
+              <div className="form-row-2" style={{ marginTop: '10px' }}>
+                <div className="form-col">
+                  <label className="reg-label" htmlFor="fam-dob">
+                    Date of Birth (Month & Year)
+                  </label>
+                  <div className="reg-input-wrapper">
+                    <Cake size={18} className="reg-input-icon" />
+                    <input
+                      id="fam-dob"
+                      type="month"
+                      className="reg-text-input"
+                      value={famDob}
+                      onChange={(e) => setFamDob(e.target.value)}
+                    />
                   </div>
-                  <input
-                    type=\"month\"
-                    className=\"reg-text-input\"
-                    value={famDob}
-                    onChange={(e) => setFamDob(e.target.value)}
-                  />
+                  {calculatedFamAge !== null && (
+                    <span className="field-hint-text age-calculated">Calculated Age: {calculatedFamAge} years</span>
+                  )}
                 </div>
 
-                <div className=\"form-group-col\">
-                  <label className=\"reg-label\">Mobile Number (Optional)</label>
+                <div className="form-col">
+                  <label className="reg-label" htmlFor="fam-mobile">
+                    Mobile Number <span className="optional-tag">(Optional)</span>
+                  </label>
+                  <div className="reg-input-wrapper">
+                    <Phone size={18} className="reg-input-icon" />
+                    <input
+                      id="fam-mobile"
+                      type="tel"
+                      placeholder="+91 98765 43210"
+                      className="reg-text-input"
+                      value={famMobile}
+                      onChange={(e) => setFamMobile(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-group-full" style={{ marginTop: '10px' }}>
+                <label className="reg-label" htmlFor="fam-email">
+                  Gmail Address <span className="optional-tag">(Optional - for portal login)</span>
+                </label>
+                <div className="reg-input-wrapper">
+                  <Mail size={18} className="reg-input-icon" />
                   <input
-                    type=\"tel\"
-                    placeholder=\"e.g. 9876543210\"
-                    className=\"reg-text-input\"
-                    value={famMobile}
-                    onChange={(e) => setFamMobile(e.target.value)}
+                    id="fam-email"
+                    type="email"
+                    placeholder="family.member@gmail.com"
+                    className="reg-text-input"
+                    value={famEmail}
+                    onChange={(e) => setFamEmail(e.target.value)}
                   />
                 </div>
               </div>
             </div>
 
-            <div className=\"family-modal-footer\">
+            <div className="family-modal-footer">
               <button
-                type=\"button\"
-                className=\"btn-modal-cancel\"
+                type="button"
+                className="btn-modal-cancel"
                 onClick={() => setIsFamilyModalOpen(false)}
               >
                 Cancel
               </button>
               <button
-                type=\"button\"
-                className=\"btn-modal-save\"
+                type="button"
+                className="btn-modal-save"
                 onClick={handleSaveFamilyMember}
               >
-                <CheckCircle2 size={16} />
                 <span>Save Member</span>
               </button>
             </div>
@@ -1740,113 +1902,139 @@ export const RegistrationFlow: React.FC = () => {
       )}
 
       {/* ====================================================================
-          VEHICLE MODAL POPUP
+          MODAL POPUP: ADD / EDIT VEHICLE & PARKING SLOT
           ==================================================================== */}
       {isVehicleModalOpen && (
-        <div className=\"family-modal-overlay animate-fade-in\">
-          <div className=\"family-modal-dialog animate-scale-in\">
-            <div className=\"family-modal-header\">
-              <div className=\"family-modal-header-left\">
-                <Car size={20} className=\"family-modal-icon\" />
-                <h3 className=\"family-modal-title\">
-                  {editingVehicleIndex !== null ? 'Edit Vehicle Details' : 'Add Vehicle & Slot'}
+        <div className="family-modal-overlay animate-fade-in">
+          <div className="family-modal-dialog animate-scale-in">
+            <div className="family-modal-header">
+              <div className="family-modal-header-left">
+                <Car size={20} className="family-modal-icon" />
+                <h3 className="family-modal-title">
+                  {editingVehicleIndex !== null ? 'Edit Vehicle / Parking Slot' : 'Add Vehicle / Parking Slot'}
                 </h3>
               </div>
               <button
-                type=\"button\"
-                className=\"btn-modal-close\"
+                type="button"
+                className="btn-modal-close"
                 onClick={() => setIsVehicleModalOpen(false)}
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className=\"family-modal-body\">
-              {vehModalError && (
-                <div className=\"register-error-alert animate-fade-in\" style={{ margin: 0 }}>
-                  <AlertCircle size={16} />
-                  <span>{vehModalError}</span>
-                </div>
-              )}
+            <div className="family-modal-body">
+              {vehModalError && <div className="modal-error-alert">{vehModalError}</div>}
 
-              <div className=\"form-grid-2col\">
-                <div className=\"form-group-col\">
-                  <label className=\"reg-label\">Parking Slot No.</label>
+              <div className="form-row-2">
+                <div className="form-col">
+                  <label className="reg-label" htmlFor="veh-slot">
+                    Parking Slot Number <span className="req-star">*</span>
+                  </label>
                   <input
-                    type=\"text\"
-                    placeholder=\"e.g. B1-42 or Stilt-12\"
-                    className=\"reg-text-input\"
+                    id="veh-slot"
+                    type="text"
+                    placeholder="e.g. B1-042 or B2-118"
+                    className="reg-text-input"
                     value={vehSlot}
                     onChange={(e) => setVehSlot(e.target.value)}
                     autoFocus
                   />
                 </div>
 
-                <div className=\"form-group-col\">
-                  <label className=\"reg-label\">Vehicle Type</label>
+                <div className="form-col">
+                  <label className="reg-label" htmlFor="veh-type">
+                    Vehicle Type <span className="req-star">*</span>
+                  </label>
                   <select
-                    className=\"reg-text-input\"
+                    id="veh-type"
+                    className="reg-text-input"
                     value={vehType}
                     onChange={(e) => setVehType(e.target.value)}
                   >
-                    <option value=\"4W (Car)\">4W (Car)</option>
-                    <option value=\"2W (Bike/Scooter)\">2W (Bike/Scooter)</option>
-                    <option value=\"EV Car\">EV Car</option>
-                    <option value=\"EV 2W\">EV 2W</option>
+                    <option value="4W (Car)">4-Wheeler (Car / SUV)</option>
+                    <option value="2W (Bike / Scooter)">2-Wheeler (Bike / Scooter)</option>
+                    <option value="EV 4W">Electric 4W (EV Car)</option>
+                    <option value="EV 2W">Electric 2W (EV Bike)</option>
+                    <option value="Bicycle">Bicycle</option>
                   </select>
                 </div>
               </div>
 
-              <div className=\"form-grid-2col\">
-                <div className=\"form-group-col\">
-                  <label className=\"reg-label\">Make & Model</label>
+              <div className="form-row-2" style={{ marginTop: '10px' }}>
+                <div className="form-col">
+                  <label className="reg-label" htmlFor="veh-reg">
+                    Registration / Number Plate
+                  </label>
                   <input
-                    type=\"text\"
-                    placeholder=\"e.g. Hyundai Creta\"
-                    className=\"reg-text-input\"
-                    value={vehMakeModel}
-                    onChange={(e) => setVehMakeModel(e.target.value)}
-                  />
-                </div>
-
-                <div className=\"form-group-col\">
-                  <label className=\"reg-label\">Registration Number</label>
-                  <input
-                    type=\"text\"
-                    placeholder=\"e.g. TS 09 AB 1234\"
-                    className=\"reg-text-input\"
+                    id="veh-reg"
+                    type="text"
+                    placeholder="e.g. TS09EA1234"
+                    className="reg-text-input uppercase"
                     value={vehRegNumber}
                     onChange={(e) => setVehRegNumber(e.target.value)}
                   />
                 </div>
+
+                <div className="form-col">
+                  <label className="reg-label" htmlFor="veh-make">
+                    Make & Model
+                  </label>
+                  <input
+                    id="veh-make"
+                    type="text"
+                    placeholder="e.g. Honda City / Hyundai Creta"
+                    className="reg-text-input"
+                    value={vehMakeModel}
+                    onChange={(e) => setVehMakeModel(e.target.value)}
+                  />
+                </div>
               </div>
 
-              <div className=\"form-group-full\">
-                <label className=\"reg-label\">Colour / Remarks (Optional)</label>
-                <input
-                  type=\"text\"
-                  placeholder=\"e.g. White color, FASTag enabled\"
-                  className=\"reg-text-input\"
-                  value={vehColour}
-                  onChange={(e) => setVehColour(e.target.value)}
-                />
+              <div className="form-row-2" style={{ marginTop: '10px' }}>
+                <div className="form-col">
+                  <label className="reg-label" htmlFor="veh-colour">
+                    Vehicle Colour
+                  </label>
+                  <input
+                    id="veh-colour"
+                    type="text"
+                    placeholder="e.g. White, Silver, Black"
+                    className="reg-text-input"
+                    value={vehColour}
+                    onChange={(e) => setVehColour(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-col">
+                  <label className="reg-label" htmlFor="veh-remarks">
+                    Notes / Bay Location
+                  </label>
+                  <input
+                    id="veh-remarks"
+                    type="text"
+                    placeholder="e.g. Near Tower A Lift Pillar"
+                    className="reg-text-input"
+                    value={vehRemarks}
+                    onChange={(e) => setVehRemarks(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className=\"family-modal-footer\">
+            <div className="family-modal-footer">
               <button
-                type=\"button\"
-                className=\"btn-modal-cancel\"
+                type="button"
+                className="btn-modal-cancel"
                 onClick={() => setIsVehicleModalOpen(false)}
               >
                 Cancel
               </button>
               <button
-                type=\"button\"
-                className=\"btn-modal-save\"
+                type="button"
+                className="btn-modal-save"
                 onClick={handleSaveVehicle}
               >
-                <CheckCircle2 size={16} />
                 <span>Save Vehicle</span>
               </button>
             </div>
@@ -1858,58 +2046,58 @@ export const RegistrationFlow: React.FC = () => {
           INFO MODAL POPUP: WHY ADD FAMILY MEMBERS?
           ==================================================================== */}
       {isFamilyInfoModalOpen && (
-        <div className=\"family-modal-overlay animate-fade-in\">
-          <div className=\"family-modal-dialog info-modal animate-scale-in\">
-            <div className=\"family-modal-header\">
-              <div className=\"family-modal-header-left\">
-                <HeartHandshake size={20} className=\"family-modal-icon\" />
-                <h3 className=\"family-modal-title\">Why Add Residing Family Members?</h3>
+        <div className="family-modal-overlay animate-fade-in">
+          <div className="family-modal-dialog info-modal animate-scale-in">
+            <div className="family-modal-header">
+              <div className="family-modal-header-left">
+                <HeartHandshake size={20} className="family-modal-icon" />
+                <h3 className="family-modal-title">Why Add Residing Family Members?</h3>
               </div>
               <button
-                type=\"button\"
-                className=\"btn-modal-close\"
+                type="button"
+                className="btn-modal-close"
                 onClick={() => setIsFamilyInfoModalOpen(false)}
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className=\"family-modal-body\">
-              <div className=\"info-popup-benefit-card\">
-                <div className=\"info-benefit-icon-badge\">
+            <div className="family-modal-body">
+              <div className="info-popup-benefit-card">
+                <div className="info-benefit-icon-badge">
                   <Users size={18} />
                 </div>
-                <div className=\"info-benefit-content\">
+                <div className="info-benefit-content">
                   <h4>Accurate Community Headcount</h4>
                   <p>Enables accurate planning for society dinners, festival prasad, puja arrangements, and community events.</p>
                 </div>
               </div>
 
-              <div className=\"info-popup-benefit-card\">
-                <div className=\"info-benefit-icon-badge\">
+              <div className="info-popup-benefit-card">
+                <div className="info-benefit-icon-badge">
                   <ShieldCheck size={18} />
                 </div>
-                <div className=\"info-benefit-content\">
+                <div className="info-benefit-content">
                   <h4>Emergency & Security Support</h4>
                   <p>In case of emergencies or medical assistance, society guards and emergency responders have instant family contact information.</p>
                 </div>
               </div>
 
-              <div className=\"info-popup-benefit-card\">
-                <div className=\"info-benefit-icon-badge\">
+              <div className="info-popup-benefit-card">
+                <div className="info-benefit-icon-badge">
                   <KeyRound size={18} />
                 </div>
-                <div className=\"info-benefit-content\">
+                <div className="info-benefit-content">
                   <h4>Access & Facilities</h4>
                   <p>Enables registered family members to utilize clubhouse amenities, book badminton courts, and access resident features.</p>
                 </div>
               </div>
             </div>
 
-            <div className=\"family-modal-footer\">
+            <div className="family-modal-footer">
               <button
-                type=\"button\"
-                className=\"btn-modal-save\"
+                type="button"
+                className="btn-modal-save"
                 onClick={() => setIsFamilyInfoModalOpen(false)}
               >
                 Got It
