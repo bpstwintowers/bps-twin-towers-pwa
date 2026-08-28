@@ -324,7 +324,7 @@ export const OpportunityFormModal: React.FC<OpportunityFormModalProps> = ({
             />
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+          <div className="modal-footer">
             <button
               type="button"
               className="btn-outline"
@@ -337,9 +337,8 @@ export const OpportunityFormModal: React.FC<OpportunityFormModalProps> = ({
               type="submit"
               className="btn-primary"
               disabled={submitting}
-              style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' }}
             >
-              {submitting ? 'Saving...' : opportunityToEdit ? 'Update Opportunity' : 'Publish Opportunity'}
+              {submitting ? 'Saving...' : opportunityToEdit ? 'Update Opportunity' : 'Create Opportunity'}
             </button>
           </div>
         </form>

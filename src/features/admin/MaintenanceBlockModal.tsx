@@ -168,12 +168,21 @@ export const MaintenanceBlockModal: React.FC<MaintenanceBlockModalProps> = ({
             />
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-            <button type="button" className="btn-outline" onClick={onClose} disabled={submitting}>
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn-outline"
+              onClick={onClose}
+              disabled={submitting}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn-primary" disabled={submitting}>
-              {submitting ? 'Creating Block...' : 'Block Facility Slot'}
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={submitting}
+            >
+              {submitting ? 'Creating...' : 'Block Facility'}
             </button>
           </div>
         </form>

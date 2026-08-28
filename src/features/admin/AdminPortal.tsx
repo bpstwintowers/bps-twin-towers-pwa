@@ -20,6 +20,7 @@ import {
   Megaphone,
   Sparkles,
   Wrench,
+  Menu,
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import {
@@ -74,6 +75,7 @@ export const AdminPortal: React.FC = () => {
 
   // Navigation & Tabs
   const [activeTab, setActiveTab] = useState<ActiveTab>(getInitialTab);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   useEffect(() => {
     const targetTab = getInitialTab();
@@ -228,37 +230,220 @@ export const AdminPortal: React.FC = () => {
   };
 
   return (
-    <div className="admin-container">
-      <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
-        {/* Modern Executive Header */}
+    <div className="admin-layout">
+      {/* 1. ADMIN DESKTOP SIDEBAR (MATCHES RESIDENTS MENU ARCHITECTURE) */}
+      <aside className={`admin-sidebar ${isMobileNavOpen ? 'mobile-open' : ''}`}>
+        <div className="admin-sidebar-header">
+          <div className="admin-sidebar-brand" onClick={() => navigate('/')}>
+            <img src="/logo.png" alt="BPS" className="admin-sidebar-logo" />
+            <div>
+              <div className="admin-sidebar-name">BPS Twin Towers</div>
+              <div className="admin-sidebar-badge">Society Admin</div>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="admin-sidebar-close-btn"
+            onClick={() => setIsMobileNavOpen(false)}
+            aria-label="Close navigation"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Navigation Menu List */}
+        <nav className="admin-sidebar-nav">
+          <div className="admin-nav-section-label">OPERATIONS & DIRECTORY</div>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'registrations' ? 'active' : ''}`}
+            onClick={() => {
+              handleTabChange('registrations');
+              setIsMobileNavOpen(false);
+            }}
+          >
+            <FileCheck size={18} />
+            <span>Registration Queue</span>
+            {(stats?.pendingCount ?? 0) > 0 && (
+              <span className="admin-nav-badge">{stats?.pendingCount}</span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'residents' ? 'active' : ''}`}
+            onClick={() => {
+              handleTabChange('residents');
+              setIsMobileNavOpen(false);
+            }}
+          >
+            <Users size={18} />
+            <span>Resident Directory</span>
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'flats' ? 'active' : ''}`}
+            onClick={() => {
+              handleTabChange('flats');
+              setIsMobileNavOpen(false);
+            }}
+          >
+            <Building size={18} />
+            <span>Flat Inventory</span>
+          </button>
+
+          <div className="admin-nav-section-label">COMMUNITY & EVENTS</div>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'events' ? 'active' : ''}`}
+            onClick={() => {
+              handleTabChange('events');
+              setIsMobileNavOpen(false);
+            }}
+          >
+            <Calendar size={18} />
+            <span>Events & Festivals</span>
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'finance' ? 'active' : ''}`}
+            onClick={() => {
+              handleTabChange('finance');
+              setIsMobileNavOpen(false);
+            }}
+          >
+            <HeartHandshake size={18} />
+            <span>Donations & Finance</span>
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'volunteers' ? 'active' : ''}`}
+            onClick={() => {
+              handleTabChange('volunteers');
+              setIsMobileNavOpen(false);
+            }}
+          >
+            <HandHelping size={18} />
+            <span>Volunteers & Teams</span>
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'sponsors' ? 'active' : ''}`}
+            onClick={() => {
+              handleTabChange('sponsors');
+              setIsMobileNavOpen(false);
+            }}
+          >
+            <Award size={18} />
+            <span>Sponsors & Partners</span>
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'communications' ? 'active' : ''}`}
+            onClick={() => {
+              handleTabChange('communications');
+              setIsMobileNavOpen(false);
+            }}
+          >
+            <Megaphone size={18} />
+            <span>Communications & Notices</span>
+          </button>
+
+          <div className="admin-nav-section-label">FACILITIES & SECURITY</div>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'visitors' ? 'active' : ''}`}
+            onClick={() => {
+              handleTabChange('visitors');
+              setIsMobileNavOpen(false);
+            }}
+          >
+            <Shield size={18} />
+            <span>Visitors & Gate</span>
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'facilities' ? 'active' : ''}`}
+            onClick={() => {
+              handleTabChange('facilities');
+              setIsMobileNavOpen(false);
+            }}
+          >
+            <Sparkles size={18} />
+            <span>Facilities</span>
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'complaints' ? 'active' : ''}`}
+            onClick={() => {
+              handleTabChange('complaints');
+              setIsMobileNavOpen(false);
+            }}
+          >
+            <Wrench size={18} />
+            <span>Helpdesk</span>
+          </button>
+        </nav>
+
+        {/* Sidebar Footer: Return to resident view */}
+        <div className="admin-sidebar-footer">
+          <button
+            type="button"
+            className="admin-nav-return-btn"
+            onClick={() => navigate('/')}
+          >
+            <ArrowLeft size={16} />
+            <span>Resident Dashboard</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Mobile drawer backdrop */}
+      {isMobileNavOpen && (
+        <div
+          className="admin-mobile-backdrop"
+          onClick={() => setIsMobileNavOpen(false)}
+        />
+      )}
+
+      {/* 2. ADMIN MAIN SCROLLABLE CONTENT */}
+      <main className="admin-main-area">
+        {/* Executive Header */}
         <div className="admin-header">
           <div className="admin-header-title">
             <button
-              className="btn-header-back"
-              onClick={() => navigate('/')}
-              title="Return to Resident Dashboard"
+              type="button"
+              className="btn-mobile-menu-toggle"
+              onClick={() => setIsMobileNavOpen(true)}
+              aria-label="Open navigation menu"
             >
-              <ArrowLeft size={16} />
-              <span>Resident View</span>
+              <Menu size={20} />
             </button>
-
-            <div className="admin-header-icon-badge">
-              <Shield size={24} />
-            </div>
 
             <div className="admin-title-text">
               <h1>
-                <span>Executive Command Console</span>
-                <span className="admin-badge">Live Management</span>
+                <span>Society Operations</span>
+                <span className="admin-badge">Executive Console</span>
               </h1>
               <p className="admin-subtitle">
-                BPS Twin Towers Society Operations • Tower A & B
+                BPS Twin Towers Administration • Tower A & B
               </p>
             </div>
           </div>
 
           <div className="admin-header-actions">
             <button
+              type="button"
               className="btn-header-refresh"
               onClick={loadAllData}
               disabled={loading}
@@ -288,7 +473,11 @@ export const AdminPortal: React.FC = () => {
             }}
           >
             <span>{actionSuccess}</span>
-            <button onClick={() => setActionSuccess(null)} style={{ color: '#059669', background: 'none', border: 'none', cursor: 'pointer' }}>
+            <button
+              type="button"
+              onClick={() => setActionSuccess(null)}
+              style={{ color: '#059669', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
               <X size={16} />
             </button>
           </div>
@@ -311,7 +500,11 @@ export const AdminPortal: React.FC = () => {
             }}
           >
             <span>{actionError}</span>
-            <button onClick={() => setActionError(null)} style={{ color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer' }}>
+            <button
+              type="button"
+              onClick={() => setActionError(null)}
+              style={{ color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
               <X size={16} />
             </button>
           </div>
@@ -393,102 +586,6 @@ export const AdminPortal: React.FC = () => {
               </div>
               <div className="stat-label">Occupied Flat Inventory</div>
             </div>
-          </div>
-        </div>
-
-        {/* Segmented Admin Navigation Tabs */}
-        <div className="admin-tabs-container">
-          <div className="admin-tabs">
-            <button
-              className={`admin-tab ${activeTab === 'registrations' ? 'active' : ''}`}
-              onClick={() => handleTabChange('registrations')}
-            >
-              <FileCheck size={16} />
-              <span>Registration Queue</span>
-              {(stats?.pendingCount ?? 0) > 0 && (
-                <span className="admin-tab-count">{stats?.pendingCount}</span>
-              )}
-            </button>
-
-            <button
-              className={`admin-tab ${activeTab === 'residents' ? 'active' : ''}`}
-              onClick={() => handleTabChange('residents')}
-            >
-              <Users size={16} />
-              <span>Resident Directory</span>
-            </button>
-
-            <button
-              className={`admin-tab ${activeTab === 'flats' ? 'active' : ''}`}
-              onClick={() => handleTabChange('flats')}
-            >
-              <Building size={16} />
-              <span>Flat Inventory</span>
-            </button>
-
-            <button
-              className={`admin-tab ${activeTab === 'events' ? 'active' : ''}`}
-              onClick={() => handleTabChange('events')}
-            >
-              <Calendar size={16} />
-              <span>Events & Festivals</span>
-            </button>
-
-            <button
-              className={`admin-tab ${activeTab === 'finance' ? 'active' : ''}`}
-              onClick={() => handleTabChange('finance')}
-            >
-              <HeartHandshake size={16} />
-              <span>Donations & Finance</span>
-            </button>
-
-            <button
-              className={`admin-tab ${activeTab === 'volunteers' ? 'active' : ''}`}
-              onClick={() => handleTabChange('volunteers')}
-            >
-              <HandHelping size={16} />
-              <span>Volunteers & Teams</span>
-            </button>
-
-            <button
-              className={`admin-tab ${activeTab === 'sponsors' ? 'active' : ''}`}
-              onClick={() => handleTabChange('sponsors')}
-            >
-              <Award size={16} />
-              <span>Sponsors & Partners</span>
-            </button>
-
-            <button
-              className={`admin-tab ${activeTab === 'communications' ? 'active' : ''}`}
-              onClick={() => handleTabChange('communications')}
-            >
-              <Megaphone size={16} />
-              <span>Communications & Notices</span>
-            </button>
-
-            <button
-              className={`admin-tab ${activeTab === 'visitors' ? 'active' : ''}`}
-              onClick={() => handleTabChange('visitors')}
-            >
-              <Shield size={16} />
-              <span>Visitors & Gate</span>
-            </button>
-
-            <button
-              className={`admin-tab ${activeTab === 'facilities' ? 'active' : ''}`}
-              onClick={() => handleTabChange('facilities')}
-            >
-              <Sparkles size={16} />
-              <span>Facilities</span>
-            </button>
-
-            <button
-              className={`admin-tab ${activeTab === 'complaints' ? 'active' : ''}`}
-              onClick={() => handleTabChange('complaints')}
-            >
-              <Wrench size={16} />
-              <span>Helpdesk</span>
-            </button>
           </div>
         </div>
 
@@ -886,7 +983,7 @@ export const AdminPortal: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };

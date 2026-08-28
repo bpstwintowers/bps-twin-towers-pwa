@@ -244,15 +244,19 @@ export const SponsorTierModal: React.FC<SponsorTierModalProps> = ({
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-            <button type="button" className="btn-outline" onClick={onClose} disabled={submitting}>
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn-outline"
+              onClick={onClose}
+              disabled={submitting}
+            >
               Cancel
             </button>
             <button
               type="submit"
               className="btn-primary"
               disabled={submitting}
-              style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}
             >
               {submitting ? 'Saving...' : tierToEdit ? 'Update Tier' : 'Create Tier'}
             </button>

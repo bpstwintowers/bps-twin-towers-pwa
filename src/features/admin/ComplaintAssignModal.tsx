@@ -178,12 +178,21 @@ export const ComplaintAssignModal: React.FC<ComplaintAssignModalProps> = ({
             />
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-            <button type="button" className="btn-outline" onClick={onClose} disabled={submitting}>
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn-outline"
+              onClick={onClose}
+              disabled={submitting}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn-primary" disabled={submitting}>
-              {submitting ? 'Updating...' : 'Save & Update Ticket'}
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={submitting}
+            >
+              {submitting ? 'Updating...' : 'Save Assignment'}
             </button>
           </div>
         </form>

@@ -240,8 +240,13 @@ export const AnnouncementFormModal: React.FC<AnnouncementFormModalProps> = ({
             />
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-            <button type="button" className="btn-outline" onClick={onClose} disabled={submitting}>
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn-outline"
+              onClick={onClose}
+              disabled={submitting}
+            >
               Cancel
             </button>
             <button
@@ -249,7 +254,7 @@ export const AnnouncementFormModal: React.FC<AnnouncementFormModalProps> = ({
               className="btn-primary"
               disabled={submitting}
             >
-              {submitting ? 'Saving...' : announcementToEdit ? 'Update Draft' : 'Save Announcement Draft'}
+              {submitting ? 'Publishing...' : 'Publish Announcement'}
             </button>
           </div>
         </form>

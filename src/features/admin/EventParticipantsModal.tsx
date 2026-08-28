@@ -138,6 +138,12 @@ export const EventParticipantsModal: React.FC<EventParticipantsModalProps> = ({
             </table>
           )}
         </div>
+
+        <div className="modal-footer">
+          <button type="button" className="btn-outline" onClick={onClose}>
+            Close
+          </button>
+        </div>
       </div>
     </div>
   );

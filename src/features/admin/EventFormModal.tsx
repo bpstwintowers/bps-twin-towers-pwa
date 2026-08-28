@@ -320,7 +320,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             />
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+          <div className="modal-footer">
             <button
               type="button"
               className="btn-outline"
