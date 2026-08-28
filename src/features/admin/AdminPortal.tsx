@@ -229,71 +229,66 @@ export const AdminPortal: React.FC = () => {
 
   return (
     <div className="admin-container">
-      <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-        {/* Header */}
+      <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
+        {/* Modern Executive Header */}
         <div className="admin-header">
           <div className="admin-header-title">
             <button
-              className="btn-outline"
+              className="btn-header-back"
               onClick={() => navigate('/')}
-              style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)' }}
               title="Return to Resident Dashboard"
             >
-              <ArrowLeft size={18} />
+              <ArrowLeft size={16} />
+              <span>Resident View</span>
             </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <img
-                src="/logo.png"
-                alt="BPS"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '6px',
-                  objectFit: 'cover',
-                }}
-              />
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Shield size={18} style={{ color: '#f59e0b' }} />
-                  <h1 style={{ fontSize: '1.35rem', fontWeight: 700, margin: 0 }}>
-                    Admin Portal
-                  </h1>
-                  <span className="admin-badge">Admin Access</span>
-                </div>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  BPS Twin Towers Society Management
-                </p>
-              </div>
+
+            <div className="admin-header-icon-badge">
+              <Shield size={24} />
+            </div>
+
+            <div className="admin-title-text">
+              <h1>
+                <span>Executive Command Console</span>
+                <span className="admin-badge">Live Management</span>
+              </h1>
+              <p className="admin-subtitle">
+                BPS Twin Towers Society Operations • Tower A & B
+              </p>
             </div>
           </div>
-          <button
-            className="btn-outline"
-            onClick={loadAllData}
-            disabled={loading}
-            style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
-          >
-            <RefreshCw size={15} />
-            Refresh
-          </button>
+
+          <div className="admin-header-actions">
+            <button
+              className="btn-header-refresh"
+              onClick={loadAllData}
+              disabled={loading}
+              title="Refresh Realtime Society Data"
+            >
+              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+              <span>{loading ? 'Refreshing...' : 'Sync Data'}</span>
+            </button>
+          </div>
         </div>
 
         {/* Action feedback banners */}
         {actionSuccess && (
           <div
             style={{
-              padding: '0.75rem 1rem',
+              padding: '0.85rem 1.25rem',
               background: 'rgba(16, 185, 129, 0.12)',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
-              borderRadius: 'var(--radius-md)',
-              color: '#34d399',
-              marginBottom: '1rem',
+              border: '1px solid rgba(16, 185, 129, 0.35)',
+              borderRadius: 'var(--radius-lg)',
+              color: '#059669',
+              fontWeight: 600,
+              marginBottom: '1.25rem',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.08)',
             }}
           >
             <span>{actionSuccess}</span>
-            <button onClick={() => setActionSuccess(null)} style={{ color: '#34d399' }}>
+            <button onClick={() => setActionSuccess(null)} style={{ color: '#059669', background: 'none', border: 'none', cursor: 'pointer' }}>
               <X size={16} />
             </button>
           </div>
@@ -302,153 +297,212 @@ export const AdminPortal: React.FC = () => {
         {actionError && (
           <div
             style={{
-              padding: '0.75rem 1rem',
+              padding: '0.85rem 1.25rem',
               background: 'rgba(239, 68, 68, 0.12)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: 'var(--radius-md)',
-              color: '#f87171',
-              marginBottom: '1rem',
+              border: '1px solid rgba(239, 68, 68, 0.35)',
+              borderRadius: 'var(--radius-lg)',
+              color: '#dc2626',
+              fontWeight: 600,
+              marginBottom: '1.25rem',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.08)',
             }}
           >
             <span>{actionError}</span>
-            <button onClick={() => setActionError(null)} style={{ color: '#f87171' }}>
+            <button onClick={() => setActionError(null)} style={{ color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer' }}>
               <X size={16} />
             </button>
           </div>
         )}
 
-        {/* Stats Grid */}
+        {/* Luxury KPI Metrics Stat Cards Grid */}
         <div className="admin-stats-grid">
-          <div className="stat-card" style={{ borderLeft: '4px solid #f59e0b' }}>
-            <span className="stat-number">{stats?.pendingCount ?? 0}</span>
-            <span className="stat-label">Pending Requests</span>
+          {/* 1. Pending Approvals */}
+          <div className="stat-card pending">
+            <div className="stat-card-top">
+              <div className="stat-icon-wrapper amber">
+                <FileCheck size={20} />
+              </div>
+              <span className="stat-trend-pill amber">
+                {(stats?.pendingCount ?? 0) > 0 ? '● Action Required' : '✓ Cleared'}
+              </span>
+            </div>
+            <div>
+              <div className="stat-number">{stats?.pendingCount ?? 0}</div>
+              <div className="stat-label">Pending Registrations</div>
+            </div>
           </div>
-          <div className="stat-card" style={{ borderLeft: '4px solid #fb923c' }}>
-            <span className="stat-number">{stats?.correctionCount ?? 0}</span>
-            <span className="stat-label">Corrections</span>
+
+          {/* 2. Corrections Required */}
+          <div className="stat-card action">
+            <div className="stat-card-top">
+              <div className="stat-icon-wrapper red">
+                <AlertTriangle size={20} />
+              </div>
+              <span className="stat-trend-pill">Awaiting Edit</span>
+            </div>
+            <div>
+              <div className="stat-number">{stats?.correctionCount ?? 0}</div>
+              <div className="stat-label">Resident Corrections</div>
+            </div>
           </div>
-          <div className="stat-card" style={{ borderLeft: '4px solid #10b981' }}>
-            <span className="stat-number">{stats?.approvedCount ?? 0}</span>
-            <span className="stat-label">Approved Total</span>
+
+          {/* 3. Approved Registrations */}
+          <div className="stat-card occupancy">
+            <div className="stat-card-top">
+              <div className="stat-icon-wrapper emerald">
+                <CheckCircle size={20} />
+              </div>
+              <span className="stat-trend-pill green">Verified</span>
+            </div>
+            <div>
+              <div className="stat-number">{stats?.approvedCount ?? 0}</div>
+              <div className="stat-label">Approved Members</div>
+            </div>
           </div>
-          <div className="stat-card" style={{ borderLeft: '4px solid var(--accent-primary)' }}>
-            <span className="stat-number">{stats?.totalResidents ?? 0}</span>
-            <span className="stat-label">Active Members</span>
+
+          {/* 4. Active Residents */}
+          <div className="stat-card residents">
+            <div className="stat-card-top">
+              <div className="stat-icon-wrapper blue">
+                <Users size={20} />
+              </div>
+              <span className="stat-trend-pill">Directory</span>
+            </div>
+            <div>
+              <div className="stat-number">{stats?.totalResidents ?? 0}</div>
+              <div className="stat-label">Total Residents</div>
+            </div>
           </div>
-          <div className="stat-card" style={{ borderLeft: '4px solid #8b5cf6' }}>
-            <span className="stat-number">{stats?.totalFlats ?? 504}</span>
-            <span className="stat-label">Total Flats</span>
+
+          {/* 5. Flat Inventory & Occupancy */}
+          <div className="stat-card flats">
+            <div className="stat-card-top">
+              <div className="stat-icon-wrapper teal">
+                <Building size={20} />
+              </div>
+              <span className="stat-trend-pill green">
+                {Math.round(((stats?.occupiedFlats ?? 0) / (stats?.totalFlats || 504)) * 100)}% Occupied
+              </span>
+            </div>
+            <div>
+              <div className="stat-number">
+                {stats?.occupiedFlats ?? 0} <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ {stats?.totalFlats ?? 504}</span>
+              </div>
+              <div className="stat-label">Occupied Flat Inventory</div>
+            </div>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="admin-tabs">
-          <button
-            className={`admin-tab ${activeTab === 'registrations' ? 'active' : ''}`}
-            onClick={() => handleTabChange('registrations')}
-          >
-            <FileCheck size={16} />
-            Registration Queue
-            {(stats?.pendingCount ?? 0) > 0 && (
-              <span className="admin-tab-count">{stats?.pendingCount}</span>
-            )}
-          </button>
-          <button
-            className={`admin-tab ${activeTab === 'residents' ? 'active' : ''}`}
-            onClick={() => handleTabChange('residents')}
-          >
-            <Users size={16} />
-            Resident Directory
-          </button>
-          <button
-            className={`admin-tab ${activeTab === 'flats' ? 'active' : ''}`}
-            onClick={() => handleTabChange('flats')}
-          >
-            <Building size={16} />
-            Flat Inventory
-          </button>
-          <button
-            className={`admin-tab ${activeTab === 'events' ? 'active' : ''}`}
-            onClick={() => handleTabChange('events')}
-          >
-            <Calendar size={16} />
-            Events & Festivals
-          </button>
-          <button
-            className={`admin-tab ${activeTab === 'finance' ? 'active' : ''}`}
-            onClick={() => handleTabChange('finance')}
-          >
-            <HeartHandshake size={16} />
-            Donations & Finance
-          </button>
-          <button
-            className={`admin-tab ${activeTab === 'volunteers' ? 'active' : ''}`}
-            onClick={() => handleTabChange('volunteers')}
-          >
-            <HandHelping size={16} />
-            Volunteers & Teams
-          </button>
-          <button
-            className={`admin-tab ${activeTab === 'sponsors' ? 'active' : ''}`}
-            onClick={() => handleTabChange('sponsors')}
-          >
-            <Award size={16} />
-            Sponsors & Partners
-          </button>
-          <button
-            className={`admin-tab ${activeTab === 'communications' ? 'active' : ''}`}
-            onClick={() => handleTabChange('communications')}
-          >
-            <Megaphone size={16} />
-            Communications & Notices
-          </button>
-          <button
-            className={`admin-tab ${activeTab === 'visitors' ? 'active' : ''}`}
-            onClick={() => handleTabChange('visitors')}
-          >
-            <Shield size={16} />
-            Visitors & Gate
-          </button>
-          <button
-            className={`admin-tab ${activeTab === 'facilities' ? 'active' : ''}`}
-            onClick={() => handleTabChange('facilities')}
-          >
-            <Sparkles size={16} />
-            Facilities
-          </button>
-          <button
-            className={`admin-tab ${activeTab === 'complaints' ? 'active' : ''}`}
-            onClick={() => handleTabChange('complaints')}
-          >
-            <Wrench size={16} />
-            Helpdesk
-          </button>
+        {/* Segmented Admin Navigation Tabs */}
+        <div className="admin-tabs-container">
+          <div className="admin-tabs">
+            <button
+              className={`admin-tab ${activeTab === 'registrations' ? 'active' : ''}`}
+              onClick={() => handleTabChange('registrations')}
+            >
+              <FileCheck size={16} />
+              <span>Registration Queue</span>
+              {(stats?.pendingCount ?? 0) > 0 && (
+                <span className="admin-tab-count">{stats?.pendingCount}</span>
+              )}
+            </button>
+
+            <button
+              className={`admin-tab ${activeTab === 'residents' ? 'active' : ''}`}
+              onClick={() => handleTabChange('residents')}
+            >
+              <Users size={16} />
+              <span>Resident Directory</span>
+            </button>
+
+            <button
+              className={`admin-tab ${activeTab === 'flats' ? 'active' : ''}`}
+              onClick={() => handleTabChange('flats')}
+            >
+              <Building size={16} />
+              <span>Flat Inventory</span>
+            </button>
+
+            <button
+              className={`admin-tab ${activeTab === 'events' ? 'active' : ''}`}
+              onClick={() => handleTabChange('events')}
+            >
+              <Calendar size={16} />
+              <span>Events & Festivals</span>
+            </button>
+
+            <button
+              className={`admin-tab ${activeTab === 'finance' ? 'active' : ''}`}
+              onClick={() => handleTabChange('finance')}
+            >
+              <HeartHandshake size={16} />
+              <span>Donations & Finance</span>
+            </button>
+
+            <button
+              className={`admin-tab ${activeTab === 'volunteers' ? 'active' : ''}`}
+              onClick={() => handleTabChange('volunteers')}
+            >
+              <HandHelping size={16} />
+              <span>Volunteers & Teams</span>
+            </button>
+
+            <button
+              className={`admin-tab ${activeTab === 'sponsors' ? 'active' : ''}`}
+              onClick={() => handleTabChange('sponsors')}
+            >
+              <Award size={16} />
+              <span>Sponsors & Partners</span>
+            </button>
+
+            <button
+              className={`admin-tab ${activeTab === 'communications' ? 'active' : ''}`}
+              onClick={() => handleTabChange('communications')}
+            >
+              <Megaphone size={16} />
+              <span>Communications & Notices</span>
+            </button>
+
+            <button
+              className={`admin-tab ${activeTab === 'visitors' ? 'active' : ''}`}
+              onClick={() => handleTabChange('visitors')}
+            >
+              <Shield size={16} />
+              <span>Visitors & Gate</span>
+            </button>
+
+            <button
+              className={`admin-tab ${activeTab === 'facilities' ? 'active' : ''}`}
+              onClick={() => handleTabChange('facilities')}
+            >
+              <Sparkles size={16} />
+              <span>Facilities</span>
+            </button>
+
+            <button
+              className={`admin-tab ${activeTab === 'complaints' ? 'active' : ''}`}
+              onClick={() => handleTabChange('complaints')}
+            >
+              <Wrench size={16} />
+              <span>Helpdesk</span>
+            </button>
+          </div>
         </div>
 
         {/* Search & Filter Bar (Only for Registrations, Residents, Flats) */}
         {activeTab !== 'events' && activeTab !== 'finance' && activeTab !== 'volunteers' && activeTab !== 'sponsors' && activeTab !== 'communications' && activeTab !== 'visitors' && activeTab !== 'facilities' && activeTab !== 'complaints' && (
           <div className="admin-filter-bar">
-            <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
-              <Search
-                size={16}
-                style={{
-                  position: 'absolute',
-                  left: '0.75rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: 'var(--text-muted)',
-                }}
-              />
+            <div className="admin-search-wrapper">
+              <Search size={18} className="admin-search-icon" />
               <input
                 type="text"
                 className="admin-search-input"
-                style={{ paddingLeft: '2.4rem' }}
                 placeholder={
                   activeTab === 'registrations'
-                    ? 'Search by flat, applicant name, or mobile...'
+                    ? 'Search by applicant, flat number, or contact...'
                     : activeTab === 'residents'
                     ? 'Search residents...'
                     : 'Search flat number or block...'
@@ -459,23 +513,16 @@ export const AdminPortal: React.FC = () => {
             </div>
 
             {activeTab === 'registrations' && (
-              <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+              <div className="admin-status-filters">
                 {(['Pending', 'Correction Required', 'Approved', 'Rejected', 'ALL'] as StatusFilter[]).map(
                   (filter) => (
                     <button
                       key={filter}
-                      className="btn-outline"
+                      type="button"
+                      className={`status-filter-chip ${statusFilter === filter ? 'active' : ''}`}
                       onClick={() => setStatusFilter(filter)}
-                      style={{
-                        padding: '0.45rem 0.75rem',
-                        fontSize: '0.8rem',
-                        background:
-                          statusFilter === filter ? 'rgba(59, 130, 246, 0.2)' : undefined,
-                        borderColor:
-                          statusFilter === filter ? 'var(--accent-primary)' : undefined,
-                      }}
                     >
-                      {filter}
+                      {filter === 'ALL' ? 'All Requests' : filter}
                     </button>
                   )
                 )}
