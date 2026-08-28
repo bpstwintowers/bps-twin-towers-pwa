@@ -88,118 +88,123 @@ export const AdminFacilities: React.FC = () => {
   const pendingCount = bookings.filter((b) => b.status === 'Pending').length;
 
   return (
-    <div className="animate-fade-in">
-      {/* Metric Cards */}
-      <div className="admin-stats-grid" style={{ marginBottom: '1.5rem' }}>
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: 'var(--accent-primary)' }}>
-            {facilities.filter((f) => f.status === 'Active').length}
-          </span>
-          <span className="stat-label">Active Facilities</span>
+    <div className="admin-subpage-layout">
+      {/* Fixed Top Section: Facilities Metric Cards & Sub-tabs (Does Not Scroll) */}
+      <div className="admin-subpage-top">
+        {/* Metric Cards */}
+        <div className="admin-stats-grid">
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: 'var(--accent-primary)' }}>
+              {facilities.filter((f) => f.status === 'Active').length}
+            </span>
+            <span className="stat-label">Active Facilities</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#10b981' }}>
+              {bookings.filter((b) => b.status === 'Confirmed').length}
+            </span>
+            <span className="stat-label">Confirmed Bookings</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#fbbf24' }}>
+              {pendingCount}
+            </span>
+            <span className="stat-label">Pending Approvals</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#f87171' }}>
+              {blocks.filter((b) => b.status === 'Active').length}
+            </span>
+            <span className="stat-label">Maintenance Blocks</span>
+          </div>
         </div>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#10b981' }}>
-            {bookings.filter((b) => b.status === 'Confirmed').length}
-          </span>
-          <span className="stat-label">Confirmed Bookings</span>
-        </div>
+        {/* Sub Tabs */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              className={`admin-tab ${activeSubTab === 'facilities' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('facilities')}
+            >
+              Facilities Catalog ({facilities.length})
+            </button>
+            <button
+              className={`admin-tab ${activeSubTab === 'bookings' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('bookings')}
+            >
+              Bookings Queue {pendingCount > 0 && `(${pendingCount} Pending)`}
+            </button>
+            <button
+              className={`admin-tab ${activeSubTab === 'blocks' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('blocks')}
+            >
+              Maintenance Blocks ({blocks.length})
+            </button>
+          </div>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#fbbf24' }}>
-            {pendingCount}
-          </span>
-          <span className="stat-label">Pending Approvals</span>
-        </div>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            {activeSubTab === 'facilities' && (
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  setEditingFacility(null);
+                  setIsFacilityModalOpen(true);
+                }}
+                style={{ fontSize: '0.82rem', padding: '0.45rem 0.85rem', gap: '0.35rem' }}
+              >
+                <PlusCircle size={15} /> Add Facility
+              </button>
+            )}
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#f87171' }}>
-            {blocks.filter((b) => b.status === 'Active').length}
-          </span>
-          <span className="stat-label">Maintenance Blocks</span>
+            {activeSubTab === 'blocks' && (
+              <button
+                className="btn-primary"
+                onClick={() => setIsBlockModalOpen(true)}
+                style={{ fontSize: '0.82rem', padding: '0.45rem 0.85rem', gap: '0.35rem', background: '#f59e0b' }}
+              >
+                <Wrench size={15} /> Schedule Block
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {success && (
-        <div
-          style={{
-            padding: '0.65rem 0.85rem',
-            background: 'rgba(16, 185, 129, 0.12)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            color: '#34d399',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {success}
-        </div>
-      )}
-
-      {error && (
-        <div
-          style={{
-            padding: '0.65rem 0.85rem',
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            color: '#f87171',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {error}
-        </div>
-      )}
-
-      {/* Sub Tabs */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
-            className={`admin-tab ${activeSubTab === 'facilities' ? 'active' : ''}`}
-            onClick={() => setActiveSubTab('facilities')}
+      {/* Scrollable Content (Only this scrolls!) */}
+      <div className="admin-subpage-scrollable">
+        {success && (
+          <div
+            style={{
+              padding: '0.65rem 0.85rem',
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              color: '#34d399',
+              marginBottom: '1rem',
+              fontSize: '0.85rem',
+            }}
           >
-            Facilities Catalog ({facilities.length})
-          </button>
-          <button
-            className={`admin-tab ${activeSubTab === 'bookings' ? 'active' : ''}`}
-            onClick={() => setActiveSubTab('bookings')}
-          >
-            Bookings Queue {pendingCount > 0 && `(${pendingCount} Pending)`}
-          </button>
-          <button
-            className={`admin-tab ${activeSubTab === 'blocks' ? 'active' : ''}`}
-            onClick={() => setActiveSubTab('blocks')}
-          >
-            Maintenance Blocks ({blocks.length})
-          </button>
-        </div>
+            {success}
+          </div>
+        )}
 
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          {activeSubTab === 'facilities' && (
-            <button
-              className="btn-primary"
-              onClick={() => {
-                setEditingFacility(null);
-                setIsFacilityModalOpen(true);
-              }}
-              style={{ fontSize: '0.82rem', padding: '0.45rem 0.85rem', gap: '0.35rem' }}
-            >
-              <PlusCircle size={15} /> Add Facility
-            </button>
-          )}
-
-          {activeSubTab === 'blocks' && (
-            <button
-              className="btn-primary"
-              onClick={() => setIsBlockModalOpen(true)}
-              style={{ fontSize: '0.82rem', padding: '0.45rem 0.85rem', gap: '0.35rem', background: '#f59e0b' }}
-            >
-              <Wrench size={15} /> Schedule Block
-            </button>
-          )}
-        </div>
-      </div>
+        {error && (
+          <div
+            style={{
+              padding: '0.65rem 0.85rem',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              color: '#f87171',
+              marginBottom: '1rem',
+              fontSize: '0.85rem',
+            }}
+          >
+            {error}
+          </div>
+        )}
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text-muted)' }}>
@@ -331,6 +336,7 @@ export const AdminFacilities: React.FC = () => {
           )}
         </div>
       )}
+      </div>
 
       {/* MODALS */}
       <FacilityFormModal

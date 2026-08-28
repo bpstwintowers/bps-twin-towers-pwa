@@ -137,118 +137,123 @@ export const AdminFinance: React.FC = () => {
   const pendingDonations = donations.filter((d) => d.status === 'Pending');
 
   return (
-    <div className="animate-fade-in">
-      {/* Financial Summary Stat Cards */}
-      <div className="admin-stats-grid" style={{ marginBottom: '1.5rem' }}>
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#34d399' }}>
-            ₹{(summary?.total_verified_amount ?? 0).toLocaleString('en-IN')}
-          </span>
-          <span className="stat-label">Total Verified Collections</span>
+    <div className="admin-subpage-layout">
+      {/* Fixed Top Section: Financial KPI Cards & Sub-tabs (Does Not Scroll) */}
+      <div className="admin-subpage-top">
+        {/* Financial Summary Stat Cards */}
+        <div className="admin-stats-grid">
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#34d399' }}>
+              ₹{(summary?.total_verified_amount ?? 0).toLocaleString('en-IN')}
+            </span>
+            <span className="stat-label">Total Verified Collections</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#fbbf24' }}>
+              ₹{(summary?.total_pending_amount ?? 0).toLocaleString('en-IN')}
+            </span>
+            <span className="stat-label">Pending Verification ({summary?.pending_donations_count ?? 0})</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: 'var(--accent-primary)' }}>
+              ₹{(summary?.total_target ?? 0).toLocaleString('en-IN')}
+            </span>
+            <span className="stat-label">Total Target ({summary?.active_campaigns ?? 0} Active)</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value">
+              {summary?.verified_donations_count ?? 0}
+            </span>
+            <span className="stat-label">Verified Receipts</span>
+          </div>
         </div>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#fbbf24' }}>
-            ₹{(summary?.total_pending_amount ?? 0).toLocaleString('en-IN')}
-          </span>
-          <span className="stat-label">Pending Verification ({summary?.pending_donations_count ?? 0})</span>
-        </div>
+        {/* Sub-tabs */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              className={`admin-tab ${subTab === 'verification' ? 'active' : ''}`}
+              onClick={() => setSubTab('verification')}
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
+            >
+              <Clock size={15} />
+              Verification Queue
+              {pendingDonations.length > 0 && (
+                <span className="admin-tab-count">{pendingDonations.length}</span>
+              )}
+            </button>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: 'var(--accent-primary)' }}>
-            ₹{(summary?.total_target ?? 0).toLocaleString('en-IN')}
-          </span>
-          <span className="stat-label">Total Target ({summary?.active_campaigns ?? 0} Active)</span>
-        </div>
+            <button
+              className={`admin-tab ${subTab === 'campaigns' ? 'active' : ''}`}
+              onClick={() => setSubTab('campaigns')}
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
+            >
+              <TrendingUp size={15} />
+              Campaigns ({campaigns.length})
+            </button>
 
-        <div className="admin-stat-card">
-          <span className="stat-value">
-            {summary?.verified_donations_count ?? 0}
-          </span>
-          <span className="stat-label">Verified Receipts</span>
+            <button
+              className={`admin-tab ${subTab === 'ledger' ? 'active' : ''}`}
+              onClick={() => setSubTab('ledger')}
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
+            >
+              <Receipt size={15} />
+              All Donations Ledger
+            </button>
+          </div>
+
+          {subTab === 'campaigns' && (
+            <button
+              className="btn-primary"
+              onClick={() => {
+                setEditingCampaign(null);
+                setIsCampaignModalOpen(true);
+              }}
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', gap: '0.35rem', background: 'linear-gradient(135deg, #10b981, #059669)' }}
+            >
+              <PlusCircle size={15} />
+              New Campaign
+            </button>
+          )}
         </div>
       </div>
 
-      {success && (
-        <div
-          style={{
-            padding: '0.65rem 0.85rem',
-            background: 'rgba(16, 185, 129, 0.12)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            color: '#34d399',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {success}
-        </div>
-      )}
-
-      {error && (
-        <div
-          style={{
-            padding: '0.65rem 0.85rem',
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            color: '#f87171',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {error}
-        </div>
-      )}
-
-      {/* Sub-tabs */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
-            className={`admin-tab ${subTab === 'verification' ? 'active' : ''}`}
-            onClick={() => setSubTab('verification')}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
-          >
-            <Clock size={15} />
-            Verification Queue
-            {pendingDonations.length > 0 && (
-              <span className="admin-tab-count">{pendingDonations.length}</span>
-            )}
-          </button>
-
-          <button
-            className={`admin-tab ${subTab === 'campaigns' ? 'active' : ''}`}
-            onClick={() => setSubTab('campaigns')}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
-          >
-            <TrendingUp size={15} />
-            Campaigns ({campaigns.length})
-          </button>
-
-          <button
-            className={`admin-tab ${subTab === 'ledger' ? 'active' : ''}`}
-            onClick={() => setSubTab('ledger')}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
-          >
-            <Receipt size={15} />
-            All Donations Ledger
-          </button>
-        </div>
-
-        {subTab === 'campaigns' && (
-          <button
-            className="btn-primary"
-            onClick={() => {
-              setEditingCampaign(null);
-              setIsCampaignModalOpen(true);
+      {/* Scrollable Content (Only this scrolls!) */}
+      <div className="admin-subpage-scrollable">
+        {success && (
+          <div
+            style={{
+              padding: '0.65rem 0.85rem',
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              color: '#34d399',
+              marginBottom: '1rem',
+              fontSize: '0.85rem',
             }}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', gap: '0.35rem', background: 'linear-gradient(135deg, #10b981, #059669)' }}
           >
-            <PlusCircle size={15} />
-            New Campaign
-          </button>
+            {success}
+          </div>
         )}
-      </div>
+
+        {error && (
+          <div
+            style={{
+              padding: '0.65rem 0.85rem',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              color: '#f87171',
+              marginBottom: '1rem',
+              fontSize: '0.85rem',
+            }}
+          >
+            {error}
+          </div>
+        )}
 
       {/* SUB-TAB 1: VERIFICATION QUEUE */}
       {subTab === 'verification' && (
@@ -477,6 +482,7 @@ export const AdminFinance: React.FC = () => {
           </table>
         </div>
       )}
+      </div>
 
       {/* CAMPAIGN FORM MODAL */}
       <CampaignFormModal

@@ -525,172 +525,177 @@ export const AdminPortal: React.FC = () => {
           </div>
         )}
 
-        {/* Luxury KPI Metrics Stat Cards Grid (Registration / Flats / Residents) */}
-        {(activeTab === 'registrations' || activeTab === 'residents' || activeTab === 'flats') && (
-          <div className="admin-stats-grid">
-            {/* 1. Pending Approvals */}
-            <div className="stat-card pending">
-              <div className="stat-card-top">
-                <div className="stat-icon-wrapper amber">
-                  <FileCheck size={20} />
-                </div>
-                <span className="stat-trend-pill amber">
-                  {(stats?.pendingCount ?? 0) > 0 ? '● Action Required' : '✓ Cleared'}
-                </span>
-              </div>
-              <div>
-                <div className="stat-number">{stats?.pendingCount ?? 0}</div>
-                <div className="stat-label">Pending Registrations</div>
-              </div>
-            </div>
+        <div className="admin-view-container">
+          {(activeTab === 'registrations' || activeTab === 'residents' || activeTab === 'flats') ? (
+            <>
+              {/* Fixed Top Section: KPI Cards & Filter Bar (Does Not Scroll) */}
+              <div className="admin-fixed-top">
+                {/* Luxury KPI Metrics Stat Cards Grid */}
+                <div className="admin-stats-grid">
+                  {/* 1. Pending Approvals */}
+                  <div className="stat-card pending">
+                    <div className="stat-card-top">
+                      <div className="stat-icon-wrapper amber">
+                        <FileCheck size={20} />
+                      </div>
+                      <span className="stat-trend-pill amber">
+                        {(stats?.pendingCount ?? 0) > 0 ? '● Action Required' : '✓ Cleared'}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="stat-number">{stats?.pendingCount ?? 0}</div>
+                      <div className="stat-label">Pending Registrations</div>
+                    </div>
+                  </div>
 
-            {/* 2. Corrections Required */}
-            <div className="stat-card action">
-              <div className="stat-card-top">
-                <div className="stat-icon-wrapper red">
-                  <AlertTriangle size={20} />
-                </div>
-                <span className="stat-trend-pill">Awaiting Edit</span>
-              </div>
-              <div>
-                <div className="stat-number">{stats?.correctionCount ?? 0}</div>
-                <div className="stat-label">Resident Corrections</div>
-              </div>
-            </div>
+                  {/* 2. Corrections Required */}
+                  <div className="stat-card action">
+                    <div className="stat-card-top">
+                      <div className="stat-icon-wrapper red">
+                        <AlertTriangle size={20} />
+                      </div>
+                      <span className="stat-trend-pill">Awaiting Edit</span>
+                    </div>
+                    <div>
+                      <div className="stat-number">{stats?.correctionCount ?? 0}</div>
+                      <div className="stat-label">Resident Corrections</div>
+                    </div>
+                  </div>
 
-            {/* 3. Approved Registrations */}
-            <div className="stat-card occupancy">
-              <div className="stat-card-top">
-                <div className="stat-icon-wrapper emerald">
-                  <CheckCircle size={20} />
-                </div>
-                <span className="stat-trend-pill green">Verified</span>
-              </div>
-              <div>
-                <div className="stat-number">{stats?.approvedCount ?? 0}</div>
-                <div className="stat-label">Approved Members</div>
-              </div>
-            </div>
+                  {/* 3. Approved Registrations */}
+                  <div className="stat-card occupancy">
+                    <div className="stat-card-top">
+                      <div className="stat-icon-wrapper emerald">
+                        <CheckCircle size={20} />
+                      </div>
+                      <span className="stat-trend-pill green">Verified</span>
+                    </div>
+                    <div>
+                      <div className="stat-number">{stats?.approvedCount ?? 0}</div>
+                      <div className="stat-label">Approved Members</div>
+                    </div>
+                  </div>
 
-            {/* 4. Active Residents */}
-            <div className="stat-card residents">
-              <div className="stat-card-top">
-                <div className="stat-icon-wrapper blue">
-                  <Users size={20} />
-                </div>
-                <span className="stat-trend-pill">Directory</span>
-              </div>
-              <div>
-                <div className="stat-number">{stats?.totalResidents ?? 0}</div>
-                <div className="stat-label">Total Residents</div>
-              </div>
-            </div>
+                  {/* 4. Active Residents */}
+                  <div className="stat-card residents">
+                    <div className="stat-card-top">
+                      <div className="stat-icon-wrapper blue">
+                        <Users size={20} />
+                      </div>
+                      <span className="stat-trend-pill">Directory</span>
+                    </div>
+                    <div>
+                      <div className="stat-number">{stats?.totalResidents ?? 0}</div>
+                      <div className="stat-label">Total Residents</div>
+                    </div>
+                  </div>
 
-            {/* 5. Flat Inventory & Occupancy */}
-            <div className="stat-card flats">
-              <div className="stat-card-top">
-                <div className="stat-icon-wrapper teal">
-                  <Building size={20} />
+                  {/* 5. Flat Inventory & Occupancy */}
+                  <div className="stat-card flats">
+                    <div className="stat-card-top">
+                      <div className="stat-icon-wrapper teal">
+                        <Building size={20} />
+                      </div>
+                      <span className="stat-trend-pill green">
+                        {Math.round(((stats?.occupiedFlats ?? 0) / (stats?.totalFlats || 504)) * 100)}% Occupied
+                      </span>
+                    </div>
+                    <div>
+                      <div className="stat-number">
+                        {stats?.occupiedFlats ?? 0} <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ {stats?.totalFlats ?? 504}</span>
+                      </div>
+                      <div className="stat-label">Occupied Flat Inventory</div>
+                    </div>
+                  </div>
                 </div>
-                <span className="stat-trend-pill green">
-                  {Math.round(((stats?.occupiedFlats ?? 0) / (stats?.totalFlats || 504)) * 100)}% Occupied
-                </span>
-              </div>
-              <div>
-                <div className="stat-number">
-                  {stats?.occupiedFlats ?? 0} <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ {stats?.totalFlats ?? 504}</span>
-                </div>
-                <div className="stat-label">Occupied Flat Inventory</div>
-              </div>
-            </div>
-          </div>
-        )}
 
-        {/* Search & Filter Bar (Only for Registrations, Residents, Flats) */}
-        {activeTab !== 'events' && activeTab !== 'finance' && activeTab !== 'volunteers' && activeTab !== 'sponsors' && activeTab !== 'communications' && activeTab !== 'visitors' && activeTab !== 'facilities' && activeTab !== 'complaints' && (
-          <div className="admin-filter-bar">
-            <div className="admin-search-wrapper">
-              <Search size={18} className="admin-search-icon" />
-              <input
-                type="text"
-                className="admin-search-input"
-                placeholder={
-                  activeTab === 'registrations'
-                    ? 'Search by applicant, flat number, block, mobile, email...'
-                    : activeTab === 'residents'
-                    ? 'Search residents by name, flat, block, contact...'
-                    : 'Search flat number, block, BHK, or owner...'
-                }
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  style={{
-                    position: 'absolute',
-                    right: '0.85rem',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#94a3b8',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  title="Clear search"
-                >
-                  <X size={16} />
-                </button>
-              )}
-            </div>
-
-            {activeTab === 'registrations' && (
-              <div className="admin-status-filters">
-                {(['ALL', 'Pending', 'Correction Required', 'Approved', 'Rejected'] as StatusFilter[]).map(
-                  (filter) => {
-                    const count =
-                      filter === 'ALL'
-                        ? registrations.length
-                        : filter === 'Pending'
-                        ? (stats?.pendingCount ?? registrations.filter(r => (r.status || '').toLowerCase() === 'pending').length)
-                        : filter === 'Correction Required'
-                        ? (stats?.correctionCount ?? registrations.filter(r => (r.status || '').toLowerCase().includes('correction')).length)
-                        : filter === 'Approved'
-                        ? (stats?.approvedCount ?? registrations.filter(r => (r.status || '').toLowerCase() === 'approved').length)
-                        : (stats?.rejectedCount ?? registrations.filter(r => (r.status || '').toLowerCase() === 'rejected').length);
-                    return (
+                {/* Search & Filter Bar */}
+                <div className="admin-filter-bar">
+                  <div className="admin-search-wrapper">
+                    <Search size={18} className="admin-search-icon" />
+                    <input
+                      type="text"
+                      className="admin-search-input"
+                      placeholder={
+                        activeTab === 'registrations'
+                          ? 'Search by applicant, flat number, block, mobile, email...'
+                          : activeTab === 'residents'
+                          ? 'Search residents by name, flat, block, contact...'
+                          : 'Search flat number, block, BHK, or owner...'
+                      }
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
                       <button
-                        key={filter}
                         type="button"
-                        className={`status-filter-chip ${statusFilter === filter ? 'active' : ''}`}
-                        onClick={() => setStatusFilter(filter)}
+                        onClick={() => setSearchQuery('')}
+                        style={{
+                          position: 'absolute',
+                          right: '0.85rem',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#94a3b8',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                        title="Clear search"
                       >
-                        <span>{filter === 'ALL' ? 'All Requests' : filter}</span>
-                        <span
-                          style={{
-                            marginLeft: '0.4rem',
-                            padding: '0.1rem 0.45rem',
-                            borderRadius: '9999px',
-                            fontSize: '0.72rem',
-                            fontWeight: 800,
-                            background: statusFilter === filter ? 'var(--primary, #00897b)' : '#e2e8f0',
-                            color: statusFilter === filter ? '#ffffff' : '#475569',
-                          }}
-                        >
-                          {count}
-                        </span>
+                        <X size={16} />
                       </button>
-                    );
-                  }
-                )}
+                    )}
+                  </div>
+
+                  {activeTab === 'registrations' && (
+                    <div className="admin-status-filters">
+                      {(['ALL', 'Pending', 'Correction Required', 'Approved', 'Rejected'] as StatusFilter[]).map(
+                        (filter) => {
+                          const count =
+                            filter === 'ALL'
+                              ? registrations.length
+                              : filter === 'Pending'
+                              ? (stats?.pendingCount ?? registrations.filter(r => (r.status || '').toLowerCase() === 'pending').length)
+                              : filter === 'Correction Required'
+                              ? (stats?.correctionCount ?? registrations.filter(r => (r.status || '').toLowerCase().includes('correction')).length)
+                              : filter === 'Approved'
+                              ? (stats?.approvedCount ?? registrations.filter(r => (r.status || '').toLowerCase() === 'approved').length)
+                              : (stats?.rejectedCount ?? registrations.filter(r => (r.status || '').toLowerCase() === 'rejected').length);
+                          return (
+                            <button
+                              key={filter}
+                              type="button"
+                              className={`status-filter-chip ${statusFilter === filter ? 'active' : ''}`}
+                              onClick={() => setStatusFilter(filter)}
+                            >
+                              <span>{filter === 'ALL' ? 'All Requests' : filter}</span>
+                              <span
+                                style={{
+                                  marginLeft: '0.4rem',
+                                  padding: '0.1rem 0.45rem',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 800,
+                                  background: statusFilter === filter ? 'var(--primary, #00897b)' : '#e2e8f0',
+                                  color: statusFilter === filter ? '#ffffff' : '#475569',
+                                }}
+                              >
+                                {count}
+                              </span>
+                            </button>
+                          );
+                        }
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-          </div>
-        )}
+
+              {/* Scrollable Content (Only this scrolls!) */}
+              <div className="admin-scrollable-content">
 
         {/* TAB 1: REGISTRATION REQUESTS */}
         {activeTab === 'registrations' && (
@@ -934,30 +939,36 @@ export const AdminPortal: React.FC = () => {
             </table>
           </div>
         )}
+              </div>
+            </>
+          ) : (
+            <>
+              {/* TAB 4: EVENTS & FESTIVALS */}
+              {activeTab === 'events' && <AdminEvents />}
 
-        {/* TAB 4: EVENTS & FESTIVALS */}
-        {activeTab === 'events' && <AdminEvents />}
+              {/* TAB 5: DONATIONS & FINANCE */}
+              {activeTab === 'finance' && <AdminFinance />}
 
-        {/* TAB 5: DONATIONS & FINANCE */}
-        {activeTab === 'finance' && <AdminFinance />}
+              {/* TAB 6: VOLUNTEERS & TEAMS */}
+              {activeTab === 'volunteers' && <AdminVolunteers />}
 
-        {/* TAB 6: VOLUNTEERS & TEAMS */}
-        {activeTab === 'volunteers' && <AdminVolunteers />}
+              {/* TAB 7: SPONSORS & PARTNERS */}
+              {activeTab === 'sponsors' && <AdminSponsors />}
 
-        {/* TAB 7: SPONSORS & PARTNERS */}
-        {activeTab === 'sponsors' && <AdminSponsors />}
+              {/* TAB 8: COMMUNICATIONS & NOTICES */}
+              {activeTab === 'communications' && <AdminCommunications />}
 
-        {/* TAB 8: COMMUNICATIONS & NOTICES */}
-        {activeTab === 'communications' && <AdminCommunications />}
+              {/* TAB 9: VISITORS & GATE MANAGEMENT */}
+              {activeTab === 'visitors' && <AdminVisitors />}
 
-        {/* TAB 9: VISITORS & GATE MANAGEMENT */}
-        {activeTab === 'visitors' && <AdminVisitors />}
+              {/* TAB 10: FACILITIES MANAGEMENT */}
+              {activeTab === 'facilities' && <AdminFacilities />}
 
-        {/* TAB 10: FACILITIES MANAGEMENT */}
-        {activeTab === 'facilities' && <AdminFacilities />}
-
-        {/* TAB 11: HELPDESK & COMPLAINTS */}
-        {activeTab === 'complaints' && <AdminComplaints />}
+              {/* TAB 11: HELPDESK & COMPLAINTS */}
+              {activeTab === 'complaints' && <AdminComplaints />}
+            </>
+          )}
+        </div>
 
         {/* MODAL DIALOGS */}
         {modalType && selectedRequest && (

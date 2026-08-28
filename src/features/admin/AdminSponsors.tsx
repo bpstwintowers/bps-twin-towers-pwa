@@ -148,129 +148,103 @@ export const AdminSponsors: React.FC = () => {
   const pendingContributions = contributions.filter((c) => c.status === 'Pending');
 
   return (
-    <div className="animate-fade-in">
-      {/* Financial & Sponsorship Stats Grid */}
-      <div className="admin-stats-grid" style={{ marginBottom: '1.5rem' }}>
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#fbbf24' }}>
-            ₹{(summary?.verified_cash_amount ?? 0).toLocaleString('en-IN')}
-          </span>
-          <span className="stat-label">Verified Sponsor Cash</span>
+    <div className="admin-subpage-layout">
+      {/* Fixed Top Section: Sponsorship KPI Cards & Sub-tabs (Does Not Scroll) */}
+      <div className="admin-subpage-top">
+        {/* Financial & Sponsorship Stats Grid */}
+        <div className="admin-stats-grid">
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#fbbf24' }}>
+              ₹{(summary?.verified_cash_amount ?? 0).toLocaleString('en-IN')}
+            </span>
+            <span className="stat-label">Verified Sponsor Cash</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#60a5fa' }}>
+              ₹{(summary?.verified_in_kind_estimated_value ?? 0).toLocaleString('en-IN')}
+            </span>
+            <span className="stat-label">In-Kind Estimated Value</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#34d399' }}>
+              ₹{(summary?.total_sponsorship_value ?? 0).toLocaleString('en-IN')}
+            </span>
+            <span className="stat-label">Total Sponsorship Value</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value">
+              {summary?.active_sponsorships ?? 0}
+            </span>
+            <span className="stat-label">Active Sponsorships</span>
+          </div>
         </div>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#60a5fa' }}>
-            ₹{(summary?.verified_in_kind_estimated_value ?? 0).toLocaleString('en-IN')}
-          </span>
-          <span className="stat-label">In-Kind Estimated Value</span>
-        </div>
+        {/* Sub-tabs */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <button
+              className={`admin-tab ${subTab === 'approvals' ? 'active' : ''}`}
+              onClick={() => setSubTab('approvals')}
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
+            >
+              <Clock size={15} />
+              Approvals & Verification
+              {(pendingSponsorships.length + pendingContributions.length) > 0 && (
+                <span className="admin-tab-count">
+                  {pendingSponsorships.length + pendingContributions.length}
+                </span>
+              )}
+            </button>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#34d399' }}>
-            ₹{(summary?.total_sponsorship_value ?? 0).toLocaleString('en-IN')}
-          </span>
-          <span className="stat-label">Total Sponsorship Value</span>
-        </div>
+            <button
+              className={`admin-tab ${subTab === 'sponsorships' ? 'active' : ''}`}
+              onClick={() => setSubTab('sponsorships')}
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
+            >
+              <Award size={15} />
+              Sponsorships ({sponsorships.length})
+            </button>
 
-        <div className="admin-stat-card">
-          <span className="stat-value">
-            {summary?.active_sponsorships ?? 0}
-          </span>
-          <span className="stat-label">Active Sponsorships</span>
+            <button
+              className={`admin-tab ${subTab === 'tiers' ? 'active' : ''}`}
+              onClick={() => setSubTab('tiers')}
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
+            >
+              <Coins size={15} />
+              Tiers & Packages ({tiers.length})
+            </button>
+
+            <button
+              className={`admin-tab ${subTab === 'contributions' ? 'active' : ''}`}
+              onClick={() => setSubTab('contributions')}
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
+            >
+              <Receipt size={15} />
+              Contributions Ledger
+            </button>
+          </div>
+
+          {subTab === 'tiers' && (
+            <button
+              className="btn-primary"
+              onClick={() => {
+                setEditingTier(null);
+                setIsTierModalOpen(true);
+              }}
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', gap: '0.35rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}
+            >
+              <PlusCircle size={15} />
+              New Tier
+            </button>
+          )}
         </div>
       </div>
 
-      {success && (
-        <div
-          style={{
-            padding: '0.65rem 0.85rem',
-            background: 'rgba(16, 185, 129, 0.12)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            color: '#34d399',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {success}
-        </div>
-      )}
-
-      {error && (
-        <div
-          style={{
-            padding: '0.65rem 0.85rem',
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            color: '#f87171',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {error}
-        </div>
-      )}
-
-      {/* Sub-tabs */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <button
-            className={`admin-tab ${subTab === 'approvals' ? 'active' : ''}`}
-            onClick={() => setSubTab('approvals')}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
-          >
-            <Clock size={15} />
-            Approvals & Verification
-            {(pendingSponsorships.length + pendingContributions.length) > 0 && (
-              <span className="admin-tab-count">
-                {pendingSponsorships.length + pendingContributions.length}
-              </span>
-            )}
-          </button>
-
-          <button
-            className={`admin-tab ${subTab === 'sponsorships' ? 'active' : ''}`}
-            onClick={() => setSubTab('sponsorships')}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
-          >
-            <Award size={15} />
-            Sponsorships ({sponsorships.length})
-          </button>
-
-          <button
-            className={`admin-tab ${subTab === 'tiers' ? 'active' : ''}`}
-            onClick={() => setSubTab('tiers')}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
-          >
-            <Coins size={15} />
-            Tiers & Packages ({tiers.length})
-          </button>
-
-          <button
-            className={`admin-tab ${subTab === 'contributions' ? 'active' : ''}`}
-            onClick={() => setSubTab('contributions')}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
-          >
-            <Receipt size={15} />
-            Contributions Ledger
-          </button>
-        </div>
-
-        {subTab === 'tiers' && (
-          <button
-            className="btn-primary"
-            onClick={() => {
-              setEditingTier(null);
-              setIsTierModalOpen(true);
-            }}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', gap: '0.35rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}
-          >
-            <PlusCircle size={15} />
-            New Tier
-          </button>
-        )}
-      </div>
+      {/* Scrollable Content (Only this scrolls!) */}
+      <div className="admin-subpage-scrollable">
 
       {/* SUB-TAB 1: APPROVALS & VERIFICATION QUEUE */}
       {subTab === 'approvals' && (
@@ -604,6 +578,7 @@ export const AdminSponsors: React.FC = () => {
           </table>
         </div>
       )}
+      </div>
 
       {/* TIER MODAL */}
       <SponsorTierModal

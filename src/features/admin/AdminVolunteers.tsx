@@ -175,114 +175,84 @@ export const AdminVolunteers: React.FC = () => {
   };
 
   return (
-    <div className="animate-fade-in">
-      {/* Volunteer Summary Stat Cards */}
-      <div className="admin-stats-grid" style={{ marginBottom: '1.5rem' }}>
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#c4b5fd' }}>
-            {summary?.total_teams ?? 0}
-          </span>
-          <span className="stat-label">Volunteer Teams</span>
+    <div className="admin-subpage-layout">
+      {/* Fixed Top Section: Volunteer Summary Cards & Sub-tabs (Does Not Scroll) */}
+      <div className="admin-subpage-top">
+        {/* Volunteer Summary Stat Cards */}
+        <div className="admin-stats-grid">
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#c4b5fd' }}>
+              {summary?.total_teams ?? 0}
+            </span>
+            <span className="stat-label">Volunteer Teams</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: 'var(--accent-primary)' }}>
+              {summary?.active_opportunities ?? 0}
+            </span>
+            <span className="stat-label">Active Opportunities</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#34d399' }}>
+              {summary?.total_confirmed_volunteers ?? 0}
+            </span>
+            <span className="stat-label">Confirmed Volunteers</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#fbbf24' }}>
+              {summary?.today_shifts ?? 0}
+            </span>
+            <span className="stat-label">Today's Active Shifts</span>
+          </div>
         </div>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: 'var(--accent-primary)' }}>
-            {summary?.active_opportunities ?? 0}
-          </span>
-          <span className="stat-label">Active Opportunities</span>
-        </div>
+        {/* Sub-tabs */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              className={`admin-tab ${subTab === 'opportunities' ? 'active' : ''}`}
+              onClick={() => setSubTab('opportunities')}
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
+            >
+              <Calendar size={15} />
+              Opportunities ({opportunities.length})
+            </button>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#34d399' }}>
-            {summary?.total_confirmed_volunteers ?? 0}
-          </span>
-          <span className="stat-label">Confirmed Volunteers</span>
-        </div>
+            <button
+              className={`admin-tab ${subTab === 'teams' ? 'active' : ''}`}
+              onClick={() => setSubTab('teams')}
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
+            >
+              <Users size={15} />
+              Teams ({teams.length})
+            </button>
+          </div>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#fbbf24' }}>
-            {summary?.today_shifts ?? 0}
-          </span>
-          <span className="stat-label">Today's Active Shifts</span>
-        </div>
-      </div>
+          {subTab === 'opportunities' && (
+            <button
+              className="btn-primary"
+              onClick={() => {
+                setEditingOpportunity(null);
+                setIsOpportunityModalOpen(true);
+              }}
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', gap: '0.35rem', background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' }}
+            >
+              <PlusCircle size={15} />
+              New Opportunity
+            </button>
+          )}
 
-      {success && (
-        <div
-          style={{
-            padding: '0.65rem 0.85rem',
-            background: 'rgba(16, 185, 129, 0.12)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            color: '#34d399',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {success}
-        </div>
-      )}
-
-      {error && (
-        <div
-          style={{
-            padding: '0.65rem 0.85rem',
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            color: '#f87171',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {error}
-        </div>
-      )}
-
-      {/* Sub-tabs */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
-            className={`admin-tab ${subTab === 'opportunities' ? 'active' : ''}`}
-            onClick={() => setSubTab('opportunities')}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
-          >
-            <Calendar size={15} />
-            Opportunities ({opportunities.length})
-          </button>
-
-          <button
-            className={`admin-tab ${subTab === 'teams' ? 'active' : ''}`}
-            onClick={() => setSubTab('teams')}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem' }}
-          >
-            <Users size={15} />
-            Teams ({teams.length})
-          </button>
-        </div>
-
-        {subTab === 'opportunities' && (
-          <button
-            className="btn-primary"
-            onClick={() => {
-              setEditingOpportunity(null);
-              setIsOpportunityModalOpen(true);
-            }}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', gap: '0.35rem', background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' }}
-          >
-            <PlusCircle size={15} />
-            New Opportunity
-          </button>
-        )}
-
-        {subTab === 'teams' && (
-          <button
-            className="btn-primary"
-            onClick={() => {
-              setEditingTeam(null);
-              setTeamName('');
-              setTeamDesc('');
-              setTeamCategory('General');
+          {subTab === 'teams' && (
+            <button
+              className="btn-primary"
+              onClick={() => {
+                setEditingTeam(null);
+                setTeamName('');
+                setTeamDesc('');
+                setTeamCategory('General');
               setTeamCoordinatorId('');
               setIsTeamModalOpen(true);
             }}
@@ -292,10 +262,45 @@ export const AdminVolunteers: React.FC = () => {
             New Team
           </button>
         )}
+        </div>
       </div>
 
-      {/* SUB-TAB 1: OPPORTUNITIES */}
-      {subTab === 'opportunities' && (
+      {/* Scrollable Content (Only this scrolls!) */}
+      <div className="admin-subpage-scrollable">
+        {success && (
+          <div
+            style={{
+              padding: '0.65rem 0.85rem',
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              color: '#34d399',
+              marginBottom: '1rem',
+              fontSize: '0.85rem',
+            }}
+          >
+            {success}
+          </div>
+        )}
+
+        {error && (
+          <div
+            style={{
+              padding: '0.65rem 0.85rem',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              color: '#f87171',
+              marginBottom: '1rem',
+              fontSize: '0.85rem',
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        {/* SUB-TAB 1: OPPORTUNITIES */}
+        {subTab === 'opportunities' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
           {opportunities.map((opp) => {
             const confirmed = opp.confirmed_count || 0;
@@ -445,6 +450,7 @@ export const AdminVolunteers: React.FC = () => {
           ))}
         </div>
       )}
+      </div>
 
       {/* OPPORTUNITY MODAL */}
       <OpportunityFormModal

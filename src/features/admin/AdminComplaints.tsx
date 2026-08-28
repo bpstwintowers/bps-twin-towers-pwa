@@ -65,110 +65,115 @@ export const AdminComplaints: React.FC = () => {
   );
 
   return (
-    <div className="animate-fade-in">
-      {/* Metric Cards */}
-      <div className="admin-stats-grid" style={{ marginBottom: '1.5rem' }}>
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: 'var(--accent-primary)' }}>
-            {summary?.open_complaints ?? 0}
-          </span>
-          <span className="stat-label">Total Open Tickets</span>
+    <div className="admin-subpage-layout">
+      {/* Fixed Top Section: Complaints Metric Cards & Filters (Does Not Scroll) */}
+      <div className="admin-subpage-top">
+        {/* Metric Cards */}
+        <div className="admin-stats-grid">
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: 'var(--accent-primary)' }}>
+              {summary?.open_complaints ?? 0}
+            </span>
+            <span className="stat-label">Total Open Tickets</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#ef4444' }}>
+              {summary?.urgent_complaints ?? 0}
+            </span>
+            <span className="stat-label">Urgent / Emergency</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#f59e0b' }}>
+              {summary?.overdue_complaints ?? 0}
+            </span>
+            <span className="stat-label">Overdue SLA</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#10b981' }}>
+              {summary?.resolved_today ?? 0}
+            </span>
+            <span className="stat-label">Resolved Today</span>
+          </div>
         </div>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#ef4444' }}>
-            {summary?.urgent_complaints ?? 0}
-          </span>
-          <span className="stat-label">Urgent / Emergency</span>
-        </div>
+        {/* Filters Bar */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            {[
+              { label: 'Open & Active', value: 'OPEN_GROUP' },
+              { label: 'All Tickets', value: 'ALL' },
+              { label: 'Resolved', value: 'Resolved' },
+              { label: 'Closed', value: 'Closed' },
+            ].map((st) => (
+              <button
+                key={st.value}
+                className={`admin-tab ${statusFilter === st.value ? 'active' : ''}`}
+                onClick={() => setStatusFilter(st.value)}
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+              >
+                {st.label}
+              </button>
+            ))}
+          </div>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#f59e0b' }}>
-            {summary?.overdue_complaints ?? 0}
-          </span>
-          <span className="stat-label">Overdue SLA</span>
-        </div>
-
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#10b981' }}>
-            {summary?.resolved_today ?? 0}
-          </span>
-          <span className="stat-label">Resolved Today</span>
-        </div>
-      </div>
-
-      {error && (
-        <div
-          style={{
-            padding: '0.65rem 0.85rem',
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            color: '#f87171',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {error}
-        </div>
-      )}
-
-      {/* Filters Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {[
-            { label: 'Open & Active', value: 'OPEN_GROUP' },
-            { label: 'All Tickets', value: 'ALL' },
-            { label: 'Resolved', value: 'Resolved' },
-            { label: 'Closed', value: 'Closed' },
-          ].map((st) => (
-            <button
-              key={st.value}
-              className={`admin-tab ${statusFilter === st.value ? 'active' : ''}`}
-              onClick={() => setStatusFilter(st.value)}
-              style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
-            >
-              {st.label}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <select
-            className="admin-search-input"
-            style={{ padding: '0.4rem 0.65rem', fontSize: '0.8rem' }}
-            value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value)}
-          >
-            <option value="ALL">All Priorities</option>
-            <option value="Urgent">Urgent</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </select>
-
-          <div style={{ position: 'relative', width: '200px' }}>
-            <Search
-              size={14}
-              style={{
-                position: 'absolute',
-                left: '0.65rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: 'var(--text-muted)',
-              }}
-            />
-            <input
-              type="text"
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <select
               className="admin-search-input"
-              style={{ width: '100%', paddingLeft: '2rem', fontSize: '0.8rem' }}
-              placeholder="Search #, title, flat..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+              style={{ padding: '0.4rem 0.65rem', fontSize: '0.8rem' }}
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+            >
+              <option value="ALL">All Priorities</option>
+              <option value="Urgent">Urgent</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+
+            <div style={{ position: 'relative', width: '200px' }}>
+              <Search
+                size={14}
+                style={{
+                  position: 'absolute',
+                  left: '0.65rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-muted)',
+                }}
+              />
+              <input
+                type="text"
+                className="admin-search-input"
+                style={{ width: '100%', paddingLeft: '2rem', fontSize: '0.8rem' }}
+                placeholder="Search #, title, flat..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Scrollable Content (Only this scrolls!) */}
+      <div className="admin-subpage-scrollable">
+        {error && (
+          <div
+            style={{
+              padding: '0.65rem 0.85rem',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              color: '#f87171',
+              marginBottom: '1rem',
+              fontSize: '0.85rem',
+            }}
+          >
+            {error}
+          </div>
+        )}
 
       {/* Complaints List */}
       {loading ? (
@@ -239,6 +244,7 @@ export const AdminComplaints: React.FC = () => {
           })}
         </div>
       )}
+      </div>
 
       {/* MANAGE / ASSIGN MODAL */}
       <ComplaintAssignModal

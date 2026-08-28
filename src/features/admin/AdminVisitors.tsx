@@ -67,91 +67,96 @@ export const AdminVisitors: React.FC = () => {
   }, [statusFilter]);
 
   return (
-    <div className="animate-fade-in">
-      {/* Metric Cards */}
-      <div className="admin-stats-grid" style={{ marginBottom: '1.5rem' }}>
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#10b981' }}>
-            {summary?.currently_inside ?? insideVisits.length}
-          </span>
-          <span className="stat-label">Currently Inside Society</span>
+    <div className="admin-subpage-layout">
+      {/* Fixed Top Section: Visitors Metric Cards & Sub-tabs (Does Not Scroll) */}
+      <div className="admin-subpage-top">
+        {/* Metric Cards */}
+        <div className="admin-stats-grid">
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#10b981' }}>
+              {summary?.currently_inside ?? insideVisits.length}
+            </span>
+            <span className="stat-label">Currently Inside Society</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: 'var(--accent-primary)' }}>
+              {summary?.expected_today ?? 0}
+            </span>
+            <span className="stat-label">Expected Passes Today</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#fbbf24' }}>
+              {summary?.waiting_approval ?? 0}
+            </span>
+            <span className="stat-label">Pending Gate Approvals</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#94a3b8' }}>
+              {summary?.today_total_entries ?? 0} In / {summary?.today_total_exits ?? 0} Out
+            </span>
+            <span className="stat-label">Today's Gate Movement</span>
+          </div>
         </div>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: 'var(--accent-primary)' }}>
-            {summary?.expected_today ?? 0}
-          </span>
-          <span className="stat-label">Expected Passes Today</span>
-        </div>
+        {/* Sub Tabs */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              className={`admin-tab ${activeSubTab === 'inside' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('inside')}
+            >
+              Emergency Occupancy ({insideVisits.length})
+            </button>
+            <button
+              className={`admin-tab ${activeSubTab === 'ledger' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('ledger')}
+            >
+              Visits Ledger
+            </button>
+            <button
+              className={`admin-tab ${activeSubTab === 'gates' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('gates')}
+            >
+              Gate Infrastructure ({gates.length})
+            </button>
+          </div>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#fbbf24' }}>
-            {summary?.waiting_approval ?? 0}
-          </span>
-          <span className="stat-label">Pending Gate Approvals</span>
-        </div>
-
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#94a3b8' }}>
-            {summary?.today_total_entries ?? 0} In / {summary?.today_total_exits ?? 0} Out
-          </span>
-          <span className="stat-label">Today's Gate Movement</span>
+          {activeSubTab === 'gates' && (
+            <button
+              className="btn-primary"
+              onClick={() => {
+                setEditingGate(null);
+                setIsGateModalOpen(true);
+              }}
+              style={{ fontSize: '0.82rem', padding: '0.45rem 0.85rem', gap: '0.35rem' }}
+            >
+              <PlusCircle size={15} />
+              Add Gate
+            </button>
+          )}
         </div>
       </div>
 
-      {error && (
-        <div
-          style={{
-            padding: '0.65rem 0.85rem',
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            color: '#f87171',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {error}
-        </div>
-      )}
-
-      {/* Sub Tabs */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
-            className={`admin-tab ${activeSubTab === 'inside' ? 'active' : ''}`}
-            onClick={() => setActiveSubTab('inside')}
-          >
-            Emergency Occupancy ({insideVisits.length})
-          </button>
-          <button
-            className={`admin-tab ${activeSubTab === 'ledger' ? 'active' : ''}`}
-            onClick={() => setActiveSubTab('ledger')}
-          >
-            Visits Ledger
-          </button>
-          <button
-            className={`admin-tab ${activeSubTab === 'gates' ? 'active' : ''}`}
-            onClick={() => setActiveSubTab('gates')}
-          >
-            Gate Infrastructure ({gates.length})
-          </button>
-        </div>
-
-        {activeSubTab === 'gates' && (
-          <button
-            className="btn-primary"
-            onClick={() => {
-              setEditingGate(null);
-              setIsGateModalOpen(true);
+      {/* Scrollable Content (Only this scrolls!) */}
+      <div className="admin-subpage-scrollable">
+        {error && (
+          <div
+            style={{
+              padding: '0.65rem 0.85rem',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              color: '#f87171',
+              marginBottom: '1rem',
+              fontSize: '0.85rem',
             }}
-            style={{ fontSize: '0.82rem', padding: '0.45rem 0.85rem', gap: '0.35rem' }}
           >
-            <PlusCircle size={15} />
-            Add Gate
-          </button>
+            {error}
+          </div>
         )}
-      </div>
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text-muted)' }}>
@@ -282,6 +287,7 @@ export const AdminVisitors: React.FC = () => {
           )}
         </div>
       )}
+      </div>
 
       {/* GATE MODAL */}
       <GateFormModal

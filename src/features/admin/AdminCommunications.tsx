@@ -91,97 +91,102 @@ export const AdminCommunications: React.FC = () => {
   };
 
   return (
-    <div className="animate-fade-in">
-      {/* Communication Metric Cards */}
-      <div className="admin-stats-grid" style={{ marginBottom: '1.5rem' }}>
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: 'var(--accent-primary)' }}>
-            {summary?.active_announcements ?? 0}
-          </span>
-          <span className="stat-label">Active Announcements</span>
+    <div className="admin-subpage-layout">
+      {/* Fixed Top Section: Communication Metric Cards & Sub-tabs (Does Not Scroll) */}
+      <div className="admin-subpage-top">
+        {/* Communication Metric Cards */}
+        <div className="admin-stats-grid">
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: 'var(--accent-primary)' }}>
+              {summary?.active_announcements ?? 0}
+            </span>
+            <span className="stat-label">Active Announcements</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#ef4444' }}>
+              {summary?.urgent_announcements ?? 0}
+            </span>
+            <span className="stat-label">Urgent Alerts</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#34d399' }}>
+              {summary?.total_notifications ?? 0}
+            </span>
+            <span className="stat-label">Total Dispatched In-App</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <span className="stat-value" style={{ color: '#fbbf24' }}>
+              {summary?.unread_notifications ?? 0}
+            </span>
+            <span className="stat-label">Unread Notifications</span>
+          </div>
         </div>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#ef4444' }}>
-            {summary?.urgent_announcements ?? 0}
-          </span>
-          <span className="stat-label">Urgent Alerts</span>
-        </div>
+        {/* Action Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            {['ALL', 'Published', 'Draft', 'Cancelled'].map((st) => (
+              <button
+                key={st}
+                className={`admin-tab ${statusFilter === st ? 'active' : ''}`}
+                onClick={() => setStatusFilter(st)}
+                style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem' }}
+              >
+                {st}
+              </button>
+            ))}
+          </div>
 
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#34d399' }}>
-            {summary?.total_notifications ?? 0}
-          </span>
-          <span className="stat-label">Total Dispatched In-App</span>
-        </div>
-
-        <div className="admin-stat-card">
-          <span className="stat-value" style={{ color: '#fbbf24' }}>
-            {summary?.unread_notifications ?? 0}
-          </span>
-          <span className="stat-label">Unread Notifications</span>
+          <button
+            className="btn-primary"
+            onClick={() => {
+              setEditingAnnouncement(null);
+              setIsModalOpen(true);
+            }}
+            style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', gap: '0.35rem' }}
+          >
+            <PlusCircle size={15} />
+            New Announcement
+          </button>
         </div>
       </div>
 
-      {success && (
-        <div
-          style={{
-            padding: '0.65rem 0.85rem',
-            background: 'rgba(16, 185, 129, 0.12)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            color: '#34d399',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {success}
-        </div>
-      )}
+      {/* Scrollable Announcements List (Only this scrolls!) */}
+      <div className="admin-subpage-scrollable">
+        {success && (
+          <div
+            style={{
+              padding: '0.65rem 0.85rem',
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              color: '#34d399',
+              marginBottom: '1rem',
+              fontSize: '0.85rem',
+            }}
+          >
+            {success}
+          </div>
+        )}
 
-      {error && (
-        <div
-          style={{
-            padding: '0.65rem 0.85rem',
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            color: '#f87171',
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {error}
-        </div>
-      )}
-
-      {/* Action Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          {['ALL', 'Published', 'Draft', 'Cancelled'].map((st) => (
-            <button
-              key={st}
-              className={`admin-tab ${statusFilter === st ? 'active' : ''}`}
-              onClick={() => setStatusFilter(st)}
-              style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem' }}
-            >
-              {st}
-            </button>
-          ))}
-        </div>
-
-        <button
-          className="btn-primary"
-          onClick={() => {
-            setEditingAnnouncement(null);
-            setIsModalOpen(true);
-          }}
-          style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', gap: '0.35rem' }}
-        >
-          <PlusCircle size={15} />
-          New Announcement
-        </button>
-      </div>
+        {error && (
+          <div
+            style={{
+              padding: '0.65rem 0.85rem',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              color: '#f87171',
+              marginBottom: '1rem',
+              fontSize: '0.85rem',
+            }}
+          >
+            {error}
+          </div>
+        )}
 
       {/* Announcements List */}
       {loading ? (
@@ -265,6 +270,7 @@ export const AdminCommunications: React.FC = () => {
           ))}
         </div>
       )}
+      </div>
 
       {/* FORM MODAL */}
       <AnnouncementFormModal
