@@ -109,25 +109,42 @@ export const VisitorManagement: React.FC = () => {
 
   return (
     <div className="visitors-container">
-      <header className="visitors-header">
-        <div className="visitors-header-inner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <main className="visitors-content">
+        {/* Navigation Tabs and Invite Button */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
             <button
-              onClick={() => navigate('/')}
-              className="btn-outline"
-              style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem' }}
+              className={`admin-tab ${activeTab === 'expected' ? 'active' : ''}`}
+              onClick={() => setActiveTab('expected')}
             >
-              <ArrowLeft size={16} />
+              Expected & Active ({expectedList.length + currentlyInsideList.length})
             </button>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Shield size={18} style={{ color: 'var(--accent-primary)' }} />
-                My Visitors & Gate Passes
-              </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                BPS Twin Towers Access Control
-              </div>
-            </div>
+            <button
+              className={`admin-tab ${activeTab === 'waiting' ? 'active' : ''}`}
+              onClick={() => setActiveTab('waiting')}
+              style={{ position: 'relative' }}
+            >
+              Waiting Gate Approval ({waitingApprovalList.length})
+              {waitingApprovalList.length > 0 && (
+                <span
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: '#ef4444',
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                  }}
+                />
+              )}
+            </button>
+            <button
+              className={`admin-tab ${activeTab === 'history' ? 'active' : ''}`}
+              onClick={() => setActiveTab('history')}
+            >
+              Visit History ({visits.length})
+            </button>
           </div>
 
           <button
@@ -137,44 +154,6 @@ export const VisitorManagement: React.FC = () => {
           >
             <UserPlus size={15} />
             Invite Visitor
-          </button>
-        </div>
-      </header>
-
-      <main className="visitors-content">
-        {/* Navigation Tabs */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
-          <button
-            className={`admin-tab ${activeTab === 'expected' ? 'active' : ''}`}
-            onClick={() => setActiveTab('expected')}
-          >
-            Expected & Active ({expectedList.length + currentlyInsideList.length})
-          </button>
-          <button
-            className={`admin-tab ${activeTab === 'waiting' ? 'active' : ''}`}
-            onClick={() => setActiveTab('waiting')}
-            style={{ position: 'relative' }}
-          >
-            Waiting Gate Approval ({waitingApprovalList.length})
-            {waitingApprovalList.length > 0 && (
-              <span
-                style={{
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  background: '#ef4444',
-                  position: 'absolute',
-                  top: '8px',
-                  right: '8px',
-                }}
-              />
-            )}
-          </button>
-          <button
-            className={`admin-tab ${activeTab === 'history' ? 'active' : ''}`}
-            onClick={() => setActiveTab('history')}
-          >
-            Visit History ({visits.length})
           </button>
         </div>
 

@@ -71,37 +71,6 @@ export const MyBookings: React.FC = () => {
 
   return (
     <div className="facilities-container">
-      <header className="facilities-header">
-        <div className="facilities-header-inner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button
-              onClick={() => navigate('/facilities')}
-              className="btn-outline"
-              style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem' }}
-            >
-              <ArrowLeft size={16} />
-            </button>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <CalendarCheck size={18} style={{ color: 'var(--accent-primary)' }} />
-                My Facility Bookings
-              </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                BPS Twin Towers
-              </div>
-            </div>
-          </div>
-
-          <button
-            className="btn-primary"
-            onClick={() => navigate('/facilities')}
-            style={{ fontSize: '0.82rem', padding: '0.45rem 0.85rem', gap: '0.35rem' }}
-          >
-            <Plus size={15} /> Book Facility
-          </button>
-        </div>
-      </header>
-
       <main className="facilities-content animate-fade-in">
         {success && (
           <div

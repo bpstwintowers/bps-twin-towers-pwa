@@ -96,27 +96,12 @@ export const NotificationCenter: React.FC = () => {
 
   return (
     <div className="notif-container">
-      {/* Header */}
-      <header className="notif-header">
-        <div className="notif-header-inner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button
-              className="btn-outline"
-              onClick={() => navigate('/')}
-              style={{ padding: '0.45rem', borderRadius: 'var(--radius-md)' }}
-              title="Back to Dashboard"
-            >
-              <ArrowLeft size={18} />
-            </button>
-            <div>
-              <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
-                Notification Center
-              </h1>
-              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                {unreadCount > 0 ? `${unreadCount} unread messages` : 'All caught up'}
-              </p>
-            </div>
-          </div>
+      <div className="notif-content">
+        {/* Top Actions Row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            {unreadCount > 0 ? `${unreadCount} unread message${unreadCount > 1 ? 's' : ''}` : 'All caught up'}
+          </span>
 
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             {unreadCount > 0 && (
@@ -133,16 +118,14 @@ export const NotificationCenter: React.FC = () => {
             <button
               className="btn-outline"
               onClick={() => navigate('/settings/notifications')}
-              style={{ padding: '0.45rem', borderRadius: 'var(--radius-md)' }}
+              style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', gap: '0.35rem', borderRadius: 'var(--radius-md)' }}
               title="Notification Preferences"
             >
-              <Sliders size={17} />
+              <Sliders size={15} />
+              <span>Preferences</span>
             </button>
           </div>
         </div>
-      </header>
-
-      <div className="notif-content">
         {/* Category Pills Filter */}
         <div className="notif-category-pills">
           <button

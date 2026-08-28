@@ -144,7 +144,17 @@ export const RegistrationFlow: React.FC = () => {
   const flatSearchRef = useRef<HTMLDivElement>(null);
   const parkingFileInputRef = useRef<HTMLInputElement>(null);
   const rentalFileInputRef = useRef<HTMLInputElement>(null);
+  const rightPanelRef = useRef<HTMLDivElement>(null);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Scroll to top of panel on step progression
+  useEffect(() => {
+    if (rightPanelRef.current) {
+      rightPanelRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentStep]);
 
   const isRented = occupancyStatus === 'No, the flat is rented';
   const isFamilyLiving = occupancyStatus === 'No, my family lives here';
@@ -218,14 +228,53 @@ export const RegistrationFlow: React.FC = () => {
       }
 
       // Check if user is returning from Google OAuth redirect with pending registration payload
-      try {
-        const pendingPayloadStr = sessionStorage.getItem('pending_registration_payload');
-        const { data: { user } } = await supabase.auth.getUser();
+      let isProcessing = false;
 
-        if (user && pendingPayloadStr) {
+      async function processPendingRegistration(activeUser?: any) {
+        if (isProcessing) return;
+        const pendingPayloadStr = sessionStorage.getItem('pending_registration_payload');
+        if (!pendingPayloadStr) return;
+
+        try {
+          const user = activeUser || (await supabase.auth.getUser()).data.user;
+          if (!user) return;
+
+          isProcessing = true;
           setIsProcessingOAuthReturn(true);
           const payload = JSON.parse(pendingPayloadStr);
           sessionStorage.removeItem('pending_registration_payload');
+
+          const enteredEmail = (payload.email || '').trim().toLowerCase();
+          const authedEmail = (user.email || '').trim().toLowerCase();
+
+          // Strict Email Verification: Ensure Google account matches entered registration email
+          if (enteredEmail && authedEmail && enteredEmail !== authedEmail) {
+            console.warn(`Email mismatch during registration: entered=${enteredEmail}, authed=${authedEmail}`);
+            await supabase.auth.signOut();
+            setIsProcessingOAuthReturn(false);
+            isProcessing = false;
+
+            // Restore entered form values so user doesn't lose progress
+            if (payload.full_name) setFullName(payload.full_name);
+            if (payload.email) setEmail(payload.email);
+            if (payload.mobile_number) setMobileNumber(payload.mobile_number);
+            if (payload.occupancy_status) setOccupancyStatus(payload.occupancy_status);
+            if (payload.dob_month_year) setDobMonthYear(payload.dob_month_year);
+            if (payload.blood_group) setBloodGroup(payload.blood_group);
+            if (payload.resident_since) setResidentSince(payload.resident_since);
+            if (payload.remarks) setRemarks(payload.remarks);
+            if (payload.family_members) setFamilyMembers(payload.family_members);
+            if (payload.vehicles) setVehicles(payload.vehicles);
+            if (payload.tenant_name) setTenantName(payload.tenant_name);
+            if (payload.tenant_email) setTenantEmail(payload.tenant_email);
+            if (payload.tenant_mobile) setTenantMobile(payload.tenant_mobile);
+
+            setCurrentStep(2);
+            setError(
+              `Email Mismatch: You entered "${enteredEmail}" in the form, but authenticated with Google account "${authedEmail}". Please sign in with "${enteredEmail}" to verify flat ownership.`
+            );
+            return;
+          }
 
           try {
             await supabase.from('profiles').upsert({
@@ -266,13 +315,34 @@ export const RegistrationFlow: React.FC = () => {
           } catch (oauthErr) {
             console.error('Error completing OAuth registration:', oauthErr);
             setIsProcessingOAuthReturn(false);
+          } finally {
+            isProcessing = false;
           }
+        } catch (err) {
+          console.warn('Init error:', err);
+          setIsProcessingOAuthReturn(false);
+          isProcessing = false;
         }
-      } catch (err) {
-        console.warn('Init error:', err);
       }
+
+      processPendingRegistration();
+
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((event, session) => {
+        if (session?.user && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
+          processPendingRegistration(session.user);
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
     }
-    initPrefilled();
+    const cleanup = initPrefilled();
+    return () => {
+      cleanup.then?.((fn) => fn?.());
+    };
   }, [state, navigate]);
 
   // Handle flat search with debounce against Supabase search_flats RPC
@@ -629,7 +699,7 @@ export const RegistrationFlow: React.FC = () => {
         JSON.stringify(registrationPayload)
       );
 
-      // Trigger Fast Google OAuth Flow with login_hint
+      // Trigger Google OAuth targeting the entered Gmail address
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -754,7 +824,8 @@ export const RegistrationFlow: React.FC = () => {
                             backgroundColor: i % 2 === 0 ? '#00685f' : '#0284c7',
                           }}
                         >
-                          {r.full_name ? r.full_name.charAt(0).toUpperCase() : 'R'}\n                        </div>
+                          {r.full_name ? r.full_name.charAt(0).toUpperCase() : 'R'}
+                        </div>
                       )
                     )
                   ) : (
@@ -802,7 +873,7 @@ export const RegistrationFlow: React.FC = () => {
       {/* ====================================================================
           RIGHT REGISTRATION WORKSPACE (Section-Wise Clean Wizard)
           ==================================================================== */}
-      <div className="right-register-panel">
+      <div className="right-register-panel" ref={rightPanelRef}>
         <div className="register-card-wrapper animate-fade-in">
           {/* Header */}
           <div className="register-header">
@@ -916,7 +987,7 @@ export const RegistrationFlow: React.FC = () => {
                               <span className="selected-flat-verified-tag">✓ Available to Register</span>
                             </div>
                             <span className="selected-flat-tower-name">
-                              {selectedFlat.flat_number.toUpperCase().startsWith('B-') ? 'Tower B (Block B)' : 'Tower A (Block A)'} • BPS Twin Towers
+                              {selectedFlat.flat_number.toUpperCase().startsWith('B') ? 'Tower B' : 'Tower A'} • BPS Twin Towers
                             </span>
                           </div>
                         </div>
@@ -1286,7 +1357,7 @@ export const RegistrationFlow: React.FC = () => {
                   onClick={handleOpenAddFamilyModal}
                 >
                   <Plus size={16} />
-                  <span>+ Add Residing Family Member</span>
+                  <span>Add Residing Family Member</span>
                 </button>
               </div>
 
@@ -1367,7 +1438,7 @@ export const RegistrationFlow: React.FC = () => {
                   onClick={handleOpenAddVehicleModal}
                 >
                   <Plus size={16} />
-                  <span>+ Add Parking Slot / Vehicle</span>
+                  <span>Add Parking Slot / Vehicle</span>
                 </button>
 
                 {/* Optional Parking Document Upload */}
@@ -1681,6 +1752,13 @@ export const RegistrationFlow: React.FC = () => {
                     </span>
                   </label>
                 </div>
+
+                <div className="google-auth-email-confirm-callout">
+                  <ShieldCheck size={16} className="confirm-callout-icon" />
+                  <span>
+                    Verifying with: <strong>{email.trim().toLowerCase()}</strong>. Please confirm this account when prompted by Google.
+                  </span>
+                </div>
               </div>
 
               {/* Step Actions */}
@@ -1730,9 +1808,9 @@ export const RegistrationFlow: React.FC = () => {
 
           {/* Footer Back to Login Link */}
           <div className="register-footer-row">
-            <span className="footer-text">Already registered your flat?</span>
+            <span className="footer-text">Already registered?</span>
             <Link to="/login" className="footer-link">
-              Sign In to Your Dashboard →
+              Sign In →
             </Link>
           </div>
         </div>

@@ -70,6 +70,39 @@ export async function checkIsAdmin(): Promise<boolean> {
   return Boolean(data);
 }
 
+export async function fetchUserRoles(): Promise<string[]> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return ['Resident'];
+
+    // Try RPC first
+    const { data: rpcData, error: rpcError } = await supabase.rpc('get_my_roles');
+    if (!rpcError && Array.isArray(rpcData) && rpcData.length > 0) {
+      const roles = rpcData.map((r: any) => typeof r === 'string' ? r : r.role_name).filter(Boolean);
+      if (roles.length > 0) return roles;
+    }
+
+    // Direct query fallback with explicit foreign key join
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('roles!user_roles_role_id_fkey(name)')
+      .eq('user_id', user.id);
+
+    if (error || !data || data.length === 0) {
+      return ['Resident'];
+    }
+
+    const roleNames = data
+      .map((r: any) => r.roles?.name)
+      .filter(Boolean);
+
+    return roleNames.length > 0 ? roleNames : ['Resident'];
+  } catch (err) {
+    console.error('Error fetching user roles:', err);
+    return ['Resident'];
+  }
+}
+
 export async function fetchAdminRegistrations(): Promise<AdminRegistrationItem[]> {
   const { data, error } = await supabase
     .from('registration_requests')

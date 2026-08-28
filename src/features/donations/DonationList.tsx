@@ -69,28 +69,9 @@ export const DonationList: React.FC = () => {
 
   return (
     <div className="donations-container">
-      {/* Header */}
-      <header className="donations-header">
-        <div className="donations-header-inner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button
-              className="btn-outline"
-              onClick={() => navigate('/')}
-              style={{ padding: '0.45rem', borderRadius: 'var(--radius-md)' }}
-              title="Back to Dashboard"
-            >
-              <ArrowLeft size={18} />
-            </button>
-            <div>
-              <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
-                Community Donations & Finance
-              </h1>
-              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                BPS Twin Towers Society Contributions
-              </p>
-            </div>
-          </div>
-
+      <div className="donations-content">
+        {/* Top Meta Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '1rem' }}>
           <div
             style={{
               padding: '0.35rem 0.75rem',
@@ -105,9 +86,6 @@ export const DonationList: React.FC = () => {
             My Total: ₹{totalContributed.toLocaleString('en-IN')}
           </div>
         </div>
-      </header>
-
-      <div className="donations-content">
         {/* Tab Switcher */}
         <div className="donations-tabs">
           <button

@@ -49,40 +49,8 @@ export const ComplaintList: React.FC = () => {
 
   return (
     <div className="complaints-container">
-      <header className="complaints-header">
-        <div className="complaints-header-inner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button
-              onClick={() => navigate('/')}
-              className="btn-outline"
-              style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem' }}
-            >
-              <ArrowLeft size={16} />
-            </button>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Wrench size={18} style={{ color: '#f59e0b' }} />
-                Helpdesk & Maintenance
-              </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                BPS Twin Towers Support Tickets
-              </div>
-            </div>
-          </div>
-
-          <button
-            className="btn-primary"
-            onClick={() => navigate('/complaints/new')}
-            style={{ fontSize: '0.82rem', padding: '0.45rem 0.85rem', gap: '0.35rem' }}
-          >
-            <Plus size={15} />
-            Log Complaint
-          </button>
-        </div>
-      </header>
-
       <main className="complaints-content animate-fade-in">
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs, Search, and Log Button */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button
@@ -99,25 +67,36 @@ export const ComplaintList: React.FC = () => {
             </button>
           </div>
 
-          <div style={{ position: 'relative', width: '220px' }}>
-            <Search
-              size={15}
-              style={{
-                position: 'absolute',
-                left: '0.75rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: 'var(--text-muted)',
-              }}
-            />
-            <input
-              type="text"
-              className="admin-search-input"
-              style={{ width: '100%', paddingLeft: '2.2rem', fontSize: '0.82rem' }}
-              placeholder="Search ticket # or title..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ position: 'relative', width: '220px' }}>
+              <Search
+                size={15}
+                style={{
+                  position: 'absolute',
+                  left: '0.75rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-muted)',
+                }}
+              />
+              <input
+                type="text"
+                className="admin-search-input"
+                style={{ width: '100%', paddingLeft: '2.2rem', fontSize: '0.82rem' }}
+                placeholder="Search ticket # or title..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <button
+              className="btn-primary"
+              onClick={() => navigate('/complaints/new')}
+              style={{ fontSize: '0.82rem', padding: '0.45rem 0.85rem', gap: '0.35rem' }}
+            >
+              <Plus size={15} />
+              Log Complaint
+            </button>
           </div>
         </div>
 

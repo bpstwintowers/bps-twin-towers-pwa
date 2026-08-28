@@ -67,25 +67,36 @@ const Login: React.FC = () => {
 
   // 1. Fast Parallel Server Validation after Google Authentication Redirect
   useEffect(() => {
-    async function checkServerValidation() {
+    let isMounted = true;
+    let isProcessing = false;
+
+    async function checkServerValidation(forcedUser?: any) {
+      if (isProcessing) return;
+
       const searchParams = new URLSearchParams(window.location.search);
       const isVerifyRoute = searchParams.get('verify') === 'true';
       const pendingAuthStr = sessionStorage.getItem('pending_active_resident_auth');
 
       // Fast check: inspect local session or user
-      const { data: { session } } = await supabase.auth.getSession();
-      const user = session?.user;
+      let user = forcedUser;
+      if (!user) {
+        const { data: { session } } = await supabase.auth.getSession();
+        user = session?.user;
+      }
 
       if (!isVerifyRoute && !pendingAuthStr && !user) return;
       if (!user && !isVerifyRoute) return;
 
       try {
-        setIsVerifyingServer(true);
-        setError(null);
+        isProcessing = true;
+        if (isMounted) {
+          setIsVerifyingServer(true);
+          setError(null);
+        }
 
         const activeUser = user || (await supabase.auth.getUser()).data.user;
 
-        if (activeUser) {
+        if (activeUser && isMounted) {
           const pendingAuth = pendingAuthStr ? JSON.parse(pendingAuthStr) : null;
           if (pendingAuthStr) sessionStorage.removeItem('pending_active_resident_auth');
 
@@ -117,20 +128,38 @@ const Login: React.FC = () => {
             return;
           }
 
-          // If user is authenticated with Google but not yet registered to a flat -> Direct to registration flow
-          if (isVerifyRoute) {
-            navigate('/register', { replace: true });
-          }
+          // Option 2: Unregistered Google Account -> Sign out session & stay on Login with clear warning
+          await supabase.auth.signOut();
+          window.history.replaceState({}, '', '/login');
+          setError(
+            `This Google account (${activeUser.email}) is not registered with any flat. Please click "Register Flat" below or sign in with your registered account.`
+          );
         }
       } catch (err: any) {
         console.error('Server validation error:', err);
-        navigate('/', { replace: true });
+        setError('Failed to verify resident access. Please try again.');
       } finally {
-        setIsVerifyingServer(false);
+        if (isMounted) {
+          setIsVerifyingServer(false);
+        }
+        isProcessing = false;
       }
     }
 
     checkServerValidation();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
+        checkServerValidation(session.user);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   // Load community residents from Supabase database on mount
@@ -251,6 +280,9 @@ const Login: React.FC = () => {
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/login?verify=true`,
+          queryParams: {
+            prompt: 'select_account',
+          },
         },
       });
 
@@ -273,6 +305,9 @@ const Login: React.FC = () => {
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/login?verify=true`,
+          queryParams: {
+            prompt: 'select_account',
+          },
         },
       });
 
@@ -443,7 +478,8 @@ const Login: React.FC = () => {
             <span className="auth-pill-label">RESIDENT & OWNER PORTAL</span>
             <h2 className="auth-card-title">Welcome Back</h2>
             <p className="auth-card-subtitle">
-              Sign in with your registered Google account to access your home dashboard.
+              Sign in with your Google account to Connect Dashboard.
+
             </p>
           </div>
 
@@ -512,11 +548,11 @@ const Login: React.FC = () => {
           <div className="new-resident-reg-card">
             <div className="new-reg-card-left">
               <div className="new-reg-badge-icon">
-                <UserPlus size={20} />
+                <UserPlus size={18} />
               </div>
               <div className="new-reg-card-text">
-                <span className="new-reg-title">New Flat Owner / Resident?</span>
-                <span className="new-reg-sub">Register your flat to get portal & gate clearance</span>
+                <span className="new-reg-title">New Resident / Owner?</span>
+                <span className="new-reg-sub">Register your home to connect with your community.</span>
               </div>
             </div>
             <button
@@ -525,192 +561,11 @@ const Login: React.FC = () => {
               onClick={() => navigate('/register')}
             >
               <span>Register Flat</span>
-              <ChevronRight size={16} />
+              <ChevronRight size={15} />
             </button>
           </div>
 
-          {/* ================================================================
-              OPTIONAL LOOKUP BY FLAT NUMBER (Collapsible / Secondary)
-              ================================================================ */}
-          <div className="flat-lookup-toggle-area">
-            <button
-              type="button"
-              className="btn-toggle-flat-lookup"
-              onClick={() => {
-                if (showFlatSearch) {
-                  setFlatQuery('');
-                  setSelectedFlat(null);
-                  setFlatResidents([]);
-                  setFlatResults([]);
-                  setShowFlatDropdown(false);
-                }
-                setShowFlatSearch(!showFlatSearch);
-              }}
-            >
-              <Search size={14} />
-              <span>{showFlatSearch ? 'Hide Flat Lookup' : 'Lookup specific flat status'}</span>
-              <ChevronRight size={14} className={`lookup-toggle-arrow ${showFlatSearch ? 'open' : ''}`} />
-            </button>
 
-            {showFlatSearch && (
-              <div className="flat-selector-section animate-fade-in" ref={searchContainerRef} style={{ marginTop: '10px' }}>
-                <div className="flat-search-pill-wrapper">
-                  <Search size={18} className="search-pill-icon" />
-                  <input
-                    type="text"
-                    placeholder="Search flat (e.g. A-402, B-811)..."
-                    className="flat-search-pill-input"
-                    value={flatQuery}
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    onFocus={() => {
-                      if (flatResults.length > 0) setShowFlatDropdown(true);
-                    }}
-                    autoComplete="off"
-                  />
-                  {isSearching && <span className="search-spinner-text">Searching...</span>}
-                </div>
-
-                {/* Flat Autocomplete Dropdown */}
-                {showFlatDropdown && flatResults.length > 0 && (
-                  <div className="flat-search-dropdown-menu">
-                    {flatResults.map((flat) => (
-                      <div
-                        key={flat.flat_id}
-                        className="flat-dropdown-row"
-                        onClick={() => handleSelectFlat(flat)}
-                      >
-                        <div className="row-flat-info">
-                          <Home size={16} className="flat-icon-muted" />
-                          <span className="row-flat-num">{flat.flat_number}</span>
-                          {flat.bhk && <span className="row-bhk-tag">{flat.bhk}</span>}
-                        </div>
-                        <span className={`row-status-pill ${flat.owner_registered ? 'occupied' : 'available'}`}>
-                          {flat.owner_registered ? 'Registered' : 'Available'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* ================================================================
-              STEP 2: BACKEND CHECKS STATUS: ACTIVE | PENDING | NOT REGISTERED
-              ================================================================ */}
-          {selectedFlat && (
-            <div className="recognized-flat-section animate-fade-in">
-              <div className="recognized-flat-header">
-                <span className="recognized-flat-title">
-                  Flat <strong>{selectedFlat.flat_number}</strong>
-                </span>
-                {selectedFlat.bhk && <span className="recognized-bhk">{selectedFlat.bhk}</span>}
-              </div>
-
-              {isLoadingResidents ? (
-                <div className="residents-skeleton-loader">Verifying flat status...</div>
-              ) : (
-                (() => {
-                  const activeResidents = flatResidents.filter((r) => r.status !== 'pending');
-                  const pendingResidents = flatResidents.filter((r) => r.status === 'pending');
-
-                  // 1. ACTIVE STATUS -> Click "Continue with [Masked Email]" -> Google Auth -> Server Validation -> Dashboard
-                  if (activeResidents.length > 0) {
-                    return (
-                      <div className="resident-pills-list">
-                        {activeResidents.map((resident) => (
-                          <button
-                            key={resident.id}
-                            className="resident-login-pill-btn"
-                            onClick={() => handleActiveResidentLogin(resident)}
-                            disabled={googleLoading || isVerifyingServer}
-                          >
-                            <div className="resident-pill-left">
-                              <div className="resident-avatar-circle">
-                                {resident.full_name.charAt(0).toUpperCase()}
-                              </div>
-                              <div className="resident-info-block">
-                                <div className="resident-name-row">
-                                  <span className="resident-name-text">{resident.full_name}</span>
-                                  <span className={`role-badge ${resident.resident_type.toLowerCase()}`}>
-                                    {resident.resident_type}
-                                  </span>
-                                </div>
-                                <span className="resident-email-masked">
-                                  Continue with {resident.masked_email}
-                                </span>
-                              </div>
-                            </div>
-                            <ChevronRight size={18} className="pill-arrow-icon" />
-                          </button>
-                        ))}
-                      </div>
-                    );
-                  }
-
-                  // 2. PENDING STATUS -> Pending message & Track Status
-                  if (pendingResidents.length > 0) {
-                    return (
-                      <div className="flat-pending-callout animate-fade-in">
-                        <div className="pending-status-header">
-                          <div className="pending-badge-icon">
-                            <Clock size={20} className="clock-amber-icon" />
-                          </div>
-                          <div className="pending-header-text">
-                            <h3 className="pending-status-title">Registration Pending</h3>
-                            <span className="pending-applicant-email">
-                              Applicant: <strong>{pendingResidents[0].masked_email}</strong>
-                            </span>
-                          </div>
-                        </div>
-                        <p className="pending-status-desc">
-                          Your registration is under review. Our admin team will verify your details and approve your account shortly.
-                        </p>
-                        <button
-                          type="button"
-                          className="track-status-action-btn"
-                          onClick={() => navigate('/registration-status')}
-                        >
-                          <Clock size={15} />
-                          <span>Track Application Status</span>
-                          <ChevronRight size={16} />
-                        </button>
-                      </div>
-                    );
-                  }
-
-                  // 3. NOT REGISTERED -> Register Button -> Registration Form
-                  return (
-                    <div className="flat-unregistered-callout animate-fade-in">
-                      <div className="unregistered-header">
-                        <span className="unregistered-tag">NOT REGISTERED</span>
-                        <p className="unregistered-text">
-                          No resident registered yet for <strong>{selectedFlat.flat_number}</strong>.
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        className="register-flat-primary-btn"
-                        onClick={() =>
-                          navigate('/register', {
-                            state: {
-                              flat_id: selectedFlat.flat_id,
-                              flat_number: selectedFlat.flat_number,
-                              bhk: selectedFlat.bhk,
-                            },
-                          })
-                        }
-                      >
-                        <UserPlus size={18} />
-                        <span>Register Flat {selectedFlat.flat_number}</span>
-                        <ChevronRight size={18} />
-                      </button>
-                    </div>
-                  );
-                })()
-              )}
-            </div>
-          )}
 
           {/* ================================================================
               TRUST, SECURITY & FOOTER LINKS

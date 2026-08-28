@@ -75,28 +75,9 @@ export const SponsorList: React.FC = () => {
 
   return (
     <div className="sponsors-container">
-      {/* Header */}
-      <header className="sponsors-header">
-        <div className="sponsors-header-inner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button
-              className="btn-outline"
-              onClick={() => navigate('/')}
-              style={{ padding: '0.45rem', borderRadius: 'var(--radius-md)' }}
-              title="Back to Dashboard"
-            >
-              <ArrowLeft size={18} />
-            </button>
-            <div>
-              <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
-                Sponsors & Partners
-              </h1>
-              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                BPS Twin Towers Community Backers
-              </p>
-            </div>
-          </div>
-
+      <div className="sponsors-content">
+        {/* Top Action Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '1rem' }}>
           <button
             className="btn-primary"
             onClick={() => handleApplyTier()}
@@ -111,9 +92,6 @@ export const SponsorList: React.FC = () => {
             Partner With Us
           </button>
         </div>
-      </header>
-
-      <div className="sponsors-content">
         {/* Tab Switcher */}
         <div className="donations-tabs">
           <button

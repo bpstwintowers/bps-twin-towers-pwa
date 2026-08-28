@@ -68,30 +68,6 @@ export const AnnouncementList: React.FC = () => {
 
   return (
     <div className="announcements-container">
-      {/* Header */}
-      <header className="notif-header">
-        <div className="notif-header-inner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button
-              className="btn-outline"
-              onClick={() => navigate('/')}
-              style={{ padding: '0.45rem', borderRadius: 'var(--radius-md)' }}
-              title="Back to Dashboard"
-            >
-              <ArrowLeft size={18} />
-            </button>
-            <div>
-              <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
-                Community Bulletin
-              </h1>
-              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Official BPS Twin Towers Notices & Broadcasts
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <div className="notif-content">
         {/* Category Pills */}
         <div className="notif-category-pills">

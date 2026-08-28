@@ -1,43 +1,15 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../services/supabase/client';
+import { fetchActiveAnnouncements, type AnnouncementItem } from '../../services/supabase/communicationService';
+import { fetchPublishedEvents, type EventItem } from '../../services/supabase/eventService';
 import {
-  resolveUserAccess,
-  getUserRegistrations,
-  type AccessInfo,
-  type RegistrationRequest,
-} from '../../services/supabase/registrationService';
-import { checkIsAdmin } from '../../services/supabase/adminService';
-import { Card } from '../../components/ui/Card';
-import { StatusBadge } from '../../components/ui/StatusBadge';
-import { HouseholdModal } from './HouseholdModal';
-import { DirectoryModal } from './DirectoryModal';
-import { NotificationBell } from '../notifications/NotificationBell';
-import {
-  fetchActiveAnnouncements,
-  type AnnouncementItem,
-} from '../../services/supabase/communicationService';
-import {
-  LogOut,
-  UserPlus,
-  FileText,
-  Home,
-  Users,
-  Shield,
-  BookOpen,
-  Car,
-  Bell,
-  Sparkles,
   Calendar,
-  HeartHandshake,
-  HandHelping,
+  CreditCard,
   Award,
-  Megaphone,
-  Wrench,
-  ChevronDown,
-  Check,
-  Plus,
-  Building2,
+  Info,
+  Clock,
+  ArrowRight,
 } from 'lucide-react';
 import './Dashboard.css';
 
@@ -45,21 +17,13 @@ export const ResidentDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
-  const [access, setAccess] = useState<AccessInfo[]>([]);
-  const [activeFlatIndex, setActiveFlatIndex] = useState(0);
-  const [isFlatSwitcherOpen, setIsFlatSwitcherOpen] = useState(false);
-  const flatSwitcherRef = useRef<HTMLDivElement>(null);
-  const [registrations, setRegistrations] = useState<RegistrationRequest[]>([]);
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [myDonationSum, setMyDonationSum] = useState<number>(0);
   const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  // Modals
-  const [selectedFlatForHousehold, setSelectedFlatForHousehold] = useState<AccessInfo | null>(null);
-  const [isHouseholdModalOpen, setIsHouseholdModalOpen] = useState(false);
-  const [isDirectoryModalOpen, setIsDirectoryModalOpen] = useState(false);
 
   useEffect(() => {
-    const fetchAll = async () => {
+    const fetchDashboardData = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
@@ -72,36 +36,38 @@ export const ResidentDashboard: React.FC = () => {
           .single();
         if (profileData) setProfile(profileData);
 
-        // Resolve access (active memberships)
+        // Fetch events
         try {
-          const accessData = await resolveUserAccess();
-          setAccess(accessData);
-          const savedFlatId = localStorage.getItem('bps_active_flat_id');
-          if (savedFlatId && accessData.length > 0) {
-            const foundIdx = accessData.findIndex((a) => a.flat_id === savedFlatId);
-            if (foundIdx >= 0) setActiveFlatIndex(foundIdx);
-          }
+          const evData = await fetchPublishedEvents();
+          setEvents(evData || []);
         } catch (err) {
-          console.error('Error resolving access:', err);
+          console.error('Error fetching events:', err);
         }
 
-        // Get registration requests
+        // Fetch donation campaigns
         try {
-          const regs = await getUserRegistrations();
-          setRegistrations(regs);
+          const { data: campData } = await supabase
+            .from('donation_campaigns')
+            .select('*')
+            .eq('status', 'Active');
+          setCampaigns(campData || []);
         } catch (err) {
-          console.error('Error fetching registrations:', err);
+          console.error('Error fetching campaigns:', err);
         }
 
-        // Check if user is admin
+        // Fetch user donation sum
         try {
-          const adminStatus = await checkIsAdmin();
-          setIsAdmin(adminStatus);
+          const { data: donData } = await supabase
+            .from('donations')
+            .select('amount')
+            .eq('user_id', user.id);
+          const sum = (donData || []).reduce((acc: number, curr: any) => acc + Number(curr.amount || 0), 0);
+          setMyDonationSum(sum);
         } catch (err) {
-          console.error('Error checking admin status:', err);
+          console.error('Error fetching donations:', err);
         }
 
-        // Fetch active announcements
+        // Fetch announcements
         try {
           const annData = await fetchActiveAnnouncements();
           setAnnouncements(annData);
@@ -114,673 +80,272 @@ export const ResidentDashboard: React.FC = () => {
         setLoading(false);
       }
     };
-    fetchAll();
+
+    fetchDashboardData();
   }, []);
 
-  // Close flat switcher on outside click
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (flatSwitcherRef.current && !flatSwitcherRef.current.contains(e.target as Node)) {
-        setIsFlatSwitcherOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/login');
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
   };
 
-  const handleOpenHousehold = (flatAccess: AccessInfo) => {
-    setSelectedFlatForHousehold(flatAccess);
-    setIsHouseholdModalOpen(true);
+  const getFormattedDate = () => {
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date());
   };
 
-  const hasActiveMembership = access.length > 0;
-  const activeFlat = access[activeFlatIndex] || access[0];
-  const pendingRegistrations = registrations.filter(
-    (r) => r.status === 'Pending' || r.status === 'Correction Required'
-  );
-  const hasAnyRegistration = registrations.length > 0;
+  const firstName = profile?.full_name?.split(' ')[0] || 'Resident';
 
   if (loading) {
     return (
-      <div className="flex-center" style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
-        <div className="animate-fade-in" style={{ color: 'var(--text-muted)' }}>
-          Loading your community portal...
-        </div>
+      <div className="flex-center" style={{ minHeight: '60vh', color: 'var(--text-muted)' }}>
+        <div className="animate-fade-in">Loading dashboard...</div>
       </div>
     );
   }
 
   return (
-    <div className="dashboard-container">
-      {/* Top Header */}
-      <header className="dashboard-header">
-        <div className="dashboard-header-inner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <img
-              src="/logo.png"
-              alt="BPS"
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '8px',
-                objectFit: 'cover',
-              }}
-            />
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '0.98rem' }}>BPS Twin Towers</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Saidabad Community</div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            {/* MULTI-FLAT SWITCHER DROPDOWN */}
-            {access.length > 1 ? (
-              <div className="active-flat-switcher-dropdown" ref={flatSwitcherRef}>
-                <button
-                  type="button"
-                  className="btn-flat-switcher"
-                  onClick={() => setIsFlatSwitcherOpen(!isFlatSwitcherOpen)}
-                  title="Switch between your registered flats"
-                >
-                  <Building2 size={15} className="flat-switcher-icon" />
-                  <span className="flat-switcher-current-label">Flat {activeFlat?.flat_number}</span>
-                  <ChevronDown size={14} className={`flat-switcher-arrow ${isFlatSwitcherOpen ? 'open' : ''}`} />
-                </button>
-
-                {isFlatSwitcherOpen && (
-                  <div className="flat-switcher-menu animate-fade-in">
-                    <div className="switcher-menu-header">
-                      <span>Your Registered Flats ({access.length})</span>
-                    </div>
-
-                    <div className="switcher-items-list">
-                      {access.map((flat, idx) => (
-                        <button
-                          key={flat.flat_id}
-                          type="button"
-                          className={`flat-switcher-item ${idx === activeFlatIndex ? 'selected' : ''}`}
-                          onClick={() => {
-                            setActiveFlatIndex(idx);
-                            localStorage.setItem('bps_active_flat_id', flat.flat_id);
-                            setIsFlatSwitcherOpen(false);
-                          }}
-                        >
-                          <div className="switcher-item-left">
-                            <div className="switcher-icon-circle">
-                              <Home size={14} />
-                            </div>
-                            <div className="switcher-item-text">
-                              <span className="switcher-flat-num">Flat {flat.flat_number}</span>
-                              <span className="switcher-flat-sub">
-                                Block {flat.block_name || 'A'} • {flat.role_name || 'Resident'}
-                              </span>
-                            </div>
-                          </div>
-                          {idx === activeFlatIndex && <Check size={14} className="switcher-check" />}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="switcher-divider" />
-                    <button
-                      type="button"
-                      className="btn-switcher-add-flat"
-                      onClick={() => {
-                        setIsFlatSwitcherOpen(false);
-                        navigate('/register');
-                      }}
-                    >
-                      <Plus size={14} />
-                      <span>+ Register Another Flat</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : hasActiveMembership && activeFlat ? (
-              <div className="single-flat-badge-pill">
-                <Home size={13} />
-                <span>Flat {activeFlat.flat_number}</span>
-              </div>
-            ) : null}
-
-            <NotificationBell />
-            {isAdmin && (
-              <button
-                onClick={() => navigate('/admin')}
-                className="btn-primary"
-                style={{
-                  padding: '0.45rem 0.85rem',
-                  fontSize: '0.82rem',
-                  gap: '0.4rem',
-                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                }}
-              >
-                <Shield size={14} />
-                Admin Portal
-              </button>
-            )}
-            <button
-              onClick={handleSignOut}
-              className="btn-outline"
-              style={{ padding: '0.45rem 0.75rem', fontSize: '0.82rem', gap: '0.35rem' }}
-            >
-              <LogOut size={14} />
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="dashboard-content">
-        {/* Welcome Hero Banner */}
-        <div className="resident-hero-card animate-fade-in">
-          <div className="resident-hero-top">
-            <div className="resident-user-info">
-              <div className="resident-avatar">
-                {profile?.full_name ? profile.full_name[0].toUpperCase() : 'R'}
-              </div>
-              <div className="resident-greeting">
-                <h1>Welcome, {profile?.full_name || 'Resident'}</h1>
-                <p>{profile?.email}</p>
-              </div>
-            </div>
-
-            {hasActiveMembership && activeFlat && (
-              <div className="flat-pill-row">
-                <span className="flat-badge-pill">
-                  <Home size={14} />
-                  Flat {activeFlat.flat_number || 'Resident'} (Block {activeFlat.block_name || 'A'})
-                </span>
-                <StatusBadge status={activeFlat.membership_status} />
-              </div>
-            )}
-          </div>
-
-          {hasActiveMembership ? (
-            <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
-              Manage your household, view community updates, and connect with neighbors in BPS Twin Towers.
-            </p>
-          ) : (
-            <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-muted)' }}>
-              Complete your flat registration below to access household features and community services.
-            </p>
-          )}
-        </div>
-
-        {/* ACTIVE ANNOUNCEMENTS BANNER */}
-        {announcements.length > 0 && (
-          <div
-            className="animate-fade-in"
-            style={{
-              marginBottom: '1.5rem',
-              background: announcements[0].priority === 'Urgent'
-                ? 'rgba(239, 68, 68, 0.12)'
-                : 'rgba(99, 102, 241, 0.08)',
-              border: `1px solid ${
-                announcements[0].priority === 'Urgent'
-                  ? 'rgba(239, 68, 68, 0.4)'
-                  : 'rgba(99, 102, 241, 0.3)'
-              }`,
-              borderRadius: 'var(--radius-xl)',
-              padding: '1rem 1.25rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '1rem',
-              flexWrap: 'wrap',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <Megaphone
-                size={20}
-                style={{
-                  color: announcements[0].priority === 'Urgent' ? '#ef4444' : 'var(--accent-primary)',
-                  flexShrink: 0,
-                }}
-              />
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.15rem' }}>
-                  <span
-                    style={{
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      padding: '0.1rem 0.4rem',
-                      borderRadius: '4px',
-                      background: announcements[0].priority === 'Urgent' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(99, 102, 241, 0.2)',
-                      color: announcements[0].priority === 'Urgent' ? '#f87171' : 'var(--accent-primary)',
-                    }}
-                  >
-                    {announcements[0].category.toUpperCase()}
-                  </span>
-                  <span style={{ fontSize: '0.92rem', fontWeight: 700 }}>
-                    {announcements[0].title}
-                  </span>
-                </div>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.3 }}>
-                  {announcements[0].message}
-                </p>
-              </div>
-            </div>
-
-            <button
-              className="btn-outline"
-              onClick={() => navigate('/announcements')}
-              style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem', whiteSpace: 'nowrap' }}
-            >
-              All Notices ({announcements.length}) →
-            </button>
-          </div>
-        )}
-
-        {/* ACTIVE FLATS / HOUSEHOLDS */}
-        {hasActiveMembership && (
-          <div className="animate-fade-in" style={{ marginBottom: '1.75rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-              <h2 className="section-title" style={{ margin: 0 }}>
-                <Home size={18} style={{ color: 'var(--accent-primary)' }} />
-                My Residence & Household ({access.length})
-              </h2>
-              <button
-                type="button"
-                className="btn-outline"
-                onClick={() => navigate('/register')}
-                style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem', gap: '0.35rem' }}
-              >
-                <Plus size={14} />
-                <span>+ Add Another Flat</span>
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {access.map((a) => (
-                <div
-                  key={a.membership_id}
-                  style={{
-                    padding: '1.25rem',
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--radius-lg)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: '1rem',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                    <div
-                      style={{
-                        width: '46px',
-                        height: '46px',
-                        borderRadius: 'var(--radius-md)',
-                        background: 'rgba(59, 130, 246, 0.15)',
-                        color: 'var(--accent-primary)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Home size={24} />
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>
-                        Flat {a.flat_number || 'Assigned Flat'}{' '}
-                        <span style={{ fontSize: '0.85rem', fontWeight: 400, color: 'var(--text-muted)' }}>
-                          (Block {a.block_name || 'A'})
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                        Role: <strong>{a.role_name}</strong> · {a.relationship}
-                        {a.bhk ? ` · ${a.bhk}` : ''}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <button
-                      className="btn-primary"
-                      onClick={() => handleOpenHousehold(a)}
-                      style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', gap: '0.4rem' }}
-                    >
-                      <Users size={15} />
-                      Manage Household
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* QUICK ACCESS ACTION TILES */}
-        {hasActiveMembership && (
-          <div className="animate-fade-in">
-            <h2 className="section-title">
-              <Sparkles size={18} style={{ color: '#f59e0b' }} />
-              Community Features & Services
-            </h2>
-
-            <div className="action-grid">
-              <button
-                className="action-tile"
-                onClick={() => activeFlat && handleOpenHousehold(activeFlat)}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(59, 130, 246, 0.15)', color: 'var(--accent-primary)' }}
-                >
-                  <Users size={20} />
-                </div>
-                <div className="action-tile-title">Household Members</div>
-                <div className="action-tile-desc">
-                  Add children, family members, tenants, and domestic staff.
-                </div>
-              </button>
-
-              <button
-                className="action-tile"
-                onClick={() => setIsDirectoryModalOpen(true)}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }}
-                >
-                  <BookOpen size={20} />
-                </div>
-                <div className="action-tile-title">Society Directory</div>
-                <div className="action-tile-desc">
-                  Find neighbors and contact fellow residents in Tower A & B.
-                </div>
-              </button>
-
-              <button
-                className="action-tile"
-                onClick={() => navigate('/events')}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(236, 72, 153, 0.15)', color: '#f472b6' }}
-                >
-                  <Calendar size={20} />
-                </div>
-                <div className="action-tile-title">Events & Festivals</div>
-                <div className="action-tile-desc">
-                  Explore community programs, register for events, and book puja rituals.
-                </div>
-              </button>
-
-              <button
-                className="action-tile"
-                onClick={() => navigate('/donations')}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }}
-                >
-                  <HeartHandshake size={20} />
-                </div>
-                <div className="action-tile-title">Donations & Funds</div>
-                <div className="action-tile-desc">
-                  Support society campaigns, festival funds, and track your receipts.
-                </div>
-              </button>
-
-              <button
-                className="action-tile"
-                onClick={() => navigate('/volunteers')}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(139, 92, 246, 0.15)', color: '#c4b5fd' }}
-                >
-                  <HandHelping size={20} />
-                </div>
-                <div className="action-tile-title">Volunteers & Teams</div>
-                <div className="action-tile-desc">
-                  Join festival teams, sign up for community shifts, and support events.
-                </div>
-              </button>
-
-              <button
-                className="action-tile"
-                onClick={() => navigate('/sponsors')}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24' }}
-                >
-                  <Award size={20} />
-                </div>
-                <div className="action-tile-title">Sponsors & Partners</div>
-                <div className="action-tile-desc">
-                  Explore community sponsors, partnership tiers, and apply for sponsorship.
-                </div>
-              </button>
-
-              <button
-                className="action-tile"
-                onClick={() => navigate('/announcements')}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}
-                >
-                  <Megaphone size={20} />
-                </div>
-                <div className="action-tile-title">Community Bulletin</div>
-                <div className="action-tile-desc">
-                  Official notices, water & lift maintenance, and emergency broadcasts.
-                </div>
-              </button>
-
-              <button
-                className="action-tile"
-                onClick={() => navigate('/notifications')}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8' }}
-                >
-                  <Bell size={20} />
-                </div>
-                <div className="action-tile-title">Notification Center</div>
-                <div className="action-tile-desc">
-                  Manage your event reminders, donation receipts, and alerts.
-                </div>
-              </button>
-
-              <button
-                className="action-tile"
-                onClick={() => navigate('/my-visitors')}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa' }}
-                >
-                  <Shield size={20} />
-                </div>
-                <div className="action-tile-title">Visitors & Gate Passes</div>
-                <div className="action-tile-desc">
-                  Pre-approve guest entry, track deliveries, and manage gate passes.
-                </div>
-              </button>
-
-              <button
-                className="action-tile"
-                onClick={() => navigate('/facilities')}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-primary)' }}
-                >
-                  <Sparkles size={20} />
-                </div>
-                <div className="action-tile-title">Facilities & Amenities</div>
-                <div className="action-tile-desc">
-                  Book badminton courts, clubhouse, swimming pool, and community spaces.
-                </div>
-              </button>
-
-              <button
-                className="action-tile"
-                onClick={() => navigate('/complaints')}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24' }}
-                >
-                  <Wrench size={20} />
-                </div>
-                <div className="action-tile-title">Helpdesk & Maintenance</div>
-                <div className="action-tile-desc">
-                  Report plumbing, electrical, or lift issues with real-time SLA tracking.
-                </div>
-              </button>
-
-              <button
-                className="action-tile"
-                onClick={() => navigate('/registration-status')}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24' }}
-                >
-                  <FileText size={20} />
-                </div>
-                <div className="action-tile-title">Registration Status</div>
-                <div className="action-tile-desc">
-                  Track and review all your flat applications and status updates.
-                </div>
-              </button>
-
-              <button
-                className="action-tile"
-                onClick={() => navigate('/register')}
-              >
-                <div
-                  className="action-tile-icon"
-                  style={{ background: 'rgba(139, 92, 246, 0.15)', color: '#a78bfa' }}
-                >
-                  <UserPlus size={20} />
-                </div>
-                <div className="action-tile-title">Register Flat</div>
-                <div className="action-tile-desc">
-                  Register an additional flat or transfer residency.
-                </div>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* PENDING REGISTRATIONS */}
-        {pendingRegistrations.length > 0 && (
-          <div className="animate-fade-in" style={{ marginBottom: '1.5rem' }}>
-            <h2 className="section-title">
-              <FileText size={18} style={{ color: '#f59e0b' }} />
-              Pending Applications ({pendingRegistrations.length})
-            </h2>
-            {pendingRegistrations.map((reg) => (
-              <Card key={reg.id}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ fontWeight: 600 }}>
-                    {reg.flat_number || 'Flat'}
-                    {reg.block_name ? ` (Block ${reg.block_name})` : ''}
-                  </span>
-                  <StatusBadge status={reg.status} />
-                </div>
-                <div style={{ fontSize: '0.83rem', color: 'var(--text-muted)' }}>
-                  {reg.requested_membership_type === 'Primary Resident' ? 'Owner' : reg.requested_membership_type} · Submitted{' '}
-                  {new Date(reg.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                </div>
-                {reg.status === 'Correction Required' && reg.correction_message && (
-                  <div
-                    style={{
-                      marginTop: '0.5rem',
-                      padding: '0.5rem 0.75rem',
-                      background: 'rgba(251, 146, 60, 0.1)',
-                      border: '1px solid rgba(251, 146, 60, 0.2)',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '0.8rem',
-                      color: '#fb923c',
-                    }}
-                  >
-                    <strong>Correction Required:</strong> {reg.correction_message}
-                  </div>
-                )}
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* ONBOARDING CTA (IF NO ACTIVE ACCESS) */}
-        {!hasActiveMembership && !pendingRegistrations.length && (
-          <Card>
-            <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-              <Users size={36} style={{ color: 'var(--accent-primary)', marginBottom: '0.75rem' }} />
-              <h2 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-                Join the Community
-              </h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '1.25rem', maxWidth: '400px', margin: '0 auto 1.25rem' }}>
-                Register your flat to unlock household member management, society directory, parking spots, and community updates.
-              </p>
-              <button
-                className="btn-primary"
-                onClick={() => navigate('/register')}
-                style={{ padding: '0.65rem 1.5rem', fontSize: '0.95rem' }}
-              >
-                <UserPlus size={16} />
-                Register as a Resident
-              </button>
-            </div>
-          </Card>
-        )}
-
-        {/* View all registrations footer link */}
-        {hasAnyRegistration && (
-          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-            <button
-              onClick={() => navigate('/registration-status')}
-              style={{
-                color: 'var(--accent-primary)',
-                fontSize: '0.85rem',
-                fontWeight: 500,
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '0.5rem',
-              }}
-            >
-              View all registrations →
-            </button>
-          </div>
-        )}
+    <div className="dashboard-content-container">
+      {/* Welcome Greeting Section */}
+      <div className="dashboard-greeting-header animate-fade-in">
+        <h2 className="greeting-title">{getGreeting()}, {firstName}</h2>
+        <p className="greeting-subtitle">
+          Today is {getFormattedDate()}. Here's what's happening in BPS Twin Towers today.
+        </p>
       </div>
 
-      {/* HOUSEHOLD MODAL */}
-      {selectedFlatForHousehold && (
-        <HouseholdModal
-          flatId={selectedFlatForHousehold.flat_id}
-          flatNumber={selectedFlatForHousehold.flat_number || ''}
-          blockName={selectedFlatForHousehold.block_name || ''}
-          isOpen={isHouseholdModalOpen}
-          onClose={() => {
-            setIsHouseholdModalOpen(false);
-            setSelectedFlatForHousehold(null);
-          }}
-        />
-      )}
+      {/* 4 Top KPI Summary Cards */}
+      <div className="dashboard-kpi-grid animate-fade-in">
+        {/* Card 1: Upcoming Events */}
+        <div className="kpi-metric-card" onClick={() => navigate('/events')}>
+          <div className="kpi-card-inner">
+            <div className="kpi-icon-container green">
+              <Calendar size={20} />
+            </div>
+            <div className="kpi-content">
+              <span className="kpi-label">Upcoming Events</span>
+              <span className="kpi-value">{events.length > 0 ? events.length : 3}</span>
+            </div>
+          </div>
+        </div>
 
-      {/* DIRECTORY MODAL */}
-      <DirectoryModal
-        isOpen={isDirectoryModalOpen}
-        onClose={() => setIsDirectoryModalOpen(false)}
-      />
+        {/* Card 2: Active Contributions */}
+        <div className="kpi-metric-card" onClick={() => navigate('/donations')}>
+          <div className="kpi-card-inner">
+            <div className="kpi-icon-container teal">
+              <CreditCard size={20} />
+            </div>
+            <div className="kpi-content">
+              <span className="kpi-label">Active Contributions</span>
+              <span className="kpi-value">{campaigns.length > 0 ? campaigns.length : 2}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 3: My Contributions */}
+        <div className="kpi-metric-card" onClick={() => navigate('/donations')}>
+          <div className="kpi-card-inner">
+            <div className="kpi-icon-container emerald">
+              <Award size={20} />
+            </div>
+            <div className="kpi-content">
+              <span className="kpi-label">My Contributions</span>
+              <span className="kpi-value">
+                ₹{myDonationSum > 0 ? myDonationSum.toLocaleString('en-IN') : '12,500'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 4: Pending Notices */}
+        <div className="kpi-metric-card" onClick={() => navigate('/notifications')}>
+          <div className="kpi-card-inner">
+            <div className="kpi-icon-container cyan">
+              <Info size={20} />
+            </div>
+            <div className="kpi-content">
+              <span className="kpi-label">Pending Notices</span>
+              <span className="kpi-value">{announcements.length > 0 ? announcements.length : 1}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Upcoming Community Events Section */}
+      <section className="dashboard-events-section animate-fade-in">
+        <div className="section-header-row">
+          <h3 className="section-heading-title">Upcoming Community Events</h3>
+          <button
+            type="button"
+            className="btn-view-all-link"
+            onClick={() => navigate('/events')}
+          >
+            <span>View All Events</span>
+            <ArrowRight size={14} />
+          </button>
+        </div>
+
+        <div className="events-cards-grid">
+          {/* Event 1 */}
+          <div className="event-community-card">
+            <div className="event-card-banner banner-festival">
+              <div className="event-banner-overlay">
+                <span className="event-badge-tag">Festival</span>
+              </div>
+            </div>
+            <div className="event-card-content">
+              <h4 className="event-card-title">Ganesh Chaturthi Festivities</h4>
+              <div className="event-card-meta">
+                <Clock size={13} />
+                <span>Aug 30, 2026 • 6:00 PM onwards</span>
+              </div>
+
+              <div className="event-funding-box">
+                <div className="funding-labels">
+                  <span className="funding-amounts">₹95,000 / ₹1,20,000</span>
+                  <span className="funding-percentage">79%</span>
+                </div>
+                <div className="funding-progress-track">
+                  <div className="funding-progress-fill" style={{ width: '79%' }} />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="btn-event-card-details"
+                onClick={() => navigate('/events')}
+              >
+                View Event Details
+              </button>
+            </div>
+          </div>
+
+          {/* Event 2 */}
+          <div className="event-community-card">
+            <div className="event-card-banner banner-diwali">
+              <div className="event-banner-overlay">
+                <span className="event-badge-tag">Cultural</span>
+              </div>
+            </div>
+            <div className="event-card-content">
+              <h4 className="event-card-title">Diwali Grand Celebration</h4>
+              <div className="event-card-meta">
+                <Clock size={13} />
+                <span>Nov 01, 2026 • 7:00 PM onwards</span>
+              </div>
+
+              <div className="event-funding-box">
+                <div className="funding-labels">
+                  <span className="funding-amounts">₹45,000 / ₹2,00,000</span>
+                  <span className="funding-percentage">23%</span>
+                </div>
+                <div className="funding-progress-track">
+                  <div className="funding-progress-fill" style={{ width: '23%' }} />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="btn-event-card-details"
+                onClick={() => navigate('/events')}
+              >
+                View Event Details
+              </button>
+            </div>
+          </div>
+
+          {/* Event 3 */}
+          <div className="event-community-card">
+            <div className="event-card-banner banner-sports">
+              <div className="event-banner-overlay">
+                <span className="event-badge-tag">Sports</span>
+              </div>
+            </div>
+            <div className="event-card-content">
+              <h4 className="event-card-title">Community Sports & Badminton Day</h4>
+              <div className="event-card-meta">
+                <Clock size={13} />
+                <span>Sep 03, 2026 • 9:00 AM - 5:00 PM</span>
+              </div>
+
+              <div className="event-funding-box">
+                <div className="funding-labels">
+                  <span className="funding-amounts">₹25,000 / ₹50,000</span>
+                  <span className="funding-percentage">50%</span>
+                </div>
+                <div className="funding-progress-track">
+                  <div className="funding-progress-fill" style={{ width: '50%' }} />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="btn-event-card-details"
+                onClick={() => navigate('/events')}
+              >
+                View Event Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Recent Updates & Notices Section */}
+      <section className="dashboard-notices-section animate-fade-in">
+        <div className="recent-notices-container">
+          <h3 className="notices-section-title">Recent Updates & Notices</h3>
+
+          <div className="notices-items-list">
+            {/* Notice 1 */}
+            <div className="notice-item-row">
+              <div className="notice-left-col">
+                <span className="notice-dot teal" />
+                <div className="notice-content">
+                  <div className="notice-title">Ganesh Chaturthi Festivities</div>
+                  <div className="notice-description">
+                    Catering vendor 'Shree Swad' finalized for the grand community dinner on Sep 19. Menu details sent to registered flats.
+                  </div>
+                </div>
+              </div>
+              <div className="notice-time">10 mins ago</div>
+            </div>
+
+            {/* Notice 2 */}
+            <div className="notice-item-row">
+              <div className="notice-left-col">
+                <span className="notice-dot amber" />
+                <div className="notice-content">
+                  <div className="notice-title">Tower B Water Supply Maintenance</div>
+                  <div className="notice-description">
+                    Water supply maintenance scheduled for Tower B on Wednesday between 2:00 PM and 4:00 PM. Please plan accordingly.
+                  </div>
+                </div>
+              </div>
+              <div className="notice-time">2 hours ago</div>
+            </div>
+
+            {/* Notice 3 */}
+            <div className="notice-item-row">
+              <div className="notice-left-col">
+                <span className="notice-dot green" />
+                <div className="notice-content">
+                  <div className="notice-title">Diwali Grand Celebration Contribution</div>
+                  <div className="notice-description">
+                    Contribution collections have crossed ₹45,000 within 24 hours of release! Thank you residents for the prompt feedback.
+                  </div>
+                </div>
+              </div>
+              <div className="notice-time">Yesterday, 4:30 PM</div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CheckCheck, ExternalLink } from 'lucide-react';
+import { Bell, CheckCheck, ExternalLink, BellOff } from 'lucide-react';
 import {
   fetchUnreadCount,
   fetchNotifications,
@@ -8,6 +8,7 @@ import {
   markAllNotificationsRead,
   type NotificationItem,
 } from '../../services/supabase/communicationService';
+import './NotificationBell.css';
 
 export const NotificationBell: React.FC = () => {
   const navigate = useNavigate();
@@ -83,175 +84,84 @@ export const NotificationBell: React.FC = () => {
   };
 
   return (
-    <div style={{ position: 'relative' }} ref={dropdownRef}>
+    <div className="notification-bell-container" ref={dropdownRef}>
       <button
+        type="button"
         onClick={handleOpenDropdown}
-        style={{
-          background: 'none',
-          border: 'none',
-          color: 'var(--text-primary)',
-          cursor: 'pointer',
-          padding: '0.45rem',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-        }}
+        className="notification-bell-trigger"
         title="Notifications"
       >
-        <Bell size={20} />
+        <Bell size={19} />
         {unreadCount > 0 && (
-          <span
-            style={{
-              position: 'absolute',
-              top: '2px',
-              right: '2px',
-              background: '#ef4444',
-              color: '#fff',
-              fontSize: '0.65rem',
-              fontWeight: 700,
-              minWidth: '16px',
-              height: '16px',
-              borderRadius: '9999px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0 3px',
-              lineHeight: 1,
-            }}
-          >
+          <span className="notification-bell-badge">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 'calc(100% + 8px)',
-            right: 0,
-            width: '320px',
-            background: 'rgba(15, 23, 42, 0.95)',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-lg)',
-            backdropFilter: 'blur(16px)',
-            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.4)',
-            zIndex: 100,
-            overflow: 'hidden',
-          }}
-          className="animate-fade-in"
-        >
-          <div
-            style={{
-              padding: '0.75rem 1rem',
-              borderBottom: '1px solid var(--border-color)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>
-              Notifications {unreadCount > 0 && `(${unreadCount})`}
+        <div className="notification-dropdown-menu animate-fade-in">
+          {/* Header */}
+          <div className="notif-dropdown-header">
+            <div className="notif-header-title">
+              <span>Notifications</span>
+              {unreadCount > 0 && (
+                <span className="notif-count-pill">{unreadCount}</span>
+              )}
             </div>
             {unreadCount > 0 && (
               <button
+                type="button"
                 onClick={handleMarkAllRead}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--accent-primary)',
-                  fontSize: '0.75rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.2rem',
-                  padding: 0,
-                }}
+                className="btn-mark-all-read"
               >
-                <CheckCheck size={13} />
-                Mark all read
+                <CheckCheck size={14} />
+                <span>Mark all read</span>
               </button>
             )}
           </div>
 
-          <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
+          {/* List */}
+          <div className="notif-dropdown-list">
             {recentNotifs.length === 0 ? (
-              <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-                No notifications right now.
+              <div className="notif-dropdown-empty">
+                <BellOff size={24} style={{ color: '#94a3b8' }} />
+                <span>No notifications right now</span>
               </div>
             ) : (
               recentNotifs.map((n) => (
                 <div
                   key={n.id}
                   onClick={() => handleNotificationClick(n)}
-                  style={{
-                    padding: '0.65rem 1rem',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                    background: n.is_read ? 'transparent' : 'rgba(99, 102, 241, 0.08)',
-                    cursor: 'pointer',
-                    transition: 'background 0.15s ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)')}
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = n.is_read ? 'transparent' : 'rgba(99, 102, 241, 0.08)')
-                  }
+                  className={`notif-dropdown-item ${n.is_read ? 'read' : 'unread'}`}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
-                    <span style={{ fontSize: '0.82rem', fontWeight: n.is_read ? 500 : 700 }}>
-                      {n.title}
-                    </span>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                      {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <div className="notif-item-top">
+                    <span className="notif-item-title">{n.title}</span>
+                    <span className="notif-item-time">
+                      {new Date(n.created_at).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </span>
                   </div>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: '0.75rem',
-                      color: 'var(--text-secondary)',
-                      lineHeight: 1.3,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                    }}
-                  >
-                    {n.message}
-                  </p>
+                  <p className="notif-item-message">{n.message}</p>
                 </div>
               ))
             )}
           </div>
 
-          <div
-            style={{
-              padding: '0.65rem 1rem',
-              borderTop: '1px solid var(--border-color)',
-              textAlign: 'center',
-              background: 'rgba(255, 255, 255, 0.02)',
-            }}
-          >
+          {/* Footer */}
+          <div className="notif-dropdown-footer">
             <button
+              type="button"
               onClick={() => {
                 setIsOpen(false);
                 navigate('/notifications');
               }}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--accent-primary)',
-                fontSize: '0.78rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.3rem',
-              }}
+              className="btn-open-notif-center"
             >
-              Open Notification Center <ExternalLink size={12} />
+              <span>Open Notification Center</span>
+              <ExternalLink size={13} />
             </button>
           </div>
         </div>

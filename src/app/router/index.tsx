@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../guards/ProtectedRoute';
 import { AdminRoute } from '../guards/AdminRoute';
 
+import { AppLayout } from '../../components/layout/AppLayout';
+
 // Core immediate routes
 import Login from '../../features/auth/Login';
 import { ResidentDashboard } from '../../features/residents/Dashboard';
@@ -104,26 +106,28 @@ export const AppRouter: React.FC = () => {
 
           {/* Protected Routes (Residents) */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<ResidentDashboard />} />
-            <Route path="/events" element={<EventList />} />
-            <Route path="/events/:id" element={<EventDetails />} />
-            <Route path="/donations" element={<DonationList />} />
-            <Route path="/volunteers" element={<VolunteerList />} />
-            <Route path="/sponsors" element={<SponsorList />} />
-            <Route path="/notifications" element={<NotificationCenter />} />
-            <Route path="/announcements" element={<AnnouncementList />} />
-            <Route path="/settings/notifications" element={<NotificationPreferences />} />
-            <Route path="/my-visitors" element={<VisitorManagement />} />
-            <Route path="/security" element={<SecurityConsole />} />
-            <Route path="/gate" element={<SecurityConsole />} />
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<ResidentDashboard />} />
+              <Route path="/events" element={<EventList />} />
+              <Route path="/events/:id" element={<EventDetails />} />
+              <Route path="/donations" element={<DonationList />} />
+              <Route path="/volunteers" element={<VolunteerList />} />
+              <Route path="/sponsors" element={<SponsorList />} />
+              <Route path="/notifications" element={<NotificationCenter />} />
+              <Route path="/announcements" element={<AnnouncementList />} />
+              <Route path="/settings/notifications" element={<NotificationPreferences />} />
+              <Route path="/my-visitors" element={<VisitorManagement />} />
+              <Route path="/security" element={<SecurityConsole />} />
+              <Route path="/gate" element={<SecurityConsole />} />
 
-            {/* Facilities & Complaints */}
-            <Route path="/facilities" element={<FacilityList />} />
-            <Route path="/facilities/:id" element={<FacilityDetails />} />
-            <Route path="/my-bookings" element={<MyBookings />} />
-            <Route path="/complaints" element={<ComplaintList />} />
-            <Route path="/complaints/new" element={<ComplaintForm />} />
-            <Route path="/complaints/:id" element={<ComplaintDetails />} />
+              {/* Facilities & Complaints */}
+              <Route path="/facilities" element={<FacilityList />} />
+              <Route path="/facilities/:id" element={<FacilityDetails />} />
+              <Route path="/my-bookings" element={<MyBookings />} />
+              <Route path="/complaints" element={<ComplaintList />} />
+              <Route path="/complaints/new" element={<ComplaintForm />} />
+              <Route path="/complaints/:id" element={<ComplaintDetails />} />
+            </Route>
           </Route>
 
           {/* Protected Routes (Admins Only) */}

@@ -73,26 +73,20 @@ export const EventList: React.FC = () => {
 
   return (
     <div className="events-container">
-      {/* Header */}
-      <header className="events-header">
-        <div className="events-header-inner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button
-              className="btn-outline"
-              onClick={() => navigate('/')}
-              style={{ padding: '0.45rem', borderRadius: 'var(--radius-md)' }}
-              title="Back to Dashboard"
-            >
-              <ArrowLeft size={18} />
-            </button>
-            <div>
-              <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
-                Community Events & Festivals
-              </h1>
-              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                BPS Twin Towers Society Activities
-              </p>
-            </div>
+      {/* Main Content */}
+      <div className="events-content">
+        {/* Top Actions Row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div className="category-pills" style={{ marginBottom: 0 }}>
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.value}
+                className={`category-pill ${selectedCategory === cat.value ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(cat.value)}
+              >
+                {cat.label}
+              </button>
+            ))}
           </div>
 
           <button
@@ -108,22 +102,6 @@ export const EventList: React.FC = () => {
             <Sparkles size={14} />
             Book Puja Slot
           </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="events-content">
-        {/* Category Pills */}
-        <div className="category-pills">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.value}
-              className={`category-pill ${selectedCategory === cat.value ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(cat.value)}
-            >
-              {cat.label}
-            </button>
-          ))}
         </div>
 
         {/* Search Bar */}
