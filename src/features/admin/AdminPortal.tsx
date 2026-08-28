@@ -859,11 +859,17 @@ export const AdminPortal: React.FC = () => {
                 )}
               </div>
 
-              <div className="modal-actions">
-                <button className="btn-outline" onClick={handleCloseModal} disabled={actionLoading}>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn-modal-cancel"
+                  onClick={handleCloseModal}
+                  disabled={actionLoading}
+                >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   className={
                     modalType === 'approve'
                       ? 'btn-approve'
