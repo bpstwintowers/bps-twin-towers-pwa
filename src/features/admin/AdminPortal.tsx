@@ -138,14 +138,22 @@ export const AdminPortal: React.FC = () => {
   // Filtered registrations
   const filteredRegistrations = useMemo(() => {
     return registrations.filter((item) => {
+      const itemStatus = (item.status || '').toLowerCase().trim();
+      const targetFilter = statusFilter.toLowerCase().trim();
       const matchesStatus =
-        statusFilter === 'ALL' || item.status === statusFilter;
+        statusFilter === 'ALL' ||
+        itemStatus === targetFilter ||
+        (targetFilter === 'correction required' && itemStatus.includes('correction'));
+
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
         !q ||
         (item.flat_number && item.flat_number.toLowerCase().includes(q)) ||
+        (item.block_name && item.block_name.toLowerCase().includes(q)) ||
         (item.applicant_name && item.applicant_name.toLowerCase().includes(q)) ||
         (item.applicant_email && item.applicant_email.toLowerCase().includes(q)) ||
+        (item.relationship && item.relationship.toLowerCase().includes(q)) ||
+        (item.requested_membership_type && item.requested_membership_type.toLowerCase().includes(q)) ||
         (item.mobile && item.mobile.toLowerCase().includes(q));
       return matchesStatus && matchesSearch;
     });
@@ -160,6 +168,9 @@ export const AdminPortal: React.FC = () => {
         (r.full_name && r.full_name.toLowerCase().includes(q)) ||
         (r.email && r.email.toLowerCase().includes(q)) ||
         (r.flat_number && r.flat_number.toLowerCase().includes(q)) ||
+        (r.block_name && r.block_name.toLowerCase().includes(q)) ||
+        (r.relationship && r.relationship.toLowerCase().includes(q)) ||
+        (r.membership_type && r.membership_type.toLowerCase().includes(q)) ||
         (r.mobile && r.mobile.includes(q))
       );
     });
@@ -173,7 +184,9 @@ export const AdminPortal: React.FC = () => {
       return (
         f.flat_number.toLowerCase().includes(q) ||
         (f.primary_owner && f.primary_owner.toLowerCase().includes(q)) ||
-        f.block_name.toLowerCase().includes(q)
+        f.block_name.toLowerCase().includes(q) ||
+        (f.bhk && f.bhk.toLowerCase().includes(q)) ||
+        (f.status && f.status.toLowerCase().includes(q))
       );
     });
   }, [flats, searchQuery]);
@@ -418,40 +431,42 @@ export const AdminPortal: React.FC = () => {
 
       {/* 2. ADMIN MAIN SCROLLABLE CONTENT */}
       <main className="admin-main-area">
-        {/* Executive Header */}
-        <div className="admin-header">
-          <div className="admin-header-title">
-            <button
-              type="button"
-              className="btn-mobile-menu-toggle"
-              onClick={() => setIsMobileNavOpen(true)}
-              aria-label="Open navigation menu"
-            >
-              <Menu size={20} />
-            </button>
+        {/* Executive Sticky Header (Does Not Scroll) */}
+        <div className="admin-header-sticky-wrapper">
+          <div className="admin-header">
+            <div className="admin-header-title">
+              <button
+                type="button"
+                className="btn-mobile-menu-toggle"
+                onClick={() => setIsMobileNavOpen(true)}
+                aria-label="Open navigation menu"
+              >
+                <Menu size={20} />
+              </button>
 
-            <div className="admin-title-text">
-              <h1>
-                <span>Society Operations</span>
-                <span className="admin-badge">Executive Console</span>
-              </h1>
-              <p className="admin-subtitle">
-                BPS Twin Towers Administration • Tower A & B
-              </p>
+              <div className="admin-title-text">
+                <h1>
+                  <span>Society Operations</span>
+                  <span className="admin-badge">Executive Console</span>
+                </h1>
+                <p className="admin-subtitle">
+                  BPS Twin Towers Administration • Tower A & B
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="admin-header-actions">
-            <button
-              type="button"
-              className="btn-header-refresh"
-              onClick={loadAllData}
-              disabled={loading}
-              title="Refresh Realtime Society Data"
-            >
-              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
-              <span>{loading ? 'Refreshing...' : 'Sync Data'}</span>
-            </button>
+            <div className="admin-header-actions">
+              <button
+                type="button"
+                className="btn-header-refresh"
+                onClick={loadAllData}
+                disabled={loading}
+                title="Refresh Realtime Society Data"
+              >
+                <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+                <span>{loading ? 'Refreshing...' : 'Sync Data'}</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -601,29 +616,76 @@ export const AdminPortal: React.FC = () => {
                 className="admin-search-input"
                 placeholder={
                   activeTab === 'registrations'
-                    ? 'Search by applicant, flat number, or contact...'
+                    ? 'Search by applicant, flat number, block, mobile, email...'
                     : activeTab === 'residents'
-                    ? 'Search residents...'
-                    : 'Search flat number or block...'
+                    ? 'Search residents by name, flat, block, contact...'
+                    : 'Search flat number, block, BHK, or owner...'
                 }
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  style={{
+                    position: 'absolute',
+                    right: '0.85rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#94a3b8',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  title="Clear search"
+                >
+                  <X size={16} />
+                </button>
+              )}
             </div>
 
             {activeTab === 'registrations' && (
               <div className="admin-status-filters">
-                {(['Pending', 'Correction Required', 'Approved', 'Rejected', 'ALL'] as StatusFilter[]).map(
-                  (filter) => (
-                    <button
-                      key={filter}
-                      type="button"
-                      className={`status-filter-chip ${statusFilter === filter ? 'active' : ''}`}
-                      onClick={() => setStatusFilter(filter)}
-                    >
-                      {filter === 'ALL' ? 'All Requests' : filter}
-                    </button>
-                  )
+                {(['ALL', 'Pending', 'Correction Required', 'Approved', 'Rejected'] as StatusFilter[]).map(
+                  (filter) => {
+                    const count =
+                      filter === 'ALL'
+                        ? registrations.length
+                        : filter === 'Pending'
+                        ? (stats?.pendingCount ?? registrations.filter(r => (r.status || '').toLowerCase() === 'pending').length)
+                        : filter === 'Correction Required'
+                        ? (stats?.correctionCount ?? registrations.filter(r => (r.status || '').toLowerCase().includes('correction')).length)
+                        : filter === 'Approved'
+                        ? (stats?.approvedCount ?? registrations.filter(r => (r.status || '').toLowerCase() === 'approved').length)
+                        : (stats?.rejectedCount ?? registrations.filter(r => (r.status || '').toLowerCase() === 'rejected').length);
+                    return (
+                      <button
+                        key={filter}
+                        type="button"
+                        className={`status-filter-chip ${statusFilter === filter ? 'active' : ''}`}
+                        onClick={() => setStatusFilter(filter)}
+                      >
+                        <span>{filter === 'ALL' ? 'All Requests' : filter}</span>
+                        <span
+                          style={{
+                            marginLeft: '0.4rem',
+                            padding: '0.1rem 0.45rem',
+                            borderRadius: '9999px',
+                            fontSize: '0.72rem',
+                            fontWeight: 800,
+                            background: statusFilter === filter ? 'var(--primary, #00897b)' : '#e2e8f0',
+                            color: statusFilter === filter ? '#ffffff' : '#475569',
+                          }}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  }
                 )}
               </div>
             )}
