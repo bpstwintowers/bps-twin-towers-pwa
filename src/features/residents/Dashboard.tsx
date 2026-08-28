@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../services/supabase/client';
 import {
@@ -34,6 +34,10 @@ import {
   Award,
   Megaphone,
   Wrench,
+  ChevronDown,
+  Check,
+  Plus,
+  Building2,
 } from 'lucide-react';
 import './Dashboard.css';
 
@@ -42,6 +46,9 @@ export const ResidentDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
   const [access, setAccess] = useState<AccessInfo[]>([]);
+  const [activeFlatIndex, setActiveFlatIndex] = useState(0);
+  const [isFlatSwitcherOpen, setIsFlatSwitcherOpen] = useState(false);
+  const flatSwitcherRef = useRef<HTMLDivElement>(null);
   const [registrations, setRegistrations] = useState<RegistrationRequest[]>([]);
   const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -69,6 +76,11 @@ export const ResidentDashboard: React.FC = () => {
         try {
           const accessData = await resolveUserAccess();
           setAccess(accessData);
+          const savedFlatId = localStorage.getItem('bps_active_flat_id');
+          if (savedFlatId && accessData.length > 0) {
+            const foundIdx = accessData.findIndex((a) => a.flat_id === savedFlatId);
+            if (foundIdx >= 0) setActiveFlatIndex(foundIdx);
+          }
         } catch (err) {
           console.error('Error resolving access:', err);
         }
@@ -105,6 +117,17 @@ export const ResidentDashboard: React.FC = () => {
     fetchAll();
   }, []);
 
+  // Close flat switcher on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (flatSwitcherRef.current && !flatSwitcherRef.current.contains(e.target as Node)) {
+        setIsFlatSwitcherOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/login');
@@ -116,6 +139,7 @@ export const ResidentDashboard: React.FC = () => {
   };
 
   const hasActiveMembership = access.length > 0;
+  const activeFlat = access[activeFlatIndex] || access[0];
   const pendingRegistrations = registrations.filter(
     (r) => r.status === 'Pending' || r.status === 'Correction Required'
   );
@@ -130,8 +154,6 @@ export const ResidentDashboard: React.FC = () => {
       </div>
     );
   }
-
-  const primaryFlat = access[0];
 
   return (
     <div className="dashboard-container">
@@ -155,7 +177,76 @@ export const ResidentDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            {/* MULTI-FLAT SWITCHER DROPDOWN */}
+            {access.length > 1 ? (
+              <div className="active-flat-switcher-dropdown" ref={flatSwitcherRef}>
+                <button
+                  type="button"
+                  className="btn-flat-switcher"
+                  onClick={() => setIsFlatSwitcherOpen(!isFlatSwitcherOpen)}
+                  title="Switch between your registered flats"
+                >
+                  <Building2 size={15} className="flat-switcher-icon" />
+                  <span className="flat-switcher-current-label">Flat {activeFlat?.flat_number}</span>
+                  <ChevronDown size={14} className={`flat-switcher-arrow ${isFlatSwitcherOpen ? 'open' : ''}`} />
+                </button>
+
+                {isFlatSwitcherOpen && (
+                  <div className="flat-switcher-menu animate-fade-in">
+                    <div className="switcher-menu-header">
+                      <span>Your Registered Flats ({access.length})</span>
+                    </div>
+
+                    <div className="switcher-items-list">
+                      {access.map((flat, idx) => (\n                        <button
+                          key={flat.flat_id}
+                          type="button"
+                          className={`flat-switcher-item ${idx === activeFlatIndex ? 'selected' : ''}`}
+                          onClick={() => {
+                            setActiveFlatIndex(idx);
+                            localStorage.setItem('bps_active_flat_id', flat.flat_id);
+                            setIsFlatSwitcherOpen(false);
+                          }}
+                        >
+                          <div className="switcher-item-left">
+                            <div className="switcher-icon-circle">
+                              <Home size={14} />
+                            </div>
+                            <div className="switcher-item-text">
+                              <span className="switcher-flat-num">Flat {flat.flat_number}</span>
+                              <span className="switcher-flat-sub">
+                                Block {flat.block_name || 'A'} • {flat.role_name || 'Resident'}
+                              </span>
+                            </div>
+                          </div>
+                          {idx === activeFlatIndex && <Check size={14} className="switcher-check" />}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="switcher-divider" />
+                    <button
+                      type="button"
+                      className="btn-switcher-add-flat"
+                      onClick={() => {
+                        setIsFlatSwitcherOpen(false);
+                        navigate('/register');
+                      }}
+                    >
+                      <Plus size={14} />
+                      <span>+ Register Another Flat</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : hasActiveMembership && activeFlat ? (
+              <div className="single-flat-badge-pill">
+                <Home size={13} />
+                <span>Flat {activeFlat.flat_number}</span>
+              </div>
+            ) : null}
+
             <NotificationBell />
             {isAdmin && (
               <button
@@ -199,13 +290,13 @@ export const ResidentDashboard: React.FC = () => {
               </div>
             </div>
 
-            {hasActiveMembership && primaryFlat && (
+            {hasActiveMembership && activeFlat && (
               <div className="flat-pill-row">
                 <span className="flat-badge-pill">
                   <Home size={14} />
-                  Flat {primaryFlat.flat_number || 'Resident'} (Block {primaryFlat.block_name || 'A'})
+                  Flat {activeFlat.flat_number || 'Resident'} (Block {activeFlat.block_name || 'A'})
                 </span>
-                <StatusBadge status={primaryFlat.membership_status} />
+                <StatusBadge status={activeFlat.membership_status} />
               </div>
             )}
           </div>
@@ -289,10 +380,21 @@ export const ResidentDashboard: React.FC = () => {
         {/* ACTIVE FLATS / HOUSEHOLDS */}
         {hasActiveMembership && (
           <div className="animate-fade-in" style={{ marginBottom: '1.75rem' }}>
-            <h2 className="section-title">
-              <Home size={18} style={{ color: 'var(--accent-primary)' }} />
-              My Residence & Household
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
+              <h2 className="section-title" style={{ margin: 0 }}>
+                <Home size={18} style={{ color: 'var(--accent-primary)' }} />
+                My Residence & Household ({access.length})
+              </h2>
+              <button
+                type="button"
+                className="btn-outline"
+                onClick={() => navigate('/register')}
+                style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem', gap: '0.35rem' }}
+              >
+                <Plus size={14} />
+                <span>+ Add Another Flat</span>
+              </button>
+            </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {access.map((a) => (
@@ -366,7 +468,7 @@ export const ResidentDashboard: React.FC = () => {
             <div className="action-grid">
               <button
                 className="action-tile"
-                onClick={() => primaryFlat && handleOpenHousehold(primaryFlat)}
+                onClick={() => activeFlat && handleOpenHousehold(activeFlat)}
               >
                 <div
                   className="action-tile-icon"
