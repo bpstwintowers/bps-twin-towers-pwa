@@ -10,7 +10,8 @@ import { ResidentDashboard } from '../../features/residents/Dashboard';
 // Lazy loaded feature routes
 const RegistrationFlow = lazy(() =>
   import('../../features/residents/RegistrationFlow').then((m) => ({ default: m.RegistrationFlow }))
-);\nconst RegistrationStatus = lazy(() =>
+);
+const RegistrationStatus = lazy(() =>
   import('../../features/residents/RegistrationStatus').then((m) => ({ default: m.RegistrationStatus }))
 );
 const AdminPortal = lazy(() =>
