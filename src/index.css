@@ -1,68 +1,139 @@
-@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Stately Corporate System — Light Palette */
-  --bg-primary: #f9f9ff;
-  --bg-secondary: #f0f3ff;
-  --bg-tertiary: #e7eeff;
+  /* ==========================================================================
+     CIVIC HORIZON DESIGN SYSTEM TOKENS
+     ========================================================================== */
+
+  /* Surface & Background Palette */
+  --surface: #f9f9fb;
+  --surface-dim: #d9dadc;
+  --surface-bright: #f9f9fb;
   --surface-container-lowest: #ffffff;
-  --surface-container-low: #f0f3ff;
-  --surface-container: #e7eeff;
-  --surface-container-high: #dee8ff;
-  --surface-container-highest: #d9e3f9;
-  
-  --text-primary: #121c2c;
-  --text-secondary: #44474e;
-  --text-muted: #75777f;
-  
-  --primary: #1a3055;
+  --surface-container-low: #f3f3f5;
+  --surface-container: #eeeef0;
+  --surface-container-high: #e8e8ea;
+  --surface-container-highest: #e2e2e4;
+  --surface-variant: #e2e2e4;
+
+  --on-surface: #1a1c1d;
+  --on-surface-variant: #3d4947;
+  --inverse-surface: #2f3132;
+  --inverse-on-surface: #f0f0f2;
+
+  --outline: #6d7a77;
+  --outline-variant: #bcc9c6;
+  --surface-tint: #006a61;
+
+  --background: #f9f9fb;
+  --on-background: #1a1c1d;
+
+  /* Primary Brand (Teal 600) */
+  --primary: #00685f;
   --on-primary: #ffffff;
-  --primary-container: #1a3055;
-  --on-primary-container: #8498c3;
-  --primary-light: rgba(26, 48, 85, 0.08);
-  
-  --accent-primary: #1a3055;
-  --accent-hover: #011b3f;
-  --accent-light: rgba(26, 48, 85, 0.08);
-  
-  --secondary: #c5a059;
-  --secondary-dark: #775a19;
+  --primary-container: #008378;
+  --on-primary-container: #f4fffc;
+  --inverse-primary: #6bd8cb;
+  --primary-fixed: #89f5e7;
+  --primary-fixed-dim: #6bd8cb;
+  --on-primary-fixed: #00201d;
+  --on-primary-fixed-variant: #005049;
+
+  /* Secondary Accent (Slate / Navy) */
+  --secondary: #545f73;
   --on-secondary: #ffffff;
-  --secondary-container: #fed488;
-  --on-secondary-container: #785a1a;
-  --secondary-light: rgba(197, 160, 89, 0.12);
-  
-  --border-color: #e2e8f0;
-  --border-color-hover: #cbd5e1;
-  --outline: #75777f;
-  --outline-variant: #c4c6cf;
-  
-  --success: #0d9488;
-  --success-light: #ccfbf1;
-  --danger: #ba1a1a;
-  --danger-light: #ffdad6;
-  --warning: #b45309;
-  --warning-light: #fef3c7;
-  
-  /* Precision Architectural Radii */
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
+  --secondary-container: #d5e0f8;
+  --on-secondary-container: #586377;
+  --secondary-fixed: #d8e3fb;
+  --secondary-fixed-dim: #bcc7de;
+  --on-secondary-fixed: #111c2d;
+  --on-secondary-fixed-variant: #3c475a;
+
+  /* Tertiary Accent (Gold / Bronze) */
+  --tertiary: #755717;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #90702e;
+  --on-tertiary-container: #fffbff;
+  --tertiary-fixed: #ffdea5;
+  --tertiary-fixed-dim: #e9c176;
+  --on-tertiary-fixed: #261900;
+  --on-tertiary-fixed-variant: #5d4201;
+
+  /* Semantic Status Palette */
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+
+  --success-bg: #DCFCE7;
+  --success-text: #15803D;
+  --warning-bg: #FEF3C7;
+  --warning-text: #D97706;
+  --error-bg: #FEE2E2;
+  --error-text: #B91C1C;
+  --info-bg: #E0F2FE;
+  --info-text: #0284C7;
+
+  /* Backwards-Compatibility Mapping */
+  --bg-primary: var(--background);
+  --bg-secondary: var(--surface-container-low);
+  --bg-tertiary: var(--surface-container);
+  --text-primary: var(--on-surface);
+  --text-secondary: var(--on-surface-variant);
+  --text-muted: var(--outline);
+  --border-color: var(--surface-container-highest);
+  --border-color-hover: var(--outline-variant);
+  --primary-light: rgba(0, 104, 95, 0.08);
+  --accent-primary: var(--primary);
+  --accent-hover: var(--on-primary-fixed-variant);
+  --accent-light: rgba(0, 104, 95, 0.08);
+  --secondary-dark: var(--tertiary);
+  --secondary-light: rgba(84, 95, 115, 0.12);
+  --success: var(--success-text);
+  --success-light: var(--success-bg);
+  --danger: var(--error);
+  --danger-light: var(--error-bg);
+  --warning: var(--warning-text);
+  --warning-light: var(--warning-bg);
+
+  /* Spacing Scale */
+  --unit: 4px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-10: 64px;
+  --sidebar-admin: 260px;
+  --sidebar-resident: 240px;
+  --max-width: 1440px;
+
+  /* Shapes & Radii */
+  --radius-sm: 0.25rem;
+  --radius-default: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
   --radius-full: 9999px;
-  
-  /* Ambient Lift Elevation */
-  --shadow-sm: 0 1px 2px 0 rgba(18, 28, 44, 0.04);
-  --shadow-md: 0 4px 12px -2px rgba(18, 28, 44, 0.06), 0 2px 4px -2px rgba(18, 28, 44, 0.04);
-  --shadow-lg: 0 12px 24px -4px rgba(18, 28, 44, 0.08), 0 4px 8px -2px rgba(18, 28, 44, 0.04);
-  --shadow-ambient: 0 4px 20px 0 rgba(18, 28, 44, 0.04);
-  --shadow-gold: 0 4px 14px 0 rgba(197, 160, 89, 0.3);
-  
+  --radius-pill: 9999px;
+
+  /* Elevation & Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(26, 28, 29, 0.04);
+  --shadow-ambient: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+  --shadow-gold: 0 4px 14px rgba(117, 87, 23, 0.25);
+
   /* Typography Families */
-  --font-serif: 'Libre Caslon Text', Georgia, Cambria, 'Times New Roman', serif;
-  --font-sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* ==========================================================================
+   BASE & RESET
+   ========================================================================== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -71,25 +142,118 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--background);
+  color: var(--on-surface);
   line-height: 1.5;
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 }
 
-h1, h2, h3, .serif-heading {
-  font-family: var(--font-serif);
-  color: var(--text-primary);
-  font-weight: 700;
-  letter-spacing: -0.015em;
+/* ==========================================================================
+   TYPOGRAPHY SCALE (Civic Horizon)
+   ========================================================================== */
+.headline-4xl, h1 {
+  font-family: var(--font-sans);
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 40px;
+  letter-spacing: -0.02em;
+  color: var(--on-surface);
 }
 
-h4, h5, h6 {
+.headline-3xl, h2 {
   font-family: var(--font-sans);
-  color: var(--text-primary);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 36px;
+  letter-spacing: -0.015em;
+  color: var(--on-surface);
+}
+
+.headline-2xl, h3 {
+  font-family: var(--font-sans);
+  font-size: 24px;
   font-weight: 600;
+  line-height: 32px;
+  letter-spacing: -0.01em;
+  color: var(--on-surface);
+}
+
+.headline-xl, h4 {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  color: var(--on-surface);
+}
+
+.headline-lg, h5 {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 26px;
+  color: var(--on-surface);
+}
+
+.body-md {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--on-surface);
+}
+
+.body-base, p {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--on-surface);
+}
+
+.label-base {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--on-surface);
+}
+
+.caption-sm {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--on-surface-variant);
+}
+
+.micro-xs, .architect-label {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--outline);
+}
+
+.serif-heading {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 768px) {
+  .headline-4xl, h1 {
+    font-size: 28px;
+    line-height: 36px;
+  }
+  .headline-3xl, h2 {
+    font-size: 24px;
+    line-height: 32px;
+  }
 }
 
 a {
@@ -99,7 +263,7 @@ a {
 }
 
 a:hover {
-  color: var(--secondary-dark);
+  color: var(--on-primary-fixed-variant);
 }
 
 button {
@@ -109,25 +273,44 @@ button {
   background: none;
 }
 
-/* Stately Architectural Cards & Glass Panels */
-.glass-panel {
-  background: #ffffff;
+/* ==========================================================================
+   CONTAINERS & CARDS
+   ========================================================================== */
+.glass-panel, .community-card, .card {
+  background: var(--surface-container-lowest);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+  padding: var(--space-4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* High-End Architectural Primary Button */
+.glass-panel:hover, .community-card:hover {
+  box-shadow: var(--shadow-ambient);
+}
+
+/* Architectural Lines */
+.architectural-line-active {
+  border-left: 2px solid var(--primary);
+}
+
+.card-in-progress {
+  border-left: 2px solid var(--primary);
+}
+
+/* ==========================================================================
+   BUTTONS (Civic Horizon Standard: 44px Height)
+   ========================================================================== */
 .btn-primary {
+  min-height: 44px;
   background-color: var(--primary);
-  color: #ffffff;
+  color: var(--on-primary);
   padding: 0.65rem 1.25rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-default);
   font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.85rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
@@ -138,25 +321,26 @@ button {
 }
 
 .btn-primary:hover {
-  background-color: #011b3f;
+  background-color: var(--primary-container);
+  border-color: var(--primary-container);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-ambient);
 }
 
 .btn-primary:active {
   transform: translateY(0);
 }
 
-.btn-gold {
-  background: linear-gradient(135deg, #c5a059, #b38e44);
-  color: #ffffff;
+.btn-gold, .btn-tertiary {
+  min-height: 44px;
+  background: linear-gradient(135deg, var(--tertiary-container), var(--tertiary));
+  color: var(--on-tertiary);
   padding: 0.65rem 1.25rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-default);
   font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.85rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
@@ -165,22 +349,22 @@ button {
   box-shadow: var(--shadow-gold);
 }
 
-.btn-gold:hover {
-  background: linear-gradient(135deg, #b38e44, #9a7834);
+.btn-gold:hover, .btn-tertiary:hover {
+  background: linear-gradient(135deg, var(--tertiary), #5d4201);
   transform: translateY(-1px);
 }
 
-/* Secondary Blueprint Outline Button */
-.btn-outline {
-  background-color: #ffffff;
+.btn-outline, .btn-secondary {
+  min-height: 44px;
+  background-color: #f8fafc;
   color: var(--primary);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--outline-variant);
   padding: 0.65rem 1.25rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-default);
   font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.85rem;
-  letter-spacing: 0.02em;
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
@@ -188,36 +372,75 @@ button {
   gap: 0.5rem;
 }
 
-.btn-outline:hover {
-  background-color: var(--bg-secondary);
+.btn-outline:hover, .btn-secondary:hover {
+  background-color: var(--surface-container-low);
   border-color: var(--primary);
 }
 
-/* Form Controls */
+/* ==========================================================================
+   FORM CONTROLS
+   ========================================================================== */
 input, select, textarea {
   font-family: var(--font-sans);
-  background-color: #ffffff;
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  background-color: var(--surface-container-lowest);
+  color: var(--on-surface);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-default);
   padding: 0.65rem 0.85rem;
   font-size: 0.9rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
+  min-height: 44px;
 }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: var(--secondary);
-  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.15);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(0, 104, 95, 0.2);
 }
 
-/* Layout Utilities */
+/* ==========================================================================
+   STATUS CHIPS & BADGES
+   ========================================================================== */
+.chip, .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.chip-success, .badge-success {
+  background-color: var(--success-bg);
+  color: var(--success-text);
+}
+
+.chip-warning, .badge-warning {
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.chip-error, .badge-danger, .badge-error {
+  background-color: var(--error-bg);
+  color: var(--error-text);
+}
+
+.chip-info, .badge-info {
+  background-color: var(--info-bg);
+  color: var(--info-text);
+}
+
+/* ==========================================================================
+   LAYOUT UTILITIES
+   ========================================================================== */
 .container {
   width: 100%;
-  max-width: 1200px;
+  max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 var(--space-6);
 }
 
 .flex-center {
@@ -226,31 +449,21 @@ input:focus, select:focus, textarea:focus {
   justify-content: center;
 }
 
-/* Metadata Labels */
-.architect-label {
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
+.sidebar-admin {
+  width: var(--sidebar-admin);
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+.sidebar-resident {
+  width: var(--sidebar-resident);
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Global Modal System */
+/* ==========================================================================
+   GLOBAL MODAL SYSTEM
+   ========================================================================== */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(18, 28, 44, 0.55);
+  background: rgba(26, 28, 29, 0.55);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   display: flex;
@@ -262,17 +475,17 @@ input:focus, select:focus, textarea:focus {
 }
 
 .modal-content {
-  background: #ffffff;
+  background: var(--surface-container-lowest);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   width: 100%;
   max-width: 560px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 40px -10px rgba(18, 28, 44, 0.18);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
-  color: var(--text-primary);
+  color: var(--on-surface);
 }
 
 .modal-header {
@@ -282,14 +495,14 @@ input:focus, select:focus, textarea:focus {
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
-  background-color: var(--bg-secondary);
+  background-color: var(--surface-container-low);
 }
 
 .modal-body {
   padding: 1.5rem;
   overflow-y: auto;
   flex-grow: 1;
-  background-color: #ffffff;
+  background-color: var(--surface-container-lowest);
 }
 
 .modal-footer {
@@ -299,5 +512,15 @@ input:focus, select:focus, textarea:focus {
   justify-content: flex-end;
   gap: 0.75rem;
   flex-shrink: 0;
-  background-color: var(--bg-secondary);
+  background-color: var(--surface-container-low);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

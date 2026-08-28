@@ -10,8 +10,7 @@ import { ResidentDashboard } from '../../features/residents/Dashboard';
 // Lazy loaded feature routes
 const RegistrationFlow = lazy(() =>
   import('../../features/residents/RegistrationFlow').then((m) => ({ default: m.RegistrationFlow }))
-);
-const RegistrationStatus = lazy(() =>
+);\nconst RegistrationStatus = lazy(() =>
   import('../../features/residents/RegistrationStatus').then((m) => ({ default: m.RegistrationStatus }))
 );
 const AdminPortal = lazy(() =>
@@ -99,12 +98,12 @@ export const AppRouter: React.FC = () => {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<RegistrationFlow />} />
+          <Route path="/registration-status" element={<RegistrationStatus />} />
 
           {/* Protected Routes (Residents) */}
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<ResidentDashboard />} />
-            <Route path="/register" element={<RegistrationFlow />} />
-            <Route path="/registration-status" element={<RegistrationStatus />} />
             <Route path="/events" element={<EventList />} />
             <Route path="/events/:id" element={<EventDetails />} />
             <Route path="/donations" element={<DonationList />} />
