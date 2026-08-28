@@ -164,7 +164,7 @@ export const SponsorApplicationModal: React.FC<SponsorApplicationModalProps> = (
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content animate-fade-in" style={{ maxWidth: '580px', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="modal-content animate-fade-in" style={{ maxWidth: '580px' }}>
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Award size={22} style={{ color: '#fbbf24' }} />
@@ -181,7 +181,7 @@ export const SponsorApplicationModal: React.FC<SponsorApplicationModalProps> = (
         </div>
 
         {confirmedReceipt ? (
-          <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+          <div style={{ textAlign: 'center', padding: '1.5rem 1.25rem' }}>
             <div
               style={{
                 width: '64px',

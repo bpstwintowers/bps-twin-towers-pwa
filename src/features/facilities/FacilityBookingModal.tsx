@@ -111,7 +111,7 @@ export const FacilityBookingModal: React.FC<FacilityBookingModalProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content animate-fade-in" style={{ maxWidth: '540px', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="modal-content animate-fade-in" style={{ maxWidth: '540px' }}>
         <div className="modal-header">
           <div>
             <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Book {facility.name}</h3>
@@ -125,7 +125,7 @@ export const FacilityBookingModal: React.FC<FacilityBookingModalProps> = ({
         </div>
 
         {successResult ? (
-          <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+          <div style={{ textAlign: 'center', padding: '1.5rem 1.25rem' }}>
             <div
               style={{
                 width: '64px',

@@ -127,7 +127,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content animate-fade-in" style={{ maxWidth: '640px', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="modal-content animate-fade-in" style={{ maxWidth: '640px' }}>
         <div className="modal-header">
           <h3 style={{ margin: 0, fontSize: '1.2rem' }}>
             {eventToEdit ? 'Edit Event' : 'Create New Event'}

@@ -135,7 +135,7 @@ export const OpportunityFormModal: React.FC<OpportunityFormModalProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content animate-fade-in" style={{ maxWidth: '580px', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="modal-content animate-fade-in" style={{ maxWidth: '580px' }}>
         <div className="modal-header">
           <h3 style={{ margin: 0, fontSize: '1.2rem' }}>
             {opportunityToEdit ? 'Edit Volunteer Opportunity' : 'Create Volunteer Opportunity'}

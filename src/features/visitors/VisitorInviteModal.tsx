@@ -98,7 +98,7 @@ export const VisitorInviteModal: React.FC<VisitorInviteModalProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content animate-fade-in" style={{ maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="modal-content animate-fade-in" style={{ maxWidth: '520px' }}>
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <UserPlus size={20} style={{ color: 'var(--accent-primary)' }} />
@@ -110,7 +110,7 @@ export const VisitorInviteModal: React.FC<VisitorInviteModalProps> = ({
         </div>
 
         {generatedPass ? (
-          <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+          <div style={{ textAlign: 'center', padding: '1.5rem 1.25rem' }}>
             <div
               style={{
                 width: '64px',

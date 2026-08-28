@@ -102,7 +102,7 @@ export const AnnouncementFormModal: React.FC<AnnouncementFormModalProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content animate-fade-in" style={{ maxWidth: '540px', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="modal-content animate-fade-in" style={{ maxWidth: '540px' }}>
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Megaphone size={20} style={{ color: 'var(--accent-primary)' }} />

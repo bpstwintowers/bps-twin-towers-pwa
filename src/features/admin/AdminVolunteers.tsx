@@ -553,7 +553,7 @@ export const AdminVolunteers: React.FC = () => {
       {/* ROSTER & ATTENDANCE MODAL */}
       {selectedOppForRoster && (
         <div className="modal-overlay">
-          <div className="modal-content animate-fade-in" style={{ maxWidth: '640px', maxHeight: '90vh', overflowY: 'auto' }}>
+          <div className="modal-content animate-fade-in" style={{ maxWidth: '640px' }}>
             <div className="modal-header">
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.15rem' }}>

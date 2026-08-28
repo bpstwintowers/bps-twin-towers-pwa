@@ -135,7 +135,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content animate-fade-in" style={{ maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="modal-content animate-fade-in" style={{ maxWidth: '520px' }}>
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <HeartHandshake size={22} style={{ color: '#10b981' }} />
@@ -152,7 +152,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
         </div>
 
         {confirmedReceipt ? (
-          <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+          <div style={{ textAlign: 'center', padding: '1.5rem 1.25rem' }}>
             <div
               style={{
                 width: '64px',
@@ -242,7 +242,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({
               <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.4rem', fontWeight: 600 }}>
                 Select Contribution Amount (₹) *
               </label>
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.6rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.65rem' }}>
                 {QUICK_AMOUNTS.map((val) => (
                   <button
                     key={val}
@@ -250,8 +250,10 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                     className="btn-outline"
                     onClick={() => handleQuickAmount(val)}
                     style={{
-                      padding: '0.4rem 0.85rem',
+                      flex: '1 1 75px',
+                      padding: '0.5rem 0.75rem',
                       fontSize: '0.85rem',
+                      textAlign: 'center',
                       background: amount === val ? 'rgba(16, 185, 129, 0.2)' : undefined,
                       borderColor: amount === val ? '#10b981' : undefined,
                       color: amount === val ? '#34d399' : undefined,
@@ -262,17 +264,22 @@ export const DonationModal: React.FC<DonationModalProps> = ({
                 ))}
               </div>
 
-              <input
-                type="number"
-                min={1}
-                step="any"
-                className="admin-search-input"
-                style={{ width: '100%', fontSize: '1.1rem', fontWeight: 700 }}
-                placeholder="Or enter custom amount in ₹"
-                value={customAmount}
-                onChange={handleCustomAmountChange}
-                required
-              />
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+                  Or enter custom amount
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  step="any"
+                  className="admin-search-input"
+                  style={{ width: '100%', fontSize: '1.1rem', fontWeight: 700 }}
+                  placeholder="e.g. 2500"
+                  value={customAmount}
+                  onChange={handleCustomAmountChange}
+                  required
+                />
+              </div>
             </div>
 
             {/* Payment Method & Reference */}

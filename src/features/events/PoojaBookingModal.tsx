@@ -87,7 +87,7 @@ export const PoojaBookingModal: React.FC<PoojaBookingModalProps> = ({
         </div>
 
         {confirmedBooking ? (
-          <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+          <div style={{ textAlign: 'center', padding: '1.5rem 1.25rem' }}>
             <div
               style={{
                 width: '60px',
