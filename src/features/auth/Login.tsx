@@ -65,27 +65,35 @@ const Login: React.FC = () => {
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 1. Check Server Validation after Google Authentication Redirect
+  // 1. Fast Parallel Server Validation after Google Authentication Redirect
   useEffect(() => {
     async function checkServerValidation() {
       const searchParams = new URLSearchParams(window.location.search);
       const isVerifyRoute = searchParams.get('verify') === 'true';
       const pendingAuthStr = sessionStorage.getItem('pending_active_resident_auth');
 
-      if (!isVerifyRoute && !pendingAuthStr) return;
+      // Fast check: inspect local session or user
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+
+      if (!isVerifyRoute && !pendingAuthStr && !user) return;
+      if (!user && !isVerifyRoute) return;
 
       try {
         setIsVerifyingServer(true);
         setError(null);
 
-        const { data: { user } } = await supabase.auth.getUser();
+        const activeUser = user || (await supabase.auth.getUser()).data.user;
 
-        if (user) {
+        if (activeUser) {
           const pendingAuth = pendingAuthStr ? JSON.parse(pendingAuthStr) : null;
-          sessionStorage.removeItem('pending_active_resident_auth');
+          if (pendingAuthStr) sessionStorage.removeItem('pending_active_resident_auth');
 
-          // Backend checks active membership & access status
-          const accessInfo = await resolveUserAccess();
+          // Parallel query execution: resolve access and check registrations concurrently
+          const [accessInfo, registrations] = await Promise.all([
+            resolveUserAccess().catch(() => []),
+            getUserRegistrations().catch(() => []),
+          ]);
 
           if (accessInfo && accessInfo.length > 0) {
             const hasActiveAccess = accessInfo.some(
@@ -97,21 +105,22 @@ const Login: React.FC = () => {
               if (targetFlatId) {
                 localStorage.setItem('bps_active_flat_id', targetFlatId);
               }
-              // Server validation SUCCESS -> Navigate to Dashboard
+              // Server validation SUCCESS -> Instant navigation to Dashboard
               navigate('/', { replace: true });
               return;
             }
           }
 
           // Check if user has a pending registration
-          const registrations = await getUserRegistrations();
           if (registrations && registrations.some((r) => r.status === 'Pending')) {
             navigate('/registration-status', { replace: true });
             return;
           }
 
           // If user is authenticated with Google but not yet registered to a flat -> Direct to registration flow
-          navigate('/register', { replace: true });
+          if (isVerifyRoute) {
+            navigate('/register', { replace: true });
+          }
         }
       } catch (err: any) {
         console.error('Server validation error:', err);
