@@ -214,7 +214,9 @@ const Login: React.FC = () => {
         setShowFlatDropdown(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);\n    return () => document.removeEventListener('mousedown', handleClickOutside);\n  }, []);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Active Resident Flow: Continue with Masked Email -> Google Auth -> Server Validation -> Dashboard
   const handleActiveResidentLogin = async (resident: FlatResidentInfo) => {
@@ -560,7 +562,26 @@ const Login: React.FC = () => {
                 </div>
 
                 {/* Flat Autocomplete Dropdown */}
-                {showFlatDropdown && flatResults.length > 0 && (\n                  <div className="flat-search-dropdown-menu">\n                    {flatResults.map((flat) => (\n                      <div\n                        key={flat.flat_id}\n                        className=\"flat-dropdown-row\"\n                        onClick={() => handleSelectFlat(flat)}\n                      >\n                        <div className=\"row-flat-info\">\n                          <Home size={16} className=\"flat-icon-muted\" />\n                          <span className=\"row-flat-num\">{flat.flat_number}</span>\n                          {flat.bhk && <span className=\"row-bhk-tag\">{flat.bhk}</span>}\n                        </div>\n                        <span className={`row-status-pill ${flat.owner_registered ? 'occupied' : 'available'}`}>\n                          {flat.owner_registered ? 'Registered' : 'Available'}\n                        </span>\n                      </div>\n                    ))}\n                  </div>\n                )}
+                {showFlatDropdown && flatResults.length > 0 && (
+                  <div className="flat-search-dropdown-menu">
+                    {flatResults.map((flat) => (
+                      <div
+                        key={flat.flat_id}
+                        className="flat-dropdown-row"
+                        onClick={() => handleSelectFlat(flat)}
+                      >
+                        <div className="row-flat-info">
+                          <Home size={16} className="flat-icon-muted" />
+                          <span className="row-flat-num">{flat.flat_number}</span>
+                          {flat.bhk && <span className="row-bhk-tag">{flat.bhk}</span>}
+                        </div>
+                        <span className={`row-status-pill ${flat.owner_registered ? 'occupied' : 'available'}`}>
+                          {flat.owner_registered ? 'Registered' : 'Available'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

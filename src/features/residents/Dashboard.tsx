@@ -199,7 +199,8 @@ export const ResidentDashboard: React.FC = () => {
                     </div>
 
                     <div className="switcher-items-list">
-                      {access.map((flat, idx) => (\n                        <button
+                      {access.map((flat, idx) => (
+                        <button
                           key={flat.flat_id}
                           type="button"
                           className={`flat-switcher-item ${idx === activeFlatIndex ? 'selected' : ''}`}
