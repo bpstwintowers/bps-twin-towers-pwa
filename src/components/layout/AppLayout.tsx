@@ -154,6 +154,30 @@ export const AppLayout: React.FC = () => {
     return { label: 'Resident / Owner', color: 'resident', icon: <Home size={12} /> };
   };
 
+  const handleRoleSelect = (role: string) => {
+    setActiveRole(role);
+    const r = role.toLowerCase();
+    if (r.includes('event')) {
+      navigate('/admin/events');
+    } else if (r.includes('finance')) {
+      navigate('/admin/finance');
+    } else if (r.includes('facility') || r.includes('helpdesk')) {
+      navigate('/admin/facilities');
+    } else if (r.includes('volunteer')) {
+      navigate('/admin/volunteers');
+    } else if (r.includes('sponsor')) {
+      navigate('/admin/sponsors');
+    } else if (r.includes('communication')) {
+      navigate('/admin/communications');
+    } else if (r.includes('security') || r.includes('gate')) {
+      navigate('/security');
+    } else if (r.includes('admin')) {
+      navigate('/admin');
+    } else {
+      navigate('/');
+    }
+  };
+
   const hasActiveMembership = access.length > 0;
   const activeFlat = access[activeFlatIndex] || access[0];
 
@@ -205,12 +229,36 @@ export const AppLayout: React.FC = () => {
 
           <button
             type="button"
-            className={`sidebar-nav-item ${isNavActive('/events') ? 'active' : ''}`}
+            className={`sidebar-nav-item ${isNavActive('/events') && !location.pathname.startsWith('/admin') ? 'active' : ''}`}
             onClick={() => navigate('/events')}
           >
             <Calendar size={18} />
             <span>Events</span>
           </button>
+
+          {activeRole.toLowerCase().includes('event') && (
+            <button
+              type="button"
+              className={`sidebar-nav-item ${location.pathname.startsWith('/admin/events') ? 'active' : ''}`}
+              onClick={() => navigate('/admin/events')}
+              style={{ color: '#f59e0b', fontWeight: 600 }}
+            >
+              <Sparkles size={18} />
+              <span>Event Admin</span>
+            </button>
+          )}
+
+          {activeRole.toLowerCase() === 'admin' && (
+            <button
+              type="button"
+              className={`sidebar-nav-item ${location.pathname.startsWith('/admin') ? 'active' : ''}`}
+              onClick={() => navigate('/admin')}
+              style={{ color: 'var(--accent-primary)', fontWeight: 600 }}
+            >
+              <Shield size={18} />
+              <span>Admin Portal</span>
+            </button>
+          )}
 
           <button
             type="button"
@@ -380,13 +428,8 @@ export const AppLayout: React.FC = () => {
                             type="button"
                             className={`role-switcher-item ${isSelected ? 'selected' : ''}`}
                             onClick={() => {
-                              setActiveRole(role);
+                              handleRoleSelect(role);
                               setIsDesktopRoleOpen(false);
-                              if (role.toLowerCase() === 'admin') {
-                                navigate('/admin');
-                              } else if (role.toLowerCase().includes('event')) {
-                                navigate('/events');
-                              }
                             }}
                           >
                             <div className="role-menu-item-left">
@@ -509,15 +552,9 @@ export const AppLayout: React.FC = () => {
                             type="button"
                             className={`drawer-role-menu-item ${isSelected ? 'selected' : ''}`}
                             onClick={() => {
-                              setActiveRole(role);
+                              setIsMobileDrawerOpen(false);
                               setIsRoleDropdownOpen(false);
-                              if (role.toLowerCase() === 'admin') {
-                                setIsMobileDrawerOpen(false);
-                                navigate('/admin');
-                              } else if (role.toLowerCase().includes('event')) {
-                                setIsMobileDrawerOpen(false);
-                                navigate('/events');
-                              }
+                              handleRoleSelect(role);
                             }}
                           >
                             <div className="role-menu-item-left">

@@ -62,12 +62,31 @@ export interface AdminStats {
 }
 
 export async function checkIsAdmin(): Promise<boolean> {
-  const { data, error } = await supabase.rpc('is_admin');
-  if (error) {
-    console.error('Error checking admin status:', error);
+  try {
+    const { data, error } = await supabase.rpc('is_admin');
+    if (!error && Boolean(data)) {
+      return true;
+    }
+
+    // Check if user has Event Admin or any management role in user_roles
+    const roles = await fetchUserRoles();
+    return roles.some((r) => {
+      const lower = r.toLowerCase();
+      return (
+        lower.includes('admin') ||
+        lower.includes('event') ||
+        lower.includes('finance') ||
+        lower.includes('facility') ||
+        lower.includes('helpdesk') ||
+        lower.includes('sponsor') ||
+        lower.includes('volunteer') ||
+        lower.includes('communication')
+      );
+    });
+  } catch (err) {
+    console.error('Error checking admin status:', err);
     return false;
   }
-  return Boolean(data);
 }
 
 export async function fetchUserRoles(): Promise<string[]> {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import {
   Shield,
   CheckCircle,
@@ -50,9 +50,36 @@ type StatusFilter = 'ALL' | 'Pending' | 'Correction Required' | 'Approved' | 'Re
 
 export const AdminPortal: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  const getInitialTab = (): ActiveTab => {
+    const path = location.pathname.toLowerCase();
+    if (path.includes('/admin/events')) return 'events';
+    if (path.includes('/admin/finance')) return 'finance';
+    if (path.includes('/admin/volunteers')) return 'volunteers';
+    if (path.includes('/admin/sponsors')) return 'sponsors';
+    if (path.includes('/admin/communications')) return 'communications';
+    if (path.includes('/admin/visitors')) return 'visitors';
+    if (path.includes('/admin/facilities')) return 'facilities';
+    if (path.includes('/admin/complaints')) return 'complaints';
+    if (path.includes('/admin/residents')) return 'residents';
+    if (path.includes('/admin/flats')) return 'flats';
+
+    const tabParam = searchParams.get('tab') as ActiveTab;
+    if (tabParam) return tabParam;
+
+    return 'registrations';
+  };
 
   // Navigation & Tabs
-  const [activeTab, setActiveTab] = useState<ActiveTab>('registrations');
+  const [activeTab, setActiveTab] = useState<ActiveTab>(getInitialTab);
+
+  useEffect(() => {
+    const targetTab = getInitialTab();
+    setActiveTab(targetTab);
+  }, [location.pathname, searchParams]);
+  
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('Pending');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -96,6 +123,15 @@ export const AdminPortal: React.FC = () => {
   useEffect(() => {
     loadAllData();
   }, []);
+
+  const handleTabChange = (tab: ActiveTab) => {
+    setActiveTab(tab);
+    if (tab === 'registrations') {
+      navigate('/admin', { replace: true });
+    } else {
+      navigate(`/admin/${tab}`, { replace: true });
+    }
+  };
 
   // Filtered registrations
   const filteredRegistrations = useMemo(() => {
@@ -312,7 +348,7 @@ export const AdminPortal: React.FC = () => {
         <div className="admin-tabs">
           <button
             className={`admin-tab ${activeTab === 'registrations' ? 'active' : ''}`}
-            onClick={() => setActiveTab('registrations')}
+            onClick={() => handleTabChange('registrations')}
           >
             <FileCheck size={16} />
             Registration Queue
@@ -322,70 +358,70 @@ export const AdminPortal: React.FC = () => {
           </button>
           <button
             className={`admin-tab ${activeTab === 'residents' ? 'active' : ''}`}
-            onClick={() => setActiveTab('residents')}
+            onClick={() => handleTabChange('residents')}
           >
             <Users size={16} />
             Resident Directory
           </button>
           <button
             className={`admin-tab ${activeTab === 'flats' ? 'active' : ''}`}
-            onClick={() => setActiveTab('flats')}
+            onClick={() => handleTabChange('flats')}
           >
             <Building size={16} />
             Flat Inventory
           </button>
           <button
             className={`admin-tab ${activeTab === 'events' ? 'active' : ''}`}
-            onClick={() => setActiveTab('events')}
+            onClick={() => handleTabChange('events')}
           >
             <Calendar size={16} />
             Events & Festivals
           </button>
           <button
             className={`admin-tab ${activeTab === 'finance' ? 'active' : ''}`}
-            onClick={() => setActiveTab('finance')}
+            onClick={() => handleTabChange('finance')}
           >
             <HeartHandshake size={16} />
             Donations & Finance
           </button>
           <button
             className={`admin-tab ${activeTab === 'volunteers' ? 'active' : ''}`}
-            onClick={() => setActiveTab('volunteers')}
+            onClick={() => handleTabChange('volunteers')}
           >
             <HandHelping size={16} />
             Volunteers & Teams
           </button>
           <button
             className={`admin-tab ${activeTab === 'sponsors' ? 'active' : ''}`}
-            onClick={() => setActiveTab('sponsors')}
+            onClick={() => handleTabChange('sponsors')}
           >
             <Award size={16} />
             Sponsors & Partners
           </button>
           <button
             className={`admin-tab ${activeTab === 'communications' ? 'active' : ''}`}
-            onClick={() => setActiveTab('communications')}
+            onClick={() => handleTabChange('communications')}
           >
             <Megaphone size={16} />
             Communications & Notices
           </button>
           <button
             className={`admin-tab ${activeTab === 'visitors' ? 'active' : ''}`}
-            onClick={() => setActiveTab('visitors')}
+            onClick={() => handleTabChange('visitors')}
           >
             <Shield size={16} />
             Visitors & Gate
           </button>
           <button
             className={`admin-tab ${activeTab === 'facilities' ? 'active' : ''}`}
-            onClick={() => setActiveTab('facilities')}
+            onClick={() => handleTabChange('facilities')}
           >
             <Sparkles size={16} />
             Facilities
           </button>
           <button
             className={`admin-tab ${activeTab === 'complaints' ? 'active' : ''}`}
-            onClick={() => setActiveTab('complaints')}
+            onClick={() => handleTabChange('complaints')}
           >
             <Wrench size={16} />
             Helpdesk
