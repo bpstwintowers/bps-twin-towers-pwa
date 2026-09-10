@@ -37,7 +37,7 @@ export const GaneshContributorsList: React.FC<Props> = ({
 
   useEffect(() => {
     const el = scrollRef.current;
-    if (!el || isAutoScrollPaused || isHovered) return;
+    if (!el || isAutoScrollPaused || isHovered || (typeof window !== 'undefined' && window.innerWidth <= 640)) return;
 
     const scrollInterval = setInterval(() => {
       if (el) {
@@ -59,7 +59,7 @@ export const GaneshContributorsList: React.FC<Props> = ({
 
   useEffect(() => {
     const el = sponsorsScrollRef.current;
-    if (!el || isSponsorsHovered) return;
+    if (!el || isSponsorsHovered || (typeof window !== 'undefined' && window.innerWidth <= 640)) return;
 
     const scrollInterval = setInterval(() => {
       if (el) {

@@ -822,6 +822,13 @@
   color: #0f172a;
 }
 
+@media (max-width: 640px) {
+  .badge-live-scroll,
+  .ganesh-scroll-control-btn {
+    display: none !important;
+  }
+}
+
 /* ==========================================================================
    DESKTOP / TABLET HORIZONTAL-SCROLL TABLE & MOBILE RESPONSIVENESS
    ========================================================================== */
