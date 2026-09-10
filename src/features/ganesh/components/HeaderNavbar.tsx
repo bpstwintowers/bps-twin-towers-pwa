@@ -66,24 +66,23 @@ export const HeaderNavbar: React.FC<Props> = ({
           </div>
         </div>
 
-        <div className="ganesh-navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div className="ganesh-navbar-actions">
           {/* Live Refresh Button */}
           {onRefreshData && (
             <button
               type="button"
               onClick={onRefreshData}
               disabled={isLoading}
+              className="ganesh-nav-btn"
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.3rem',
-                padding: '0.42rem 0.75rem',
+                gap: '0.25rem',
                 background: '#f8fafc',
                 border: '1px solid #cbd5e1',
                 borderRadius: '20px',
                 color: '#475569',
                 fontWeight: 700,
-                fontSize: '0.78rem',
                 cursor: isLoading ? 'not-allowed' : 'pointer',
                 whiteSpace: 'nowrap',
               }}
@@ -95,7 +94,7 @@ export const HeaderNavbar: React.FC<Props> = ({
                   animation: isLoading ? 'spin 1s linear infinite' : 'none',
                 }}
               />
-              <span>{isLoading ? 'Syncing...' : 'Sync'}</span>
+              <span>{isLoading ? '...' : 'Sync'}</span>
             </button>
           )}
 
@@ -103,17 +102,16 @@ export const HeaderNavbar: React.FC<Props> = ({
           <button
             type="button"
             onClick={onOpenFlatPrompt}
+            className="ganesh-nav-btn"
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.35rem',
-              padding: '0.42rem 0.8rem',
+              gap: '0.25rem',
               background: userFlat ? '#fff7ed' : '#f8fafc',
               border: userFlat ? '1.5px solid #fdba74' : '1px solid #cbd5e1',
               borderRadius: '20px',
               color: userFlat ? '#9a3412' : '#475569',
               fontWeight: 700,
-              fontSize: '0.8rem',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
             }}
@@ -122,30 +120,30 @@ export const HeaderNavbar: React.FC<Props> = ({
             <span>🏠</span>
             <span>{flatButtonText}</span>
           </button>
+
           {isAdmin && (
             <div style={{ position: 'relative' }}>
               <button
                 type="button"
-                className="btn-festive-secondary"
+                className="ganesh-nav-btn"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.4rem',
-                  padding: '0.45rem 0.9rem',
+                  gap: '0.25rem',
                   background: isDropdownOpen ? '#fef3c7' : '#fff7ed',
                   color: '#9a3412',
-                  borderColor: '#fed7aa',
+                  border: '1px solid #fed7aa',
                   fontWeight: 700,
-                  fontSize: '0.82rem',
                   borderRadius: '20px',
                   cursor: 'pointer',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                <Shield size={15} color="#ea580c" />
-                <span>Admin Menu</span>
+                <Shield size={14} color="#ea580c" />
+                <span>Admin</span>
                 <ChevronDown
-                  size={14}
+                  size={13}
                   style={{
                     transform: isDropdownOpen ? 'rotate(180deg)' : 'none',
                     transition: 'transform 0.2s ease',
