@@ -107,12 +107,12 @@ export const GaneshPaymentModal: React.FC<Props> = ({
             className="qr-image-wrapper"
             style={{
               background: '#ffffff',
-              padding: '10px',
-              borderRadius: '20px',
+              padding: '6px',
+              borderRadius: '16px',
               border: '2px solid #fed7aa',
               display: 'inline-block',
-              boxShadow: '0 8px 24px rgba(234, 88, 12, 0.12)',
-              maxWidth: '280px',
+              boxShadow: '0 6px 20px rgba(234, 88, 12, 0.10)',
+              maxWidth: '250px',
               margin: '0 auto',
             }}
           >
@@ -124,21 +124,21 @@ export const GaneshPaymentModal: React.FC<Props> = ({
               alt="PhonePe Accepted Here - HARISH REDDY GUDURU"
               style={{
                 width: '100%',
-                maxHeight: '340px',
+                maxHeight: '270px',
                 objectFit: 'contain',
                 display: 'block',
-                borderRadius: '12px',
+                borderRadius: '10px',
               }}
             />
           </div>
 
-          <p style={{ fontSize: '0.82rem', color: '#78350f', margin: '0.85rem 0 1rem 0', fontWeight: 600 }}>
+          <p style={{ fontSize: '0.78rem', color: '#78350f', margin: '0.5rem 0 0.65rem 0', fontWeight: 600 }}>
             Scan with <strong>PhonePe, Google Pay, Paytm, BHIM</strong>, or any UPI app
           </p>
 
           {/* Mobile Intent Direct Launch Buttons */}
-          <div style={{ width: '100%', marginBottom: '1.15rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.45rem', marginBottom: '0.45rem' }}>
+          <div style={{ width: '100%', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.45rem' }}>
               <a
                 href={`phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&cu=INR&tn=${encodeURIComponent('BPS Ganesh Utsav')}`}
                 onClick={() => handleCopy(upiId, 'upi')}
@@ -150,10 +150,10 @@ export const GaneshPaymentModal: React.FC<Props> = ({
                   gap: '0.35rem',
                   textDecoration: 'none',
                   fontSize: '0.82rem',
-                  padding: '0.65rem 0.6rem',
+                  padding: '0.55rem 0.6rem',
                   background: '#5f259f',
                   color: '#ffffff',
-                  borderRadius: '12px',
+                  borderRadius: '10px',
                   fontWeight: 700,
                   boxShadow: '0 2px 8px rgba(95, 37, 159, 0.25)',
                 }}
@@ -173,10 +173,10 @@ export const GaneshPaymentModal: React.FC<Props> = ({
                   gap: '0.35rem',
                   textDecoration: 'none',
                   fontSize: '0.82rem',
-                  padding: '0.65rem 0.6rem',
+                  padding: '0.55rem 0.6rem',
                   background: '#1a73e8',
                   color: '#ffffff',
-                  borderRadius: '12px',
+                  borderRadius: '10px',
                   fontWeight: 700,
                   boxShadow: '0 2px 8px rgba(26, 115, 232, 0.25)',
                 }}
@@ -185,30 +185,6 @@ export const GaneshPaymentModal: React.FC<Props> = ({
                 <span>Google Pay</span>
               </a>
             </div>
-
-            <a
-              href={upiUrl}
-              onClick={() => handleCopy(upiId, 'upi')}
-              className="btn-festive-primary"
-              style={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '0.45rem',
-                textDecoration: 'none',
-                fontSize: '0.88rem',
-                padding: '0.65rem 1rem',
-                background: 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
-                color: '#ffffff',
-                borderRadius: '12px',
-                fontWeight: 700,
-                boxShadow: '0 4px 12px rgba(234, 88, 12, 0.25)',
-              }}
-            >
-              <Smartphone size={17} />
-              <span>Open in Any UPI App</span>
-            </a>
           </div>
 
           {/* Official UPI ID Box with 1-click copy */}
@@ -217,19 +193,19 @@ export const GaneshPaymentModal: React.FC<Props> = ({
             style={{
               background: '#fff7ed',
               border: '1.5px solid #fed7aa',
-              borderRadius: '14px',
-              padding: '0.85rem 1.1rem',
+              borderRadius: '12px',
+              padding: '0.65rem 0.9rem',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: '1.25rem',
+              marginBottom: '0.75rem',
             }}
           >
             <div style={{ textAlign: 'left' }}>
-              <div style={{ color: '#9a3412', fontSize: '0.74rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <div style={{ color: '#9a3412', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 UPI ID (Harish Reddy Guduru):
               </div>
-              <strong style={{ color: '#7c2d12', fontSize: '0.98rem', letterSpacing: '0.02em' }}>
+              <strong style={{ color: '#7c2d12', fontSize: '0.92rem', letterSpacing: '0.02em' }}>
                 {upiId}
               </strong>
             </div>
@@ -242,17 +218,17 @@ export const GaneshPaymentModal: React.FC<Props> = ({
                 background: copiedKey === 'upi' ? '#ecfdf5' : '#ffffff',
                 border: copiedKey === 'upi' ? '1px solid #10b981' : '1px solid #fdba74',
                 color: copiedKey === 'upi' ? '#047857' : '#c2410c',
-                padding: '0.45rem 0.85rem',
-                borderRadius: '10px',
+                padding: '0.38rem 0.75rem',
+                borderRadius: '8px',
                 fontWeight: 700,
-                fontSize: '0.8rem',
+                fontSize: '0.78rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.35rem',
+                gap: '0.3rem',
               }}
             >
-              {copiedKey === 'upi' ? <Check size={15} color="#059669" /> : <Copy size={15} />}
+              {copiedKey === 'upi' ? <Check size={14} color="#059669" /> : <Copy size={14} />}
               <span>{copiedKey === 'upi' ? 'Copied!' : 'Copy'}</span>
             </button>
           </div>
