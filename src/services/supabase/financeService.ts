@@ -91,7 +91,7 @@ export interface CreateCampaignPayload {
   target_amount: number;
   start_date: string;
   end_date?: string;
-  banner_url?: string;
+  banner_url?: string | null;
 }
 
 export interface SubmitDonationPayload {

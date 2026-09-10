@@ -1,23 +1,29 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { supabase } from '../../services/supabase/client';
 import {
   resolveUserAccess,
   type AccessInfo,
 } from '../../services/supabase/registrationService';
-import { checkIsAdmin, fetchUserRoles } from '../../services/supabase/adminService';
+import { fetchUserRoles } from '../../services/supabase/adminService';
+import { NAVIGATION_ITEMS, type NavItemConfig } from '../../config/navigation';
+import { hasRequiredRole, isSuperAdmin, hasAnyAdminRole } from '../../utils/rbac';
 import { HouseholdModal } from '../../features/residents/HouseholdModal';
 import { DirectoryModal } from '../../features/residents/DirectoryModal';
+import { EditProfileModal } from '../../features/residents/EditProfileModal';
+import { MenuVisibilityModal } from './MenuVisibilityModal';
+import {
+  getMenuVisibility,
+  fetchRemoteMenuVisibility,
+  subscribeToMenuVisibility,
+  type MenuVisibilityConfig,
+} from '../../services/menuVisibilityService';
 import { NotificationBell } from '../../features/notifications/NotificationBell';
 import {
   LogOut,
   Home,
-  Users,
   Shield,
-  Bell,
   Sparkles,
-  Calendar,
-  CreditCard,
   Award,
   ChevronDown,
   Check,
@@ -26,12 +32,21 @@ import {
   Menu,
   X,
   User,
+  Search,
+  Settings,
+  Sliders,
 } from 'lucide-react';
+import { useSearch } from '../../context/SearchContext';
 import './AppLayout.css';
 
-export const AppLayout: React.FC = () => {
+interface AppLayoutProps {
+  children?: React.ReactNode;
+}
+
+export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { searchQuery, setSearchQuery, searchPlaceholder, clearSearch, isSearchVisible } = useSearch();
 
   const [profile, setProfile] = useState<any>(null);
   const [access, setAccess] = useState<AccessInfo[]>([]);
@@ -41,18 +56,29 @@ export const AppLayout: React.FC = () => {
   const [isDrawerFlatDropdownOpen, setIsDrawerFlatDropdownOpen] = useState(false);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [activeRole, setActiveRole] = useState<string>('Resident');
-  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
-  const [isDesktopRoleOpen, setIsDesktopRoleOpen] = useState(false);
 
   const flatSwitcherRef = useRef<HTMLDivElement>(null);
-  const desktopRoleSwitcherRef = useRef<HTMLDivElement>(null);
-
-  const [isAdmin, setIsAdmin] = useState(false);
 
   // Modals
   const [selectedFlatForHousehold, setSelectedFlatForHousehold] = useState<AccessInfo | null>(null);
   const [isHouseholdModalOpen, setIsHouseholdModalOpen] = useState(false);
   const [isDirectoryModalOpen, setIsDirectoryModalOpen] = useState(false);
+  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
+  const [isMenuVisibilityModalOpen, setIsMenuVisibilityModalOpen] = useState(false);
+
+  // Menu Visibility Configuration
+  const [menuVisibility, setMenuVisibility] = useState<MenuVisibilityConfig>(getMenuVisibility());
+
+  useEffect(() => {
+    fetchRemoteMenuVisibility().then((remoteConfig) => {
+      setMenuVisibility(remoteConfig);
+    });
+
+    const unsubscribe = subscribeToMenuVisibility((newConfig) => {
+      setMenuVisibility(newConfig);
+    });
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -81,13 +107,9 @@ export const AppLayout: React.FC = () => {
           console.error('Error resolving access in layout:', err);
         }
 
-        // Check roles & admin
+        // Check roles
         try {
-          const [adminStatus, roles] = await Promise.all([
-            checkIsAdmin(),
-            fetchUserRoles(),
-          ]);
-          setIsAdmin(adminStatus);
+          const roles = await fetchUserRoles();
           setUserRoles(roles);
           if (roles.includes('Admin')) {
             setActiveRole('Admin');
@@ -110,9 +132,6 @@ export const AppLayout: React.FC = () => {
     const handleClickOutside = (e: MouseEvent) => {
       if (flatSwitcherRef.current && !flatSwitcherRef.current.contains(e.target as Node)) {
         setIsFlatSwitcherOpen(false);
-      }
-      if (desktopRoleSwitcherRef.current && !desktopRoleSwitcherRef.current.contains(e.target as Node)) {
-        setIsDesktopRoleOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -158,17 +177,17 @@ export const AppLayout: React.FC = () => {
     setActiveRole(role);
     const r = role.toLowerCase();
     if (r.includes('event')) {
-      navigate('/admin/events');
+      navigate('/events-manage');
     } else if (r.includes('finance')) {
-      navigate('/admin/finance');
+      navigate('/finance-manage');
     } else if (r.includes('facility') || r.includes('helpdesk')) {
-      navigate('/admin/facilities');
+      navigate('/facilities-manage');
     } else if (r.includes('volunteer')) {
-      navigate('/admin/volunteers');
+      navigate('/volunteers-manage');
     } else if (r.includes('sponsor')) {
-      navigate('/admin/sponsors');
+      navigate('/sponsors-manage');
     } else if (r.includes('communication')) {
-      navigate('/admin/communications');
+      navigate('/communications-manage');
     } else if (r.includes('security') || r.includes('gate')) {
       navigate('/security');
     } else if (r.includes('admin')) {
@@ -181,26 +200,54 @@ export const AppLayout: React.FC = () => {
   const hasActiveMembership = access.length > 0;
   const activeFlat = access[activeFlatIndex] || access[0];
 
+  const isSuperAdminUser = isSuperAdmin(userRoles, profile?.email);
+
+  // Filter general navigation items by admin menu visibility configuration
+  const generalNavItems = useMemo(() => {
+    return NAVIGATION_ITEMS.filter((item) => {
+      if (item.section !== 'general') return false;
+      return menuVisibility[item.id as keyof MenuVisibilityConfig] !== false;
+    });
+  }, [menuVisibility]);
+
+  const managementNavItems = useMemo(() => {
+    return NAVIGATION_ITEMS.filter(
+      (item) => item.section === 'management' && hasRequiredRole(userRoles, item.requiredRoles, profile?.email)
+    );
+  }, [userRoles, profile?.email]);
+
   // Dynamic Header Title based on current route
   const getPageTitle = () => {
     const path = location.pathname;
     if (path === '/') return 'Dashboard';
+    if (path === '/permissions' || path.startsWith('/permissions')) return 'Roles & Permissions';
+    if (path === '/events-manage' || path.startsWith('/admin/events')) return 'Event Management';
+    if (path === '/facilities-manage' || path.startsWith('/admin/facilities')) return 'Facility Bookings Admin';
+    if (path === '/complaints-manage' || path.startsWith('/admin/complaints')) return 'Complaints Console';
+    if (path === '/finance-manage' || path.startsWith('/admin/finance')) return 'Donations & Finance Admin';
+    if (path === '/volunteers-manage' || path.startsWith('/admin/volunteers')) return 'Volunteer Coordination';
+    if (path === '/sponsors-manage' || path.startsWith('/admin/sponsors')) return 'Sponsors & Partners Admin';
+    if (path === '/communications-manage' || path.startsWith('/admin/communications')) return 'Notice Board Admin';
+    if (path === '/visitors-manage' || path.startsWith('/admin/visitors')) return 'Gate & Visitor Admin';
     if (path.startsWith('/events')) return 'Events & Festivals';
-    if (path.startsWith('/donations')) return 'My Contributions';
-    if (path.startsWith('/notifications')) return 'Notifications';
+    if (path.startsWith('/ganesh')) return 'Ganesh Utsav 2026';
     if (path.startsWith('/facilities') || path.startsWith('/my-bookings')) return 'Amenities & Bookings';
     if (path.startsWith('/complaints')) return 'Maintenance & Complaints';
-    if (path.startsWith('/my-visitors')) return 'Visitor Passes & Gate';
+    if (path.startsWith('/my-visitors')) return 'Visitor Passes';
+    if (path.startsWith('/donations')) return 'My Contributions';
     if (path.startsWith('/volunteers')) return 'Volunteer Opportunities';
     if (path.startsWith('/sponsors')) return 'Society Sponsorships';
-    if (path.startsWith('/announcements')) return 'Announcements';
-    if (path.startsWith('/settings')) return 'Settings';
+    if (path.startsWith('/announcements')) return 'Announcements & Notices';
+    if (path.startsWith('/notifications')) return 'Notification Center';
+    if (path.startsWith('/profile')) return 'My Profile';
+    if (path.startsWith('/settings')) return 'Settings & Preferences';
     if (path.startsWith('/security') || path.startsWith('/gate')) return 'Security Console';
+    if (path.startsWith('/admin')) return 'Society Administration Console';
     return 'Community Portal';
   };
 
-  const isNavActive = (path: string) => {
-    if (path === '/') return location.pathname === '/';
+  const isNavActive = (path: string, exact?: boolean) => {
+    if (path === '/' || exact) return location.pathname === path;
     return location.pathname.startsWith(path);
   };
 
@@ -212,101 +259,146 @@ export const AppLayout: React.FC = () => {
       <aside className="dashboard-desktop-sidebar">
         {/* Brand Header */}
         <div className="sidebar-brand" onClick={() => navigate('/')}>
-          <img src="/logo.png" alt="BPS" className="sidebar-brand-logo" />
+          <img src="/bps-logo.png" alt="BPS Twin Towers" className="sidebar-brand-logo" />
           <div className="sidebar-brand-title">BPS Twin Towers</div>
         </div>
 
         {/* Navigation Menu */}
         <nav className="sidebar-nav-list">
-          <button
-            type="button"
-            className={`sidebar-nav-item ${isNavActive('/') ? 'active' : ''}`}
-            onClick={() => navigate('/')}
-          >
-            <Home size={18} />
-            <span>Dashboard</span>
-          </button>
+          {/* General Resident Section */}
+          {generalNavItems.map((item) => {
+            const Icon = item.icon;
+            const active = isNavActive(item.path, item.exact);
+            return (
+              <button
+                key={item.id}
+                type="button"
+                className={`sidebar-nav-item ${active ? 'active' : ''}`}
+                onClick={() => navigate(item.path)}
+              >
+                <Icon size={17} />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
 
-          <button
-            type="button"
-            className={`sidebar-nav-item ${isNavActive('/events') && !location.pathname.startsWith('/admin') ? 'active' : ''}`}
-            onClick={() => navigate('/events')}
-          >
-            <Calendar size={18} />
-            <span>Events</span>
-          </button>
-
-          {activeRole.toLowerCase().includes('event') && (
+          {/* Household / Flat Profile Item */}
+          {menuVisibility.household && (
             <button
               type="button"
-              className={`sidebar-nav-item ${location.pathname.startsWith('/admin/events') ? 'active' : ''}`}
-              onClick={() => navigate('/admin/events')}
-              style={{ color: '#f59e0b', fontWeight: 600 }}
+              className="sidebar-nav-item"
+              onClick={() => {
+                if (activeFlat) {
+                  handleOpenHousehold(activeFlat);
+                } else {
+                  setIsDirectoryModalOpen(true);
+                }
+              }}
             >
-              <Sparkles size={18} />
-              <span>Event Admin</span>
+              <User size={17} />
+              <span>My Household</span>
             </button>
           )}
 
-          {activeRole.toLowerCase() === 'admin' && (
-            <button
-              type="button"
-              className={`sidebar-nav-item ${location.pathname.startsWith('/admin') ? 'active' : ''}`}
-              onClick={() => navigate('/admin')}
-              style={{ color: 'var(--accent-primary)', fontWeight: 600 }}
-            >
-              <Shield size={18} />
-              <span>Admin Portal</span>
-            </button>
+          {/* Management / Admin Section (Visible only when user has management roles) */}
+          {managementNavItems.length > 0 && (
+            <>
+              <div className="sidebar-section-divider" />
+              <div className="sidebar-section-title">Administration</div>
+              {managementNavItems.map((item) => {
+                const Icon = item.icon;
+                const active = isNavActive(item.path, item.exact);
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`sidebar-nav-item management-item ${active ? 'active' : ''}`}
+                    onClick={() => navigate(item.path)}
+                  >
+                    <Icon size={17} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+
+              {/* Super Admin Menu Visibility Settings (Visible ONLY to Full Society Super Admin) */}
+              {isSuperAdminUser && (
+                <button
+                  type="button"
+                  className="sidebar-nav-item management-item"
+                  onClick={() => setIsMenuVisibilityModalOpen(true)}
+                  style={{ color: '#0d9488' }}
+                  title="Configure which menus are visible to residents"
+                >
+                  <Sliders size={17} />
+                  <span>Resident Menus</span>
+                </button>
+              )}
+            </>
           )}
-
-          <button
-            type="button"
-            className={`sidebar-nav-item ${isNavActive('/donations') ? 'active' : ''}`}
-            onClick={() => navigate('/donations')}
-          >
-            <CreditCard size={18} />
-            <span>My Contributions</span>
-          </button>
-
-          <button
-            type="button"
-            className={`sidebar-nav-item ${isNavActive('/notifications') ? 'active' : ''}`}
-            onClick={() => navigate('/notifications')}
-          >
-            <Bell size={18} />
-            <span>Notifications</span>
-          </button>
-
-          <button
-            type="button"
-            className="sidebar-nav-item"
-            onClick={() => {
-              if (activeFlat) {
-                handleOpenHousehold(activeFlat);
-              } else {
-                setIsDirectoryModalOpen(true);
-              }
-            }}
-          >
-            <User size={18} />
-            <span>Profile</span>
-          </button>
         </nav>
 
-        {/* Sidebar Footer User Widget */}
-        <div className="sidebar-user-widget">
-          <div className="sidebar-user-avatar">
-            {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : 'R'}
-          </div>
-          <div className="sidebar-user-info">
-            <div className="sidebar-user-name">{profile?.full_name || 'Resident'}</div>
-            <div className="sidebar-user-flat">
-              {activeFlat ? `Tower ${activeFlat.flat_number?.toUpperCase().startsWith('B') ? 'B' : 'A'}, ${activeFlat.flat_number}` : 'Resident'}
+        {/* Sidebar Footer User Section with Edit Profile & Sign Out */}
+        <div className="sidebar-user-footer-container">
+          <div
+            className="sidebar-user-widget"
+            onClick={() => setIsEditProfileModalOpen(true)}
+            title="Click to view & edit profile"
+            role="button"
+            tabIndex={0}
+          >
+            <div className="sidebar-user-avatar">
+              {profile?.photo_url ? (
+                <img
+                  src={profile.photo_url}
+                  alt="Avatar"
+                  style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              ) : (
+                profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : 'R'
+              )}
             </div>
+            <div className="sidebar-user-info">
+              <div className="sidebar-user-name">
+                {profile?.full_name || (isSuperAdmin(userRoles, profile?.email) ? 'Society Admin' : 'Resident')}
+              </div>
+              <div className="sidebar-user-flat">
+                {activeFlat
+                  ? `Tower ${activeFlat.flat_number?.toUpperCase().startsWith('B') ? 'B' : 'A'}, ${activeFlat.flat_number}`
+                  : isSuperAdmin(userRoles, profile?.email)
+                  ? 'Society Administrator'
+                  : 'Resident'}
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn-sidebar-edit-profile"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsEditProfileModalOpen(true);
+              }}
+              title="Edit Profile"
+              aria-label="Edit Profile"
+            >
+              <Settings size={15} />
+            </button>
           </div>
+
+          <button
+            type="button"
+            className="sidebar-signout-btn"
+            onClick={handleSignOut}
+            title="Sign out of your account"
+          >
+            <LogOut size={15} />
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
+
 
       {/* =========================================================================
           2. MAIN CONTENT AREA & TOP HEADER
@@ -325,6 +417,31 @@ export const AppLayout: React.FC = () => {
             </button>
             <h1 className="header-page-title">{getPageTitle()}</h1>
           </div>
+
+          {/* Dynamic Global Page Search Box */}
+          {isSearchVisible && (
+            <div className="header-search-wrapper">
+              <Search size={15} className="header-search-icon" />
+              <input
+                type="text"
+                className="header-search-input"
+                placeholder={searchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search page content"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  className="header-search-clear"
+                  onClick={clearSearch}
+                  aria-label="Clear Search"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          )}
 
           <div className="header-actions-group">
             {/* Multi-Flat Switcher (Desktop) */}
@@ -396,75 +513,27 @@ export const AppLayout: React.FC = () => {
                   <Home size={13} />
                   <span>Flat {activeFlat.flat_number}</span>
                 </div>
+              ) : isSuperAdmin(userRoles, profile?.email) ? (
+                <div
+                  className="single-flat-badge-pill"
+                  style={{
+                    background: '#f0fdfa',
+                    borderColor: '#99f6e4',
+                    color: '#00685f',
+                    fontWeight: 700,
+                  }}
+                >
+                  <Shield size={13} />
+                  <span>Society Administrator</span>
+                </div>
               ) : null}
             </div>
-
-            {/* Multi-Role Switcher (Desktop) */}
-            {userRoles.length > 1 ? (
-              <div className="active-role-switcher-dropdown desktop-only-action" ref={desktopRoleSwitcherRef}>
-                <button
-                  type="button"
-                  className={`btn-role-switcher ${getRoleDisplay(activeRole).color}`}
-                  onClick={() => setIsDesktopRoleOpen(!isDesktopRoleOpen)}
-                  title="Switch role"
-                >
-                  <span className="role-btn-inner">
-                    {getRoleDisplay(activeRole).icon}
-                    <span>{getRoleDisplay(activeRole).label}</span>
-                  </span>
-                  <ChevronDown size={13} className={`role-switcher-arrow ${isDesktopRoleOpen ? 'open' : ''}`} />
-                </button>
-
-                {isDesktopRoleOpen && (
-                  <div className="role-switcher-menu animate-fade-in">
-                    <div className="role-menu-header">Switch Role View</div>
-                    <div className="role-items-list">
-                      {userRoles.map((role) => {
-                        const display = getRoleDisplay(role);
-                        const isSelected = activeRole.toLowerCase() === role.toLowerCase();
-                        return (
-                          <button
-                            key={role}
-                            type="button"
-                            className={`role-switcher-item ${isSelected ? 'selected' : ''}`}
-                            onClick={() => {
-                              handleRoleSelect(role);
-                              setIsDesktopRoleOpen(false);
-                            }}
-                          >
-                            <div className="role-menu-item-left">
-                              <span className={`role-item-dot ${display.color}`} />
-                              <span className="role-item-name">{display.label}</span>
-                            </div>
-                            {isSelected && <Check size={14} className="role-check" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : isAdmin ? (
-              <button
-                onClick={() => navigate('/admin')}
-                className="btn-primary desktop-only-action"
-                style={{
-                  padding: '0.45rem 0.85rem',
-                  fontSize: '0.82rem',
-                  gap: '0.4rem',
-                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                }}
-              >
-                <Shield size={14} />
-                Admin Portal
-              </button>
-            ) : null}
 
             {/* Notification Bell */}
             <NotificationBell />
 
-            {/* Mobile Quick Flat Chip */}
-            {hasActiveMembership && activeFlat && (
+            {/* Mobile Quick Flat / Admin Chip */}
+            {hasActiveMembership && activeFlat ? (
               <button
                 type="button"
                 className="mobile-active-flat-chip mobile-only-action"
@@ -474,17 +543,17 @@ export const AppLayout: React.FC = () => {
                 <Building2 size={13} />
                 <span>{activeFlat.flat_number}</span>
               </button>
-            )}
-
-            {/* Sign Out (Desktop) */}
-            <button
-              onClick={handleSignOut}
-              className="btn-outline desktop-only-action"
-              style={{ padding: '0.45rem 0.75rem', fontSize: '0.82rem', gap: '0.35rem' }}
-            >
-              <LogOut size={14} />
-              Sign Out
-            </button>
+            ) : isSuperAdmin(userRoles, profile?.email) ? (
+              <button
+                type="button"
+                className="mobile-active-flat-chip mobile-only-action"
+                onClick={() => setIsMobileDrawerOpen(true)}
+                title="View Menu"
+              >
+                <Shield size={13} />
+                <span>Admin</span>
+              </button>
+            ) : null}
           </div>
         </header>
 
@@ -494,7 +563,7 @@ export const AppLayout: React.FC = () => {
             <div className="mobile-drawer-content animate-slide-left" onClick={(e) => e.stopPropagation()}>
               <div className="mobile-drawer-header">
                 <div className="drawer-brand">
-                  <img src="/logo.png" alt="BPS" className="drawer-logo" />
+                  <img src="/bps-logo.png" alt="BPS Twin Towers" className="drawer-logo" />
                   <div>
                     <div className="drawer-brand-name">BPS Twin Towers</div>
                     <div className="drawer-brand-sub">Community Portal</div>
@@ -510,65 +579,42 @@ export const AppLayout: React.FC = () => {
                 </button>
               </div>
 
-              {/* Resident Profile Card with Multi-Role Dropdown */}
+              {/* Resident Profile Card */}
               <div className="drawer-profile-card">
                 <div className="drawer-profile-top">
                   <div className="drawer-avatar">
-                    {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : 'R'}
+                    {profile?.photo_url ? (
+                      <img
+                        src={profile.photo_url}
+                        alt="Avatar"
+                        style={{ width: '100%', height: '100%', borderRadius: '10px', objectFit: 'cover' }}
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : 'R'
+                    )}
                   </div>
                   <div className="drawer-profile-info">
                     <div className="drawer-user-name">{profile?.full_name || 'Resident'}</div>
                     <div className="drawer-user-email">{profile?.email}</div>
                   </div>
-                </div>
-
-                <div className="drawer-role-switcher-container">
                   <button
                     type="button"
-                    className={`drawer-role-badge-btn ${getRoleDisplay(activeRole).color}`}
-                    onClick={() => userRoles.length > 1 && setIsRoleDropdownOpen(!isRoleDropdownOpen)}
+                    className="btn-drawer-edit-profile"
+                    onClick={() => {
+                      setIsMobileDrawerOpen(false);
+                      setIsEditProfileModalOpen(true);
+                    }}
+                    title="Edit Profile"
+                    aria-label="Edit Profile"
                   >
-                    <span className="role-btn-inner">
-                      {getRoleDisplay(activeRole).icon}
-                      <span>{getRoleDisplay(activeRole).label}</span>
-                    </span>
-                    {userRoles.length > 1 && (
-                      <ChevronDown
-                        size={12}
-                        className={`drawer-role-chevron ${isRoleDropdownOpen ? 'open' : ''}`}
-                      />
-                    )}
+                    <Settings size={16} />
                   </button>
-
-                  {isRoleDropdownOpen && userRoles.length > 1 && (
-                    <div className="drawer-role-dropdown-menu animate-fade-in">
-                      <div className="drawer-role-menu-header">Switch Active Role:</div>
-                      {userRoles.map((role) => {
-                        const display = getRoleDisplay(role);
-                        const isSelected = activeRole.toLowerCase() === role.toLowerCase();
-                        return (
-                          <button
-                            key={role}
-                            type="button"
-                            className={`drawer-role-menu-item ${isSelected ? 'selected' : ''}`}
-                            onClick={() => {
-                              setIsMobileDrawerOpen(false);
-                              setIsRoleDropdownOpen(false);
-                              handleRoleSelect(role);
-                            }}
-                          >
-                            <div className="role-menu-item-left">
-                              <span className={`role-item-dot ${display.color}`} />
-                              <span className="role-menu-item-label">{display.label}</span>
-                            </div>
-                            {isSelected && <Check size={13} className="drawer-role-check" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
                 </div>
               </div>
+
 
               {/* Active Flat Switcher Dropdown */}
               {access.length > 0 && (
@@ -648,57 +694,28 @@ export const AppLayout: React.FC = () => {
 
               {/* Resident Navigation Menu */}
               <div className="drawer-section">
-                <div className="drawer-section-title">Resident Menu</div>
+                <div className="drawer-section-title">Community Menu</div>
                 <div className="drawer-nav-list">
-                  <button
-                    type="button"
-                    className={`drawer-nav-item ${isNavActive('/') ? 'active-nav' : ''}`}
-                    onClick={() => {
-                      setIsMobileDrawerOpen(false);
-                      navigate('/');
-                    }}
-                  >
-                    <Home size={16} />
-                    <span>Dashboard</span>
-                  </button>
+                  {generalNavItems.map((item) => {
+                    const Icon = item.icon;
+                    const active = isNavActive(item.path, item.exact);
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className={`drawer-nav-item ${active ? 'active-nav' : ''}`}
+                        onClick={() => {
+                          setIsMobileDrawerOpen(false);
+                          navigate(item.path);
+                        }}
+                      >
+                        <Icon size={16} />
+                        <span>{item.label}</span>
+                      </button>
+                    );
+                  })}
 
-                  <button
-                    type="button"
-                    className={`drawer-nav-item ${isNavActive('/events') ? 'active-nav' : ''}`}
-                    onClick={() => {
-                      setIsMobileDrawerOpen(false);
-                      navigate('/events');
-                    }}
-                  >
-                    <Calendar size={16} />
-                    <span>Events</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`drawer-nav-item ${isNavActive('/donations') ? 'active-nav' : ''}`}
-                    onClick={() => {
-                      setIsMobileDrawerOpen(false);
-                      navigate('/donations');
-                    }}
-                  >
-                    <CreditCard size={16} />
-                    <span>My Contributions</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`drawer-nav-item ${isNavActive('/notifications') ? 'active-nav' : ''}`}
-                    onClick={() => {
-                      setIsMobileDrawerOpen(false);
-                      navigate('/notifications');
-                    }}
-                  >
-                    <Bell size={16} />
-                    <span>Notifications</span>
-                  </button>
-
-                  {activeFlat && (
+                  {activeFlat && menuVisibility.household && (
                     <button
                       type="button"
                       className="drawer-nav-item"
@@ -708,26 +725,53 @@ export const AppLayout: React.FC = () => {
                       }}
                     >
                       <User size={16} />
-                      <span>Profile</span>
-                    </button>
-                  )}
-
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      className="drawer-nav-item admin-highlight"
-                      style={{ marginTop: '8px' }}
-                      onClick={() => {
-                        setIsMobileDrawerOpen(false);
-                        navigate('/admin');
-                      }}
-                    >
-                      <Shield size={16} />
-                      <span>Admin Portal Console</span>
+                      <span>My Household</span>
                     </button>
                   )}
                 </div>
               </div>
+
+              {/* Management Section (Mobile Drawer) */}
+              {managementNavItems.length > 0 && (
+                <div className="drawer-section">
+                  <div className="drawer-section-title">Administration</div>
+                  <div className="drawer-nav-list">
+                    {managementNavItems.map((item) => {
+                      const Icon = item.icon;
+                      const active = isNavActive(item.path, item.exact);
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          className={`drawer-nav-item management-item ${active ? 'active-nav' : ''}`}
+                          onClick={() => {
+                            setIsMobileDrawerOpen(false);
+                            navigate(item.path);
+                          }}
+                        >
+                          <Icon size={16} />
+                          <span>{item.label}</span>
+                        </button>
+                      );
+                    })}
+
+                    {isSuperAdminUser && (
+                      <button
+                        type="button"
+                        className="drawer-nav-item management-item"
+                        onClick={() => {
+                          setIsMobileDrawerOpen(false);
+                          setIsMenuVisibilityModalOpen(true);
+                        }}
+                        style={{ color: '#0d9488' }}
+                      >
+                        <Sliders size={16} />
+                        <span>Resident Menus Config</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Drawer Footer */}
               <div className="drawer-footer">
@@ -746,7 +790,7 @@ export const AppLayout: React.FC = () => {
 
         {/* Dynamic Nested Content */}
         <main className="dashboard-content-scrollable">
-          <Outlet />
+          {children || <Outlet />}
         </main>
       </div>
 
@@ -768,6 +812,29 @@ export const AppLayout: React.FC = () => {
           onClose={() => setIsDirectoryModalOpen(false)}
         />
       )}
+
+      {/* Edit Profile Modal */}
+      {isEditProfileModalOpen && (
+        <EditProfileModal
+          isOpen={isEditProfileModalOpen}
+          onClose={() => setIsEditProfileModalOpen(false)}
+          onProfileUpdated={(updated) => {
+            setProfile((prev: any) => ({ ...prev, ...updated }));
+          }}
+          userRoles={userRoles}
+          accessList={access}
+        />
+      )}
+
+      {/* Menu Visibility Settings Modal for Admins */}
+      <MenuVisibilityModal
+        isOpen={isMenuVisibilityModalOpen}
+        onClose={() => setIsMenuVisibilityModalOpen(false)}
+        onSuccess={() => {
+          setMenuVisibility(getMenuVisibility());
+        }}
+      />
     </div>
   );
 };
+

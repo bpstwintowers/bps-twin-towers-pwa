@@ -4,6 +4,7 @@ import { ProtectedRoute } from '../guards/ProtectedRoute';
 import { AdminRoute } from '../guards/AdminRoute';
 
 import { AppLayout } from '../../components/layout/AppLayout';
+import { SearchProvider } from '../../context/SearchContext';
 
 // Core immediate routes
 import Login from '../../features/auth/Login';
@@ -16,6 +17,9 @@ const RegistrationFlow = lazy(() =>
 const RegistrationStatus = lazy(() =>
   import('../../features/residents/RegistrationStatus').then((m) => ({ default: m.RegistrationStatus }))
 );
+const ProfilePage = lazy(() =>
+  import('../../features/residents/ProfilePage').then((m) => ({ default: m.ProfilePage }))
+);
 const AdminPortal = lazy(() =>
   import('../../features/admin/AdminPortal').then((m) => ({ default: m.AdminPortal }))
 );
@@ -24,6 +28,9 @@ const EventList = lazy(() =>
 );
 const EventDetails = lazy(() =>
   import('../../features/events/EventDetails').then((m) => ({ default: m.EventDetails }))
+);
+const GaneshContributionPage = lazy(() =>
+  import('../../features/ganesh/GaneshContributionPage').then((m) => ({ default: m.GaneshContributionPage }))
 );
 const DonationList = lazy(() =>
   import('../../features/donations/DonationList').then((m) => ({ default: m.DonationList }))
@@ -68,6 +75,35 @@ const ComplaintDetails = lazy(() =>
   import('../../features/complaints/ComplaintDetails').then((m) => ({ default: m.ComplaintDetails }))
 );
 
+// Lazy loaded admin routes
+const AdminPermissions = lazy(() =>
+  import('../../features/admin/AdminPermissions').then((m) => ({ default: m.AdminPermissions }))
+);
+const AdminEvents = lazy(() =>
+  import('../../features/admin/AdminEvents').then((m) => ({ default: m.AdminEvents }))
+);
+const AdminFinance = lazy(() =>
+  import('../../features/admin/AdminFinance').then((m) => ({ default: m.AdminFinance }))
+);
+const AdminFacilities = lazy(() =>
+  import('../../features/admin/AdminFacilities').then((m) => ({ default: m.AdminFacilities }))
+);
+const AdminComplaints = lazy(() =>
+  import('../../features/admin/AdminComplaints').then((m) => ({ default: m.AdminComplaints }))
+);
+const AdminVolunteers = lazy(() =>
+  import('../../features/admin/AdminVolunteers').then((m) => ({ default: m.AdminVolunteers }))
+);
+const AdminSponsors = lazy(() =>
+  import('../../features/admin/AdminSponsors').then((m) => ({ default: m.AdminSponsors }))
+);
+const AdminCommunications = lazy(() =>
+  import('../../features/admin/AdminCommunications').then((m) => ({ default: m.AdminCommunications }))
+);
+const AdminVisitors = lazy(() =>
+  import('../../features/admin/AdminVisitors').then((m) => ({ default: m.AdminVisitors }))
+);
+
 const PageLoader: React.FC = () => (
   <div
     style={{
@@ -95,19 +131,58 @@ const PageLoader: React.FC = () => (
   </div>
 );
 
+import { supabase } from '../../services/supabase/client';
+
+const GaneshPortalRoute: React.FC = () => {
+  const [session, setSession] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) return <PageLoader />;
+
+  if (session) {
+    return (
+      <AppLayout>
+        <GaneshContributionPage isRegisteredUser={true} />
+      </AppLayout>
+    );
+  }
+
+  return <GaneshContributionPage isRegisteredUser={false} />;
+};
+
 export const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<RegistrationFlow />} />
-          <Route path="/registration-status" element={<RegistrationStatus />} />
+      <SearchProvider>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<RegistrationFlow />} />
+            <Route path="/registration-status" element={<RegistrationStatus />} />
 
-          {/* Protected Routes (Residents) */}
+            {/* Hybrid Ganesh Festival Routes (Accessible publicly by guests and authenticated residents) */}
+            <Route path="/ganesh-utsav" element={<GaneshPortalRoute />} />
+            <Route path="/ganesh-contributions" element={<GaneshPortalRoute />} />
+
+          {/* Protected Routes (Authenticated inside Main AppLayout) */}
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
+              {/* Resident General Routes */}
               <Route path="/" element={<ResidentDashboard />} />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="/events" element={<EventList />} />
               <Route path="/events/:id" element={<EventDetails />} />
               <Route path="/donations" element={<DonationList />} />
@@ -127,26 +202,64 @@ export const AppRouter: React.FC = () => {
               <Route path="/complaints" element={<ComplaintList />} />
               <Route path="/complaints/new" element={<ComplaintForm />} />
               <Route path="/complaints/:id" element={<ComplaintDetails />} />
-            </Route>
-          </Route>
 
-          {/* Protected Routes (Admins Only) */}
-          <Route element={<AdminRoute />}>
-            <Route path="/admin" element={<AdminPortal />} />
-            <Route path="/admin/events" element={<AdminPortal />} />
-            <Route path="/admin/finance" element={<AdminPortal />} />
-            <Route path="/admin/volunteers" element={<AdminPortal />} />
-            <Route path="/admin/sponsors" element={<AdminPortal />} />
-            <Route path="/admin/communications" element={<AdminPortal />} />
-            <Route path="/admin/visitors" element={<AdminPortal />} />
-            <Route path="/admin/facilities" element={<AdminPortal />} />
-            <Route path="/admin/complaints" element={<AdminPortal />} />
+              {/* Management & Admin Flat Routes (Protected by granular AdminRoute RBAC) */}
+              <Route element={<AdminRoute requiredRoles={['admin', 'super_admin', 'society admin']} />}>
+                <Route path="/permissions" element={<AdminPermissions />} />
+                <Route path="/admin" element={<AdminPortal />} />
+              </Route>
+
+              <Route element={<AdminRoute requiredRoles={['admin', 'event', 'festival', 'culture']} />}>
+                <Route path="/events-manage" element={<AdminEvents />} />
+              </Route>
+
+              <Route element={<AdminRoute requiredRoles={['admin', 'finance', 'treasurer', 'accounts']} />}>
+                <Route path="/finance-manage" element={<AdminFinance />} />
+              </Route>
+
+              <Route element={<AdminRoute requiredRoles={['admin', 'facility', 'helpdesk']} />}>
+                <Route path="/facilities-manage" element={<AdminFacilities />} />
+              </Route>
+
+              <Route element={<AdminRoute requiredRoles={['admin', 'facility', 'helpdesk', 'maintenance']} />}>
+                <Route path="/complaints-manage" element={<AdminComplaints />} />
+              </Route>
+
+              <Route element={<AdminRoute requiredRoles={['admin', 'volunteer']} />}>
+                <Route path="/volunteers-manage" element={<AdminVolunteers />} />
+              </Route>
+
+              <Route element={<AdminRoute requiredRoles={['admin', 'finance', 'sponsor']} />}>
+                <Route path="/sponsors-manage" element={<AdminSponsors />} />
+              </Route>
+
+              <Route element={<AdminRoute requiredRoles={['admin', 'communication', 'pr']} />}>
+                <Route path="/communications-manage" element={<AdminCommunications />} />
+              </Route>
+
+              <Route element={<AdminRoute requiredRoles={['admin', 'security', 'gate']} />}>
+                <Route path="/visitors-manage" element={<AdminVisitors />} />
+              </Route>
+
+              {/* Backwards-compatible legacy admin paths redirects */}
+              <Route path="/admin/permissions" element={<Navigate to="/permissions" replace />} />
+              <Route path="/admin/events" element={<Navigate to="/events-manage" replace />} />
+              <Route path="/admin/finance" element={<Navigate to="/finance-manage" replace />} />
+              <Route path="/admin/facilities" element={<Navigate to="/facilities-manage" replace />} />
+              <Route path="/admin/complaints" element={<Navigate to="/complaints-manage" replace />} />
+              <Route path="/admin/volunteers" element={<Navigate to="/volunteers-manage" replace />} />
+              <Route path="/admin/sponsors" element={<Navigate to="/sponsors-manage" replace />} />
+              <Route path="/admin/communications" element={<Navigate to="/communications-manage" replace />} />
+              <Route path="/admin/visitors" element={<Navigate to="/visitors-manage" replace />} />
+
+            </Route>
           </Route>
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
+      </SearchProvider>
     </BrowserRouter>
   );
 };

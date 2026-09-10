@@ -23,6 +23,7 @@ import {
 } from '../../services/supabase/visitorService';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { GateFormModal } from './GateFormModal';
+import './AdminPortal.css';
 
 export const AdminVisitors: React.FC = () => {
   const [summary, setSummary] = useState<GateSummary | null>(null);

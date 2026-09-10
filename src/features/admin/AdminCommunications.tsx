@@ -21,6 +21,7 @@ import {
 } from '../../services/supabase/communicationService';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { AnnouncementFormModal } from './AnnouncementFormModal';
+import './AdminPortal.css';
 
 export const AdminCommunications: React.FC = () => {
   const [summary, setSummary] = useState<CommunicationSummary | null>(null);

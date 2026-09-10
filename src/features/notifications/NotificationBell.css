@@ -68,6 +68,20 @@
   flex-direction: column;
 }
 
+@media (max-width: 768px) {
+  .notification-dropdown-menu {
+    position: fixed !important;
+    top: 60px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: 80vh;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.3) !important;
+    z-index: 9999 !important;
+  }
+}
+
 /* Header */
 .notif-dropdown-header {
   padding: 12px 16px;

@@ -1,43 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { supabase } from '../../services/supabase/client';
-import { checkIsAdmin } from '../../services/supabase/adminService';
+import { fetchUserRoles } from '../../services/supabase/adminService';
+import { hasRequiredRole, hasAnyAdminRole } from '../../utils/rbac';
 
-export const AdminRoute: React.FC = () => {
+interface AdminRouteProps {
+  requiredRoles?: string[];
+}
+
+export const AdminRoute: React.FC<AdminRouteProps> = ({ requiredRoles }) => {
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [hasSession, setHasSession] = useState(false);
 
   useEffect(() => {
-    const verifyAdmin = async () => {
+    const verifyAccess = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
           setHasSession(false);
-          setIsAdmin(false);
+          setIsAuthorized(false);
           setLoading(false);
           return;
         }
 
         setHasSession(true);
-        const adminStatus = await checkIsAdmin();
-        setIsAdmin(adminStatus);
+        const userRoles = await fetchUserRoles();
+        
+        if (requiredRoles && requiredRoles.length > 0) {
+          const authorized = hasRequiredRole(userRoles, requiredRoles, session.user.email);
+          setIsAuthorized(authorized);
+        } else {
+          const authorized = hasAnyAdminRole(userRoles, session.user.email);
+          setIsAuthorized(authorized);
+        }
       } catch (err) {
-        console.error('Admin verification failed:', err);
-        setIsAdmin(false);
+        console.error('Admin route verification failed:', err);
+        setIsAuthorized(false);
       } finally {
         setLoading(false);
       }
     };
 
-    verifyAdmin();
-  }, []);
+    verifyAccess();
+  }, [requiredRoles]);
 
   if (loading) {
     return (
-      <div className="flex-center" style={{ minHeight: '100vh' }}>
-        <div className="animate-fade-in" style={{ color: 'var(--text-muted)' }}>
-          Verifying Admin Access...
+      <div className="flex-center" style={{ minHeight: '80vh' }}>
+        <div className="animate-fade-in" style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+          Verifying permissions...
         </div>
       </div>
     );
@@ -47,7 +59,7 @@ export const AdminRoute: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (!isAdmin) {
+  if (!isAuthorized) {
     return <Navigate to="/" replace />;
   }
 

@@ -219,19 +219,21 @@ export const SponsorTierModal: React.FC<SponsorTierModalProps> = ({
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
               {benefits.map((b, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.04)',
-                    padding: '0.4rem 0.65rem',
-                    borderRadius: 'var(--radius-sm)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    fontSize: '0.82rem',
-                  }}
-                >
-                  <span>✓ {b}</span>
+                  <div
+                    key={idx}
+                    style={{
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      padding: '0.45rem 0.75rem',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      fontSize: '0.84rem',
+                      color: '#334155',
+                    }}
+                  >
+                    <span>✓ {b}</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveBenefit(idx)}

@@ -219,9 +219,9 @@ export const ResidentDashboard: React.FC = () => {
               <button
                 type="button"
                 className="btn-event-card-details"
-                onClick={() => navigate('/events')}
+                onClick={() => navigate('/ganesh-utsav')}
               >
-                View Event Details
+                Ganesh Contribution & Sponsors Hub
               </button>
             </div>
           </div>

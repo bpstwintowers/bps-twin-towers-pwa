@@ -2,101 +2,97 @@
 
 :root {
   /* ==========================================================================
-     CIVIC HORIZON DESIGN SYSTEM TOKENS
+     COMMUNITYHUB DESIGN SYSTEM (AUGUST 2026)
      ========================================================================== */
 
-  /* Surface & Background Palette */
-  --surface: #f9f9fb;
-  --surface-dim: #d9dadc;
-  --surface-bright: #f9f9fb;
-  --surface-container-lowest: #ffffff;
-  --surface-container-low: #f3f3f5;
-  --surface-container: #eeeef0;
-  --surface-container-high: #e8e8ea;
-  --surface-container-highest: #e2e2e4;
-  --surface-variant: #e2e2e4;
+  /* Neutrals */
+  --color-white: #FFFFFF;
+  --color-snow: #F8FAFC;
+  --color-light: #F5F5F7;
+  --color-border: #E5E7EB;
+  --color-muted: #9CA3AF;
+  --color-slate: #94A3B8;
+  --color-gray-600: #475569;
+  --color-gray-700: #4B5563;
+  --color-charcoal: #1F2937;
+  --color-navy: #1E293B;
+  --color-black: #000000;
 
-  --on-surface: #1a1c1d;
-  --on-surface-variant: #3d4947;
-  --inverse-surface: #2f3132;
-  --inverse-on-surface: #f0f0f2;
+  /* Brand — Teal */
+  --teal-600: #0D9488;
+  --teal-700: #0F766E;
+  --primary: #0D9488;
+  --primary-dark: #0F766E;
+  --on-primary: #FFFFFF;
 
-  --outline: #6d7a77;
-  --outline-variant: #bcc9c6;
-  --surface-tint: #006a61;
+  /* Semantic — Success Green */
+  --green-100: #DCFCE7;
+  --green-500: #10B981;
+  --green-600: #16A34A;
+  --green-700: #15803D;
 
-  --background: #f9f9fb;
-  --on-background: #1a1c1d;
+  /* Semantic — Warning Amber */
+  --amber-100: #FEF3C7;
+  --amber-400: #F59E0B;
+  --amber-600: #D97706;
 
-  /* Primary Brand (Teal 600) */
-  --primary: #00685f;
-  --on-primary: #ffffff;
-  --primary-container: #008378;
-  --on-primary-container: #f4fffc;
-  --inverse-primary: #6bd8cb;
-  --primary-fixed: #89f5e7;
-  --primary-fixed-dim: #6bd8cb;
-  --on-primary-fixed: #00201d;
-  --on-primary-fixed-variant: #005049;
+  /* Semantic — Error Red */
+  --red-100: #FEE2E2;
+  --red-400: #EF4444;
+  --red-600: #DC2626;
+  --red-700: #B91C1C;
 
-  /* Secondary Accent (Slate / Navy) */
-  --secondary: #545f73;
-  --on-secondary: #ffffff;
-  --secondary-container: #d5e0f8;
-  --on-secondary-container: #586377;
-  --secondary-fixed: #d8e3fb;
-  --secondary-fixed-dim: #bcc7de;
-  --on-secondary-fixed: #111c2d;
-  --on-secondary-fixed-variant: #3c475a;
+  /* Semantic — Info Blue */
+  --blue-100: #E0F2FE;
+  --blue-600: #0284C7;
 
-  /* Tertiary Accent (Gold / Bronze) */
-  --tertiary: #755717;
-  --on-tertiary: #ffffff;
-  --tertiary-container: #90702e;
-  --on-tertiary-container: #fffbff;
-  --tertiary-fixed: #ffdea5;
-  --tertiary-fixed-dim: #e9c176;
-  --on-tertiary-fixed: #261900;
-  --on-tertiary-fixed-variant: #5d4201;
+  /* Surfaces & Backgrounds */
+  --background: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-dim: #F5F5F7;
+  --surface-container: #FFFFFF;
+  --surface-container-low: #F8FAFC;
+  --surface-container-high: #F5F5F7;
+  --surface-container-highest: #E5E7EB;
+  --on-surface: #1E293B;
+  --on-surface-variant: #475569;
+  --outline: #9CA3AF;
+  --outline-variant: #E5E7EB;
 
-  /* Semantic Status Palette */
-  --error: #ba1a1a;
-  --on-error: #ffffff;
-  --error-container: #ffdad6;
-  --on-error-container: #93000a;
-
+  /* Semantic Status Palette Aliases */
   --success-bg: #DCFCE7;
   --success-text: #15803D;
   --warning-bg: #FEF3C7;
   --warning-text: #D97706;
   --error-bg: #FEE2E2;
-  --error-text: #B91C1C;
+  --error-text: #DC2626;
   --info-bg: #E0F2FE;
   --info-text: #0284C7;
 
   /* Backwards-Compatibility Mapping */
-  --bg-primary: var(--background);
-  --bg-secondary: var(--surface-container-low);
-  --bg-tertiary: var(--surface-container);
-  --text-primary: var(--on-surface);
-  --text-secondary: var(--on-surface-variant);
-  --text-muted: var(--outline);
-  --border-color: var(--surface-container-highest);
-  --border-color-hover: var(--outline-variant);
-  --primary-light: rgba(0, 104, 95, 0.08);
-  --accent-primary: var(--primary);
-  --accent-hover: var(--on-primary-fixed-variant);
-  --accent-light: rgba(0, 104, 95, 0.08);
-  --secondary-dark: var(--tertiary);
-  --secondary-light: rgba(84, 95, 115, 0.12);
-  --success: var(--success-text);
-  --success-light: var(--success-bg);
-  --danger: var(--error);
-  --danger-light: var(--error-bg);
-  --warning: var(--warning-text);
-  --warning-light: var(--warning-bg);
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F5F5F7;
+  --text-primary: #1E293B;
+  --text-secondary: #475569;
+  --text-muted: #9CA3AF;
+  --border-color: #E5E7EB;
+  --border-color-hover: #9CA3AF;
+  --primary-light: rgba(13, 148, 136, 0.08);
+  --accent-primary: #0D9488;
+  --accent-hover: #0F766E;
+  --accent-light: rgba(13, 148, 136, 0.08);
+  --secondary: #475569;
+  --secondary-dark: #1E293B;
+  --secondary-light: #F8FAFC;
+  --success: #16A34A;
+  --success-light: #DCFCE7;
+  --danger: #DC2626;
+  --danger-light: #FEE2E2;
+  --warning: #D97706;
+  --warning-light: #FEF3C7;
 
-  /* Spacing Scale */
+  /* Layout & Spacing */
   --unit: 4px;
   --space-1: 4px;
   --space-2: 8px;
@@ -110,25 +106,24 @@
   --sidebar-resident: 240px;
   --max-width: 1440px;
 
-  /* Shapes & Radii */
-  --radius-sm: 0.25rem;
-  --radius-default: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
+  /* Corner Radii (CommunityHub Scale) */
+  --radius-sm: 4px;      /* Badges, chips */
+  --radius-md: 8px;      /* Buttons, inputs */
+  --radius-lg: 16px;     /* Cards, toolbar */
+  --radius-xl: 24px;     /* Modals, panels, drawers */
+  --radius-pill: 40px;   /* Pills, tags */
   --radius-full: 9999px;
-  --radius-pill: 9999px;
 
-  /* Elevation & Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(26, 28, 29, 0.04);
-  --shadow-ambient: 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
-  --shadow-gold: 0 4px 14px rgba(117, 87, 23, 0.25);
+  /* Elevation (CommunityHub Scale) */
+  --shadow-low: 0 2px 12px rgba(0, 0, 0, 0.06);     /* Cards, toolbar */
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.10);  /* Elevated panels */
+  --shadow-high: 0 8px 24px rgba(0, 0, 0, 0.15);    /* Modals, drawers */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: var(--shadow-low);
+  --shadow-lg: var(--shadow-medium);
 
-  /* Typography Families */
+  /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* ==========================================================================
@@ -149,6 +144,13 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
+}
+
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
 }
 
 /* ==========================================================================
@@ -644,11 +646,11 @@ form > .modal-actions {
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.25s ease-out forwards;
 }
 

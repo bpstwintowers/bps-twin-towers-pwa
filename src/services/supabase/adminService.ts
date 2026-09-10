@@ -36,6 +36,7 @@ export interface AdminResidentItem {
   resident_type: string | null;
   status: string;
   joined_at: string;
+  parking_details?: string | null;
   flat_number?: string;
   block_name?: string;
 }
@@ -197,7 +198,8 @@ export async function fetchAdminResidents(): Promise<AdminResidentItem[]> {
       profiles!flat_members_user_id_fkey (
         full_name,
         email,
-        mobile
+        mobile,
+        parking_details
       )
     `)
     .order('joined_at', { ascending: false });
@@ -209,9 +211,26 @@ export async function fetchAdminResidents(): Promise<AdminResidentItem[]> {
     full_name: row.full_name || row.profiles?.full_name || 'Resident',
     email: row.email || row.profiles?.email || '',
     mobile: row.mobile || row.profiles?.mobile || '',
+    parking_details: row.parking_details || row.profiles?.parking_details || null,
     flat_number: row.flats?.flat_number || '',
     block_name: row.flats?.blocks?.name || '',
   }));
+}
+
+export async function deleteAdminResident(memberId: string): Promise<void> {
+  const { error } = await supabase
+    .from('flat_members')
+    .delete()
+    .eq('id', memberId);
+  if (error) throw error;
+}
+
+export async function updateAdminResidentParking(memberId: string, parkingDetails: string): Promise<void> {
+  const { error } = await supabase
+    .from('flat_members')
+    .update({ parking_details: parkingDetails })
+    .eq('id', memberId);
+  if (error) throw error;
 }
 
 export async function fetchAdminFlats(): Promise<AdminFlatItem[]> {
@@ -266,4 +285,229 @@ export async function fetchAdminStats(): Promise<AdminStats> {
     occupiedFlats: memberRows.filter(m => m.status === 'Active').length,
     totalResidents: memberRows.filter(m => m.status === 'Active').length,
   };
+}
+
+export interface AdminPermissionItem {
+  id: string; // user_role id
+  user_id: string;
+  role_id: string;
+  user_name: string;
+  email: string;
+  photo_url?: string;
+  role_name: string;
+  modules: string;
+  status: 'Active' | 'Inactive';
+  created_at?: string;
+}
+
+export interface RoleItem {
+  id: string;
+  name: string;
+  description?: string | null;
+}
+
+export function getModulesForRole(roleName: string): string {
+  const r = (roleName || '').toLowerCase();
+  if (r === 'admin' || r.includes('society admin') || r.includes('super')) {
+    return 'All';
+  }
+  if (r.includes('event') || r.includes('festival') || r.includes('culture')) {
+    return 'Events & Festivals, Ticket/Budget Tracking, Event Communications';
+  }
+  if (r.includes('facility') || r.includes('helpdesk')) {
+    return 'Facility Bookings Approval, Amenity Management, Complaints Resolution';
+  }
+  if (r.includes('finance') || r.includes('treasurer')) {
+    return 'Donations & Finance, Sponsors & Partners, Campaign Verification';
+  }
+  if (r.includes('volunteer')) {
+    return 'Volunteers & Teams, Opportunity Scheduling';
+  }
+  if (r.includes('communication') || r.includes('pr')) {
+    return 'Notice Board & Announcements, Broadcast Dispatch';
+  }
+  if (r.includes('security') || r.includes('gate')) {
+    return 'Security Console, Visitor Gate Passes & Check-in';
+  }
+  return 'Resident Community Portal';
+}
+
+export async function fetchUserPermissionsList(): Promise<AdminPermissionItem[]> {
+  try {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select(`
+        id,
+        user_id,
+        role_id,
+        created_at,
+        profiles!user_roles_user_id_fkey (
+          id,
+          full_name,
+          email,
+          photo_url
+        ),
+        roles!user_roles_role_id_fkey (
+          id,
+          name,
+          description
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return (data || []).map((row: any) => {
+      const roleName = row.roles?.name || 'Resident';
+      return {
+        id: row.id,
+        user_id: row.user_id,
+        role_id: row.role_id,
+        user_name: row.profiles?.full_name || 'Unnamed Resident',
+        email: row.profiles?.email || 'No email',
+        photo_url: row.profiles?.photo_url || '',
+        role_name: roleName,
+        modules: getModulesForRole(roleName),
+        status: 'Active',
+        created_at: row.created_at,
+      };
+    });
+  } catch (err) {
+    console.error('Error fetching user permissions:', err);
+    return [];
+  }
+}
+
+export async function fetchAllAvailableRoles(): Promise<RoleItem[]> {
+  try {
+    const { data, error } = await supabase
+      .from('roles')
+      .select('id, name, description')
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+    if (data && data.length > 0) return data;
+
+    // Fallback standard roles if table is empty
+    return [
+      { id: 'admin', name: 'Admin', description: 'Full access across all society modules' },
+      { id: 'event-admin', name: 'Event Admin', description: 'Manage events, budget & registrations' },
+      { id: 'facility-admin', name: 'Facility Admin', description: 'Manage amenities, bookings & complaints' },
+      { id: 'finance-manager', name: 'Finance Manager', description: 'Manage contributions, donations & sponsors' },
+      { id: 'volunteer-coordinator', name: 'Volunteer Coordinator', description: 'Manage opportunities & teams' },
+      { id: 'communication-admin', name: 'Communication Admin', description: 'Manage notices & announcements' },
+      { id: 'security-guard', name: 'Security Guard', description: 'Manage visitor gate check-ins' },
+    ];
+  } catch (err) {
+    console.error('Error fetching available roles:', err);
+    return [];
+  }
+}
+
+export async function fetchAllUsersForPermissionDropdown(): Promise<Array<{ id: string; full_name: string; email: string; flat_number?: string }>> {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, full_name, email')
+      .order('full_name', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  } catch (err) {
+    console.error('Error fetching users for permissions:', err);
+    return [];
+  }
+}
+
+export async function assignUserRole(userId: string, roleId: string, replaceUserRoleId?: string): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  // If editing/replacing a specific user_role, delete the old one first
+  if (replaceUserRoleId) {
+    await supabase.from('user_roles').delete().eq('id', replaceUserRoleId);
+  }
+
+  // Check if roleId is a UUID or a name that needs lookup
+  let finalRoleId = roleId;
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(roleId);
+  
+  if (!isUuid) {
+    const { data: roleRow } = await supabase
+      .from('roles')
+      .select('id')
+      .ilike('name', roleId.replace('-', ' '))
+      .maybeSingle();
+    if (roleRow) {
+      finalRoleId = roleRow.id;
+    } else {
+      const { data: newRole, error: createError } = await supabase
+        .from('roles')
+        .insert({ name: roleId })
+        .select('id')
+        .single();
+      if (!createError && newRole) {
+        finalRoleId = newRole.id;
+      }
+    }
+  }
+
+  // Insert or upsert user role
+  const { error } = await supabase
+    .from('user_roles')
+    .upsert({
+      user_id: userId,
+      role_id: finalRoleId,
+      assigned_by: user?.id || null,
+    }, { onConflict: 'user_id,role_id' });
+
+  if (error) throw error;
+}
+
+export interface UserAssignedRoleItem {
+  id: string; // user_role id
+  role_id: string;
+  role_name: string;
+  role_description?: string | null;
+  created_at?: string;
+}
+
+export async function fetchRolesForUser(userId: string): Promise<UserAssignedRoleItem[]> {
+  try {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select(`
+        id,
+        role_id,
+        created_at,
+        roles!user_roles_role_id_fkey (
+          id,
+          name,
+          description
+        )
+      `)
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+
+    return (data || []).map((row: any) => ({
+      id: row.id,
+      role_id: row.role_id,
+      role_name: row.roles?.name || 'Resident',
+      role_description: row.roles?.description || null,
+      created_at: row.created_at,
+    }));
+  } catch (err) {
+    console.error('Error fetching user roles:', err);
+    return [];
+  }
+}
+
+export async function revokeUserRole(userRoleId: string): Promise<void> {
+  const { error } = await supabase
+    .from('user_roles')
+    .delete()
+    .eq('id', userRoleId);
+
+  if (error) throw error;
 }

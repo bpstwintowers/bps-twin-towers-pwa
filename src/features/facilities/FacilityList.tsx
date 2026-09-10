@@ -15,14 +15,15 @@ import {
   type FacilityItem,
 } from '../../services/supabase/facilityService';
 import { StatusBadge } from '../../components/ui/StatusBadge';
+import { useSearch } from '../../context/SearchContext';
 import './FacilityList.css';
 
 export const FacilityList: React.FC = () => {
   const navigate = useNavigate();
+  const { searchQuery, setSearchPlaceholder } = useSearch();
   const [facilities, setFacilities] = useState<FacilityItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState('ALL');
-  const [searchQuery, setSearchQuery] = useState('');
 
   const loadData = async () => {
     try {
@@ -35,6 +36,10 @@ export const FacilityList: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setSearchPlaceholder('Search amenities & facilities by name or location...');
+  }, [setSearchPlaceholder]);
 
   useEffect(() => {
     loadData();
@@ -58,8 +63,21 @@ export const FacilityList: React.FC = () => {
   return (
     <div className="facilities-container">
       <main className="facilities-content animate-fade-in">
-        {/* Top Action Row */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+        {/* Top Action Row & Category Filters */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                className={`admin-tab ${categoryFilter === cat ? 'active' : ''}`}
+                onClick={() => setCategoryFilter(cat)}
+                style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem' }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
           <button
             className="btn-outline"
             onClick={() => navigate('/my-bookings')}
@@ -68,42 +86,6 @@ export const FacilityList: React.FC = () => {
             <CalendarCheck size={16} />
             My Bookings
           </button>
-        </div>
-        {/* Search and Category Filters */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <div style={{ position: 'relative', marginBottom: '0.75rem' }}>
-            <Search
-              size={18}
-              style={{
-                position: 'absolute',
-                left: '0.85rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: 'var(--text-muted)',
-              }}
-            />
-            <input
-              type="text"
-              className="admin-search-input"
-              style={{ width: '100%', paddingLeft: '2.5rem' }}
-              placeholder="Search facility by name or location (e.g. Badminton, Clubhouse)..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                className={`admin-tab ${categoryFilter === cat ? 'active' : ''}`}
-                onClick={() => setCategoryFilter(cat)}
-                style={{ padding: '0.4rem 0.85rem', fontSize: '0.82rem' }}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Facilities Grid */}

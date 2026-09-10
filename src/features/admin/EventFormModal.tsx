@@ -306,6 +306,65 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             </div>
           </div>
 
+          <div style={{ marginBottom: '0.85rem' }}>
+            <label style={{ display: 'block', fontSize: '0.82rem', marginBottom: '0.25rem', fontWeight: 600 }}>
+              Hero Banner Image URL
+            </label>
+            <input
+              type="url"
+              className="admin-search-input"
+              style={{ width: '100%' }}
+              placeholder="https://images.unsplash.com/... (direct .jpg / .png / .webp link)"
+              value={bannerUrl}
+              onChange={(e) => setBannerUrl(e.target.value)}
+            />
+            <span style={{ display: 'block', fontSize: '0.74rem', color: '#64748b', marginTop: '0.25rem' }}>
+              💡 Direct image URL only (e.g. Unsplash, .jpg, .png). Avoid pasting webpage links.
+            </span>
+            <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.4rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => setBannerUrl('https://images.unsplash.com/photo-1567591370504-20a2bf4762c3?q=80&w=1600&auto=format&fit=crop')}
+                style={{ fontSize: '0.72rem', padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#f8fafc', cursor: 'pointer' }}
+              >
+                🪔 Ganesh Utsav
+              </button>
+              <button
+                type="button"
+                onClick={() => setBannerUrl('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600&auto=format&fit=crop')}
+                style={{ fontSize: '0.72rem', padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#f8fafc', cursor: 'pointer' }}
+              >
+                🎆 Diwali
+              </button>
+              <button
+                type="button"
+                onClick={() => setBannerUrl('https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1600&auto=format&fit=crop')}
+                style={{ fontSize: '0.72rem', padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#f8fafc', cursor: 'pointer' }}
+              >
+                🎭 Cultural
+              </button>
+              <button
+                type="button"
+                onClick={() => setBannerUrl('https://images.unsplash.com/photo-1526676037777-05a232554f77?q=80&w=1600&auto=format&fit=crop')}
+                style={{ fontSize: '0.72rem', padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#f8fafc', cursor: 'pointer' }}
+              >
+                🏆 Sports
+              </button>
+            </div>
+            {bannerUrl.trim() && (
+              <div style={{ marginTop: '0.5rem', height: '90px', borderRadius: '6px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f1f5f9' }}>
+                <img
+                  src={bannerUrl}
+                  alt="Banner preview"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
           <div style={{ marginBottom: '1.25rem' }}>
             <label style={{ display: 'block', fontSize: '0.82rem', marginBottom: '0.25rem', fontWeight: 600 }}>
               Description / Instructions

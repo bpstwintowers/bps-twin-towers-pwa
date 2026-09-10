@@ -18,6 +18,7 @@ import {
 } from '../../services/supabase/complaintService';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { ComplaintAssignModal } from './ComplaintAssignModal';
+import './AdminPortal.css';
 
 export const AdminComplaints: React.FC = () => {
   const [complaints, setComplaints] = useState<ComplaintItem[]>([]);

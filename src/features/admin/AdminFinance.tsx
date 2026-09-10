@@ -28,6 +28,7 @@ import {
 } from '../../services/supabase/financeService';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { CampaignFormModal } from './CampaignFormModal';
+import './AdminPortal.css';
 
 type FinanceSubTab = 'verification' | 'campaigns' | 'ledger';
 

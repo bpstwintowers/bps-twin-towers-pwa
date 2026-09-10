@@ -41,6 +41,8 @@ export interface EventItem {
   cancellation_reason: string | null;
   published_at: string | null;
   created_by: string | null;
+  updated_by?: string | null;
+  metadata?: any;
   created_at: string;
   updated_at: string;
   confirmed_count?: number;
@@ -103,7 +105,7 @@ export interface CreateEventPayload {
   start_time: string;
   end_date: string;
   end_time: string;
-  banner_url?: string;
+  banner_url?: string | null;
   capacity?: number;
   registration_required?: boolean;
   registration_start?: string;
@@ -380,8 +382,10 @@ export async function createAdminEvent(payload: CreateEventPayload): Promise<Eve
 
 export async function updateAdminEvent(
   id: string,
-  payload: Partial<CreateEventPayload>
+  payload: Partial<CreateEventPayload> & { metadata?: any }
 ): Promise<EventItem> {
+  const { data: { user } } = await supabase.auth.getUser();
+
   const { data, error } = await supabase
     .from('events')
     .update({
@@ -399,6 +403,8 @@ export async function updateAdminEvent(
       ...(payload.registration_required !== undefined && { registration_required: payload.registration_required }),
       ...(payload.registration_start !== undefined && { registration_start: payload.registration_start || null }),
       ...(payload.registration_end !== undefined && { registration_end: payload.registration_end || null }),
+      ...(payload.metadata !== undefined && { metadata: payload.metadata }),
+      ...(user && { updated_by: user.id }),
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)

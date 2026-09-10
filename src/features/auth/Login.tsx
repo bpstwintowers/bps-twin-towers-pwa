@@ -10,6 +10,8 @@ import {
   type FlatSearchResult,
   type FlatResidentInfo,
 } from '../../services/supabase/registrationService';
+import { fetchUserRoles } from '../../services/supabase/adminService';
+import { isSuperAdmin, hasAnyAdminRole } from '../../utils/rbac';
 import {
   Search,
   Building2,
@@ -100,11 +102,23 @@ const Login: React.FC = () => {
           const pendingAuth = pendingAuthStr ? JSON.parse(pendingAuthStr) : null;
           if (pendingAuthStr) sessionStorage.removeItem('pending_active_resident_auth');
 
-          // Parallel query execution: resolve access and check registrations concurrently
-          const [accessInfo, registrations] = await Promise.all([
+          // Parallel query execution: resolve access, check registrations, and check roles
+          const [accessInfo, registrations, userRoles] = await Promise.all([
             resolveUserAccess().catch(() => []),
             getUserRegistrations().catch(() => []),
+            fetchUserRoles().catch(() => ['Resident']),
           ]);
+
+          const isAdminUser =
+            activeUser.email?.toLowerCase().trim() === 'bpstwintowers.society@gmail.com' ||
+            isSuperAdmin(userRoles, activeUser.email) ||
+            hasAnyAdminRole(userRoles, activeUser.email);
+
+          // Admin / Full Control Access Bypass: Does not require flat assignment!
+          if (isAdminUser) {
+            navigate('/admin', { replace: true });
+            return;
+          }
 
           if (accessInfo && accessInfo.length > 0) {
             const hasActiveAccess = accessInfo.some(
@@ -382,8 +396,8 @@ const Login: React.FC = () => {
               <img src="/logo.png" alt="BPS Twin Towers Emblem" className="brand-logo-img" />
             </div>
             <div className="brand-text-block">
-              <span className="brand-super-title">Saidabad • Hyderabad</span>
               <h2 className="brand-name-title">BPS TWIN TOWERS</h2>
+              <span className="brand-super-title">Saidabad • Hyderabad</span>
             </div>
           </div>
 

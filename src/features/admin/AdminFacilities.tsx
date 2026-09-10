@@ -23,6 +23,7 @@ import {
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { FacilityFormModal } from './FacilityFormModal';
 import { MaintenanceBlockModal } from './MaintenanceBlockModal';
+import './AdminPortal.css';
 
 export const AdminFacilities: React.FC = () => {
   const [facilities, setFacilities] = useState<FacilityItem[]>([]);

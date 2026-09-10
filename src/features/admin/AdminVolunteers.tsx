@@ -33,6 +33,7 @@ import {
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { OpportunityFormModal } from './OpportunityFormModal';
 import { supabase } from '../../services/supabase/client';
+import './AdminPortal.css';
 
 type VolunteerSubTab = 'opportunities' | 'teams' | 'attendance';
 
