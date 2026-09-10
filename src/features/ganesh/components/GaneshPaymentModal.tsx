@@ -136,29 +136,78 @@ export const GaneshPaymentModal: React.FC<Props> = ({
             Scan with <strong>PhonePe, Google Pay, Paytm, BHIM</strong>, or any UPI app
           </p>
 
-          {/* Mobile Intent Direct Launch Button */}
-          <div style={{ width: '100%', marginBottom: '1rem' }}>
+          {/* Mobile Intent Direct Launch Buttons */}
+          <div style={{ width: '100%', marginBottom: '1.15rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.45rem', marginBottom: '0.45rem' }}>
+              <a
+                href={`phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&cu=INR&tn=${encodeURIComponent('BPS Ganesh Utsav')}`}
+                onClick={() => handleCopy(upiId, 'upi')}
+                className="btn-festive-primary"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  textDecoration: 'none',
+                  fontSize: '0.82rem',
+                  padding: '0.65rem 0.6rem',
+                  background: '#5f259f',
+                  color: '#ffffff',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  boxShadow: '0 2px 8px rgba(95, 37, 159, 0.25)',
+                }}
+              >
+                <span>🟣</span>
+                <span>PhonePe</span>
+              </a>
+
+              <a
+                href={`tez://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&cu=INR&tn=${encodeURIComponent('BPS Ganesh Utsav')}`}
+                onClick={() => handleCopy(upiId, 'upi')}
+                className="btn-festive-primary"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  textDecoration: 'none',
+                  fontSize: '0.82rem',
+                  padding: '0.65rem 0.6rem',
+                  background: '#1a73e8',
+                  color: '#ffffff',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  boxShadow: '0 2px 8px rgba(26, 115, 232, 0.25)',
+                }}
+              >
+                <span>🔵</span>
+                <span>Google Pay</span>
+              </a>
+            </div>
+
             <a
               href={upiUrl}
+              onClick={() => handleCopy(upiId, 'upi')}
               className="btn-festive-primary"
               style={{
                 width: '100%',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                gap: '0.5rem',
+                gap: '0.45rem',
                 textDecoration: 'none',
-                fontSize: '0.95rem',
-                padding: '0.8rem 1.2rem',
+                fontSize: '0.88rem',
+                padding: '0.65rem 1rem',
                 background: 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
                 color: '#ffffff',
-                borderRadius: '14px',
+                borderRadius: '12px',
                 fontWeight: 700,
-                boxShadow: '0 4px 14px rgba(234, 88, 12, 0.28)',
+                boxShadow: '0 4px 12px rgba(234, 88, 12, 0.25)',
               }}
             >
-              <Smartphone size={19} />
-              <span>Open in PhonePe / UPI App</span>
+              <Smartphone size={17} />
+              <span>Open in Any UPI App</span>
             </a>
           </div>
 
