@@ -381,9 +381,11 @@ const DEFAULT_EXPENSES: GaneshExpenseRecord[] = [
 ];
 
 export const GOOGLE_SHEET_EXPENSES_STORAGE_KEY = 'bps_ganesh_expense_sheet_url';
+export const DEFAULT_EXPENSE_SHEET_URL =
+  'https://docs.google.com/spreadsheets/d/1S1jLDNtDtoen4xCufk3z5ks-kEHDtfWGvjDMpjN0I0g/edit?gid=0#gid=0';
 
 export function getExpenseSheetUrl(): string {
-  return localStorage.getItem(GOOGLE_SHEET_EXPENSES_STORAGE_KEY) || '';
+  return localStorage.getItem(GOOGLE_SHEET_EXPENSES_STORAGE_KEY) || DEFAULT_EXPENSE_SHEET_URL;
 }
 
 export function setExpenseSheetUrl(url: string): void {
@@ -664,9 +666,11 @@ export function addGaneshContribution(contribution: Omit<GaneshContributionRecor
 }
 
 export const APPS_SCRIPT_STORAGE_KEY = 'bps_ganesh_apps_script_url';
+export const DEFAULT_APPS_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbxRGpinnY0Smkl1C2_mvljN9Z303okeR7asK7Cee7SJE4ItJc2U1x8mbhUcq9O8eMn0/exec';
 
 export function getAppsScriptUrl(): string {
-  return localStorage.getItem(APPS_SCRIPT_STORAGE_KEY) || '';
+  return localStorage.getItem(APPS_SCRIPT_STORAGE_KEY) || DEFAULT_APPS_SCRIPT_URL;
 }
 
 export function setAppsScriptUrl(url: string): void {
