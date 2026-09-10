@@ -334,16 +334,18 @@ export const GaneshContributorsList: React.FC<Props> = ({
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap', marginLeft: 'auto' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexShrink: 0, marginLeft: 'auto' }}>
                   <button
                     type="button"
                     onClick={onOpenSponsorModal}
+                    title="Add Special Sponsorship"
+                    className="ganesh-header-action-btn sponsor-action-btn"
                     style={{
                       background: '#fff7ed',
                       border: '1px solid #fdba74',
                       color: '#c2410c',
                       padding: '0.25rem 0.6rem',
-                      borderRadius: '6px',
+                      borderRadius: '8px',
                       fontSize: '0.72rem',
                       fontWeight: 700,
                       cursor: 'pointer',
@@ -352,7 +354,8 @@ export const GaneshContributorsList: React.FC<Props> = ({
                       gap: '0.25rem',
                     }}
                   >
-                    <Sparkles size={12} /> + Sponsor
+                    <Sparkles size={13} />
+                    <span className="ganesh-header-btn-label">+ Sponsor</span>
                   </button>
                 </div>
               </div>
@@ -389,7 +392,7 @@ export const GaneshContributorsList: React.FC<Props> = ({
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap', marginLeft: 'auto' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexShrink: 0, marginLeft: 'auto' }}>
                   {residentContributionsList.length > 2 && (
                     <>
                       <span className="ganesh-column-badge badge-live-scroll">
@@ -411,12 +414,14 @@ export const GaneshContributorsList: React.FC<Props> = ({
                   <button
                     type="button"
                     onClick={onOpenContributeModal}
+                    title="Contribute Voluntary Amount"
+                    className="ganesh-header-action-btn contribute-action-btn"
                     style={{
                       background: '#ea580c',
                       border: 'none',
                       color: '#ffffff',
                       padding: '0.25rem 0.6rem',
-                      borderRadius: '6px',
+                      borderRadius: '8px',
                       fontSize: '0.72rem',
                       fontWeight: 700,
                       cursor: 'pointer',
@@ -425,7 +430,8 @@ export const GaneshContributorsList: React.FC<Props> = ({
                       gap: '0.25rem',
                     }}
                   >
-                    <QrCode size={12} /> + Contribute
+                    <QrCode size={13} />
+                    <span className="ganesh-header-btn-label">+ Contribute</span>
                   </button>
                 </div>
               </div>

@@ -842,7 +842,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.5rem;
   padding-bottom: 0.75rem;
   margin-bottom: 0.85rem;
@@ -857,6 +857,34 @@
   align-items: center;
   gap: 0.45rem;
   margin: 0;
+}
+
+@media (max-width: 640px) {
+  .ganesh-column-header {
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .ganesh-column-title {
+    font-size: 0.85rem !important;
+  }
+
+  .ganesh-header-btn-label {
+    display: none !important;
+  }
+
+  .ganesh-header-action-btn {
+    padding: 0 !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
+  }
 }
 
 .ganesh-column-badge {
