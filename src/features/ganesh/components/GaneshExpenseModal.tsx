@@ -85,17 +85,22 @@ export const GaneshExpenseModal: React.FC<Props> = ({
         onClick={(e) => e.stopPropagation()}
         style={{
           maxWidth: '520px',
-          width: '92%',
+          width: '94%',
+          maxHeight: 'calc(100dvh - 28px)',
+          display: 'flex',
+          flexDirection: 'column',
           borderRadius: '20px',
           overflow: 'hidden',
           boxShadow: '0 20px 40px -10px rgba(0,0,0,0.3)',
+          background: '#ffffff',
         }}
       >
         {/* Header */}
         <div
           className="ganesh-modal-header"
           style={{
-            padding: '1.25rem 1.4rem',
+            flexShrink: 0,
+            padding: '1rem 1.25rem',
             background: 'linear-gradient(135deg, #9f1239 0%, #e11d48 100%)',
             color: '#ffffff',
             display: 'flex',
@@ -106,10 +111,10 @@ export const GaneshExpenseModal: React.FC<Props> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <Receipt size={22} color="#fecdd3" />
             <div>
-              <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.15rem', fontWeight: 800 }}>
+              <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.1rem', fontWeight: 800 }}>
                 Record Festival Expense
               </h3>
-              <span style={{ fontSize: '0.78rem', color: '#ffe4e6', fontWeight: 500 }}>
+              <span style={{ fontSize: '0.75rem', color: '#ffe4e6', fontWeight: 500 }}>
                 Audited payout ledger & vendor receipt entry
               </span>
             </div>
@@ -124,8 +129,19 @@ export const GaneshExpenseModal: React.FC<Props> = ({
           </button>
         </div>
 
-        {/* Body */}
-        <form onSubmit={handleSubmit} style={{ padding: '1.4rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {/* Body (Scrollable container) */}
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            padding: '1.15rem 1.25rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.85rem',
+            overflowY: 'auto',
+            flex: 1,
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
           {showSuccessToast && (
             <div
               style={{

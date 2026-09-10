@@ -51,6 +51,9 @@ export const GaneshPaymentModal: React.FC<Props> = ({
         style={{
           maxWidth: '460px',
           width: '92%',
+          maxHeight: 'calc(100dvh - 28px)',
+          display: 'flex',
+          flexDirection: 'column',
           borderRadius: '24px',
           overflow: 'hidden',
           boxShadow: '0 20px 40px -10px rgba(0,0,0,0.25)',
@@ -61,8 +64,9 @@ export const GaneshPaymentModal: React.FC<Props> = ({
         <div
           className="ganesh-modal-header"
           style={{
+            flexShrink: 0,
             background: 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
-            padding: '1.2rem 1.4rem',
+            padding: '1rem 1.25rem',
             borderBottom: 'none',
           }}
         >
@@ -83,7 +87,17 @@ export const GaneshPaymentModal: React.FC<Props> = ({
         </div>
 
         {/* Modal Body */}
-        <div className="ganesh-modal-body" style={{ padding: '1.5rem', background: '#ffffff', textAlign: 'center' }}>
+        <div
+          className="ganesh-modal-body"
+          style={{
+            padding: '1.25rem',
+            background: '#ffffff',
+            textAlign: 'center',
+            overflowY: 'auto',
+            flex: 1,
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
           <div style={{ marginBottom: '0.85rem' }}>
             <span
               style={{
