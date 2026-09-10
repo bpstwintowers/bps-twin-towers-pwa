@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, ChevronDown, FileSpreadsheet, RefreshCw } from 'lucide-react';
+import { Shield, ChevronDown, FileSpreadsheet, RefreshCw, Menu, X as CloseIcon } from 'lucide-react';
 
 interface Props {
   isAdmin?: boolean;
@@ -19,10 +19,10 @@ interface Props {
 export const HeaderNavbar: React.FC<Props> = ({
   isAdmin = true,
   onSelectPrintView,
-  onSelectAdminConsole,
+  onSelectAdminConsole: _onSelectAdminConsole,
   onSelectAdminSync,
-  onOpenContributionModal,
-  onOpenSponsorModal,
+  onOpenContributionModal: _onOpenContributionModal,
+  onOpenSponsorModal: _onOpenSponsorModal,
   onOpenExpenseModal,
   onExportCSV,
   userFlat = '',
@@ -89,12 +89,12 @@ export const HeaderNavbar: React.FC<Props> = ({
               title="Sync latest rows from Google Sheets"
             >
               <RefreshCw
-                size={13}
+                size={14}
                 style={{
                   animation: isLoading ? 'spin 1s linear infinite' : 'none',
                 }}
               />
-              <span>{isLoading ? '...' : 'Sync'}</span>
+              <span className="ganesh-nav-btn-text">{isLoading ? '...' : 'Sync'}</span>
             </button>
           )}
 
@@ -118,15 +118,19 @@ export const HeaderNavbar: React.FC<Props> = ({
             title="Click to change your Flat Number"
           >
             <span>🏠</span>
-            <span>{flatButtonText}</span>
+            <span className="ganesh-nav-btn-text">{flatButtonText}</span>
+            <span className="ganesh-nav-btn-text-mobile">
+              {userFlat && userFlat !== 'GUEST' ? userFlat.replace(/^FLAT\s*/i, '').toUpperCase() : 'Flat'}
+            </span>
           </button>
 
           {isAdmin && (
             <div style={{ position: 'relative' }}>
               <button
                 type="button"
-                className="ganesh-nav-btn"
+                className="ganesh-nav-btn ganesh-hamburger-btn"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                title="Admin & Print Menu"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -140,15 +144,20 @@ export const HeaderNavbar: React.FC<Props> = ({
                   whiteSpace: 'nowrap',
                 }}
               >
-                <Shield size={14} color="#ea580c" />
-                <span>Admin</span>
-                <ChevronDown
-                  size={13}
-                  style={{
-                    transform: isDropdownOpen ? 'rotate(180deg)' : 'none',
-                    transition: 'transform 0.2s ease',
-                  }}
-                />
+                <span className="desktop-only-flex" style={{ alignItems: 'center', gap: '0.25rem' }}>
+                  <Shield size={14} color="#ea580c" />
+                  <span>Admin Menu</span>
+                  <ChevronDown
+                    size={13}
+                    style={{
+                      transform: isDropdownOpen ? 'rotate(180deg)' : 'none',
+                      transition: 'transform 0.2s ease',
+                    }}
+                  />
+                </span>
+                <span className="mobile-only-flex" style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  {isDropdownOpen ? <CloseIcon size={16} color="#c2410c" /> : <Menu size={16} color="#c2410c" />}
+                </span>
               </button>
 
               {isDropdownOpen && (
