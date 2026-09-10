@@ -9,6 +9,8 @@ import {
   CheckCircle2,
   X,
   ArrowLeft,
+  ExternalLink,
+  Loader2,
 } from 'lucide-react';
 import type {
   GaneshSankalpamRecord,
@@ -19,6 +21,10 @@ import type {
 import {
   addOrUpdateGaneshSankalpam,
 } from '../../../services/ganeshService';
+import {
+  submitGothramToGoogleSheet,
+  getGoogleFormUrl,
+} from '../../../services/liveSheetService';
 
 interface Props {
   sankalpams: GaneshSankalpamRecord[];
@@ -59,6 +65,8 @@ export const GaneshSankalpamForm: React.FC<Props> = ({
   const [internalViewMode, setInternalViewMode] = useState<'families' | 'pujari' | 'expenses' | 'contributions'>('families');
   const [internalIsModalOpen, setInternalIsModalOpen] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [syncStatusText, setSyncStatusText] = useState('Synced with Google Sheet & Local Ledger');
 
   const viewMode = activeViewMode !== undefined ? activeViewMode : internalViewMode;
   const setViewMode = (mode: 'families' | 'pujari' | 'expenses' | 'contributions') => {
@@ -127,7 +135,7 @@ export const GaneshSankalpamForm: React.FC<Props> = ({
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!flatNo.trim()) {
       alert('Please provide your flat number (e.g. B901)');
@@ -148,19 +156,37 @@ export const GaneshSankalpamForm: React.FC<Props> = ({
       return;
     }
 
-    addOrUpdateGaneshSankalpam({
-      flatNo: flatNo.trim().toUpperCase(),
-      primaryResidentName: primaryResidentName.trim(),
-      gothram: gothram.trim(),
-      familyMembers: validMembers,
-    });
+    setIsSubmitting(true);
+    try {
+      // 1. Optimistic Local Save
+      addOrUpdateGaneshSankalpam({
+        flatNo: flatNo.trim().toUpperCase(),
+        primaryResidentName: primaryResidentName.trim(),
+        gothram: gothram.trim(),
+        familyMembers: validMembers,
+      });
 
-    setIsSaved(true);
-    onRefresh();
-    setTimeout(() => {
-      setIsSaved(false);
-      setIsModalOpen(false);
-    }, 1500);
+      // 2. Submit to Google Apps Script / Google Sheet Webhook
+      const res = await submitGothramToGoogleSheet({
+        flatNo: flatNo.trim().toUpperCase(),
+        primaryResidentName: primaryResidentName.trim(),
+        gothram: gothram.trim(),
+        familyMembers: validMembers,
+      });
+
+      setSyncStatusText(res.message || 'Saved to Google Sheet & Local Registry!');
+      setIsSaved(true);
+      onRefresh();
+      setTimeout(() => {
+        setIsSaved(false);
+        setIsSubmitting(false);
+        setIsModalOpen(false);
+      }, 1600);
+    } catch (err) {
+      console.error('Error submitting Gothram details:', err);
+      setIsSubmitting(false);
+      alert('Error submitting to Google Sheet. Details saved locally.');
+    }
   };
 
   const filteredSankalpams = sankalpams;
@@ -181,13 +207,37 @@ export const GaneshSankalpamForm: React.FC<Props> = ({
           <div
             className="ganesh-modal-content"
             onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: '680px', width: '95%' }}
+            style={{ maxWidth: '680px', width: '95%', maxHeight: 'calc(100dvh - 28px)', display: 'flex', flexDirection: 'column' }}
           >
-            <div className="ganesh-modal-header" style={{ padding: '0.8rem 1.15rem' }}>
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: '#ffffff', margin: 0, fontSize: '1.02rem', fontWeight: 700 }}>
-                <Sparkles size={17} color="#fef08a" />
-                Add / Update Gothram & Family Details
-              </h3>
+            <div className="ganesh-modal-header" style={{ padding: '0.85rem 1.25rem', flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: '#ffffff', margin: 0, fontSize: '1.02rem', fontWeight: 700 }}>
+                  <Sparkles size={17} color="#fef08a" />
+                  Add / Update Gothram &amp; Family Details
+                </h3>
+                <a
+                  href={getGoogleFormUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="no-print"
+                  style={{
+                    background: 'rgba(255,255,255,0.2)',
+                    border: '1px solid rgba(255,255,255,0.4)',
+                    color: '#ffffff',
+                    padding: '0.22rem 0.6rem',
+                    borderRadius: '6px',
+                    fontSize: '0.74rem',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                  }}
+                  title="Open official Google Form"
+                >
+                  <ExternalLink size={12} /> Fill via Google Form
+                </a>
+              </div>
               <button
                 className="ganesh-modal-close-btn"
                 onClick={() => setIsModalOpen(false)}
@@ -197,7 +247,7 @@ export const GaneshSankalpamForm: React.FC<Props> = ({
               </button>
             </div>
 
-            <div className="ganesh-modal-body">
+            <div className="ganesh-modal-body" style={{ overflowY: 'auto', flex: 1, padding: '1.25rem' }}>
               {isSaved ? (
                 <div
                   style={{
@@ -214,8 +264,11 @@ export const GaneshSankalpamForm: React.FC<Props> = ({
                   <h4 style={{ margin: '0 0 0.4rem 0', color: '#065f46', fontSize: '1.2rem' }}>
                     Gothram Details Saved Successfully!
                   </h4>
-                  <p style={{ margin: 0, color: '#047857', fontSize: '0.9rem' }}>
+                  <p style={{ margin: 0, color: '#047857', fontSize: '0.9rem', fontWeight: 600 }}>
                     Flat {flatNo} registered with {gothram} Gothram for Ganesh Utsav 2026.
+                  </p>
+                  <p style={{ margin: '0.4rem 0 0 0', color: '#059669', fontSize: '0.8rem' }}>
+                    ✓ {syncStatusText}
                   </p>
                 </div>
               ) : (
@@ -398,20 +451,42 @@ export const GaneshSankalpamForm: React.FC<Props> = ({
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.75rem' }}>
                     <button
                       type="button"
                       className="ganesh-modal-cancel-btn"
                       onClick={() => setIsModalOpen(false)}
+                      disabled={isSubmitting}
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
+                      disabled={isSubmitting}
                       className="btn-festive-primary"
-                      style={{ background: '#ea580c', color: '#ffffff', padding: '0.7rem 1.6rem', borderRadius: '12px', border: 'none', fontWeight: 700 }}
+                      style={{
+                        background: '#ea580c',
+                        color: '#ffffff',
+                        padding: '0.7rem 1.6rem',
+                        borderRadius: '12px',
+                        border: 'none',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                        opacity: isSubmitting ? 0.8 : 1,
+                      }}
                     >
-                      <Heart size={16} /> Save Gothram Details
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" /> Syncing to Google Sheet...
+                        </>
+                      ) : (
+                        <>
+                          <Heart size={16} /> Save Gothram Details
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>

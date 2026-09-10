@@ -610,47 +610,6 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
                 </div>
               </div>
             </div>
-
-            {/*
-            Target Festival Budget Card (Commented out):
-            <div
-              className="ganesh-metric-card is-clickable"
-              onClick={() => setIsCollectionsPopupOpen(true)}
-              title="Click to view Community Progress &amp; Contributions"
-            >
-              <div className="ganesh-metric-icon-wrap icon-orange">
-                <TrendingUp size={24} />
-              </div>
-              <div className="ganesh-metric-info">
-                <span className="ganesh-metric-label">Target Festival Budget</span>
-                <span className="ganesh-metric-value">
-                  ₹{summary.targetBudget.toLocaleString('en-IN')}
-                </span>
-                <span className="ganesh-metric-subtext">{progressPercentage}% Target Achieved • Click to view</span>
-              </div>
-            </div>
-
-            Net Surplus Balance Card (Commented out):
-            <div
-              className="ganesh-metric-card is-clickable"
-              onClick={() => setIsExpensesPopupOpen(true)}
-              title="Click to view Financial Reserve &amp; Expenses"
-            >
-              <div className="ganesh-metric-icon-wrap icon-emerald">
-                <DollarSign size={24} />
-              </div>
-              <div className="ganesh-metric-info">
-                <span className="ganesh-metric-label">Net Surplus Balance</span>
-                <span
-                  className="ganesh-metric-value"
-                  style={{ color: summary.netBalance >= 0 ? '#047857' : '#e11d48' }}
-                >
-                  ₹{summary.netBalance.toLocaleString('en-IN')}
-                </span>
-                <span className="ganesh-metric-subtext">Available Festival Reserve • Click to view</span>
-              </div>
-            </div>
-            */}
           </div>
         )}
 
@@ -809,11 +768,32 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
             {/* Embedded Gothram & Sankalpam Section inside the same card */}
             {mySankalpam ? (
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.2rem' }}>
-                  <span style={{ fontSize: '1rem' }}>🙏</span>
-                  <h4 style={{ margin: 0, color: '#92400e', fontSize: '0.92rem', fontWeight: 800 }}>
-                    Gothram: {mySankalpam.gothram}
-                  </h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.2rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <span style={{ fontSize: '1rem' }}>🙏</span>
+                    <h4 style={{ margin: 0, color: '#92400e', fontSize: '0.92rem', fontWeight: 800 }}>
+                      Gothram: {mySankalpam.gothram}
+                    </h4>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsGoogleFormModalOpen(true)}
+                    style={{
+                      background: '#ffffff',
+                      border: '1px solid #fdba74',
+                      color: '#c2410c',
+                      borderRadius: '8px',
+                      padding: '0.2rem 0.55rem',
+                      fontSize: '0.74rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.3rem',
+                    }}
+                  >
+                    <Sparkles size={12} /> Edit Gothram (Google Form)
+                  </button>
                 </div>
                 <div style={{ fontSize: '0.74rem', color: '#b45309', marginBottom: '0.3rem' }}>
                   {mySankalpam.familyMembers?.length || 0} family members registered for daily Sankalpam
@@ -861,23 +841,24 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
                 </div>
                 <button
                   type="button"
-                  onClick={() => setIsGothramModalOpen(true)}
+                  onClick={() => setIsGoogleFormModalOpen(true)}
                   className="btn-festive-primary"
                   style={{
                     background: '#ea580c',
                     color: '#ffffff',
                     border: 'none',
                     borderRadius: '10px',
-                    padding: '0.5rem 1rem',
+                    padding: '0.52rem 1.1rem',
                     fontWeight: 700,
-                    fontSize: '0.85rem',
+                    fontSize: '0.86rem',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.4rem',
+                    gap: '0.45rem',
                     cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(234, 88, 12, 0.2)',
                   }}
                 >
-                  <Plus size={15} /> Register Gothram for Flat {userFlat.toUpperCase()}
+                  <Sparkles size={16} /> Register Gothram for Flat {userFlat.toUpperCase()}
                 </button>
               </div>
             )}
