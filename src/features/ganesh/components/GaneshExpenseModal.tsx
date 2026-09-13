@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Receipt, CheckCircle, Plus } from 'lucide-react';
-import { addGaneshExpense } from '../../../services/ganeshService';
+import { addGaneshExpense } from '../../../services/liveSheetService';
 import type { GaneshExpenseCategory, GaneshExpenseRecord, GaneshPaymentMode } from '../../../types/ganesh';
 
 interface Props {
@@ -68,14 +68,15 @@ export const GaneshExpenseModal: React.FC<Props> = ({
   };
 
   const categories: GaneshExpenseCategory[] = [
+    'Idol & Visarjan',
     'Pandal & Decoration',
     'Priest & Puja Samagri',
     'Mahaprasadam & Food',
-    'Idol & Visarjan',
     'Sound & Lighting',
     'Cultural Events & Gifts',
     'Security & Cleaning',
     'Misc & Contingency',
+    'Celebrations',
   ];
 
   return (

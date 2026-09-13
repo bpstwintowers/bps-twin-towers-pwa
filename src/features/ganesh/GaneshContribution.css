@@ -542,6 +542,169 @@
   color: #7c3aed;
 }
 
+/* ==========================================================================
+   INTERACTIVE FESTIVAL MENU CARDS (CONTRIBUTIONS, EXPENSES, POOJA, SPOCS, SANKALPAM)
+   ========================================================================== */
+.ganesh-menu-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+  margin: 1.5rem 0 1.5rem 0;
+}
+
+.ganesh-menu-nav-card {
+  background: #ffffff;
+  border: 1.5px solid #fed7aa;
+  border-radius: 16px;
+  padding: 1rem 1.15rem;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.65rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.ganesh-menu-nav-card:hover {
+  transform: translateY(-3px);
+  border-color: #ea580c;
+  box-shadow: 0 8px 20px rgba(234, 88, 12, 0.15);
+}
+
+.ganesh-menu-nav-card.active {
+  border-color: #ea580c;
+  background: linear-gradient(135deg, #fffaf5 0%, #fff7ed 100%);
+  box-shadow: 0 0 0 2px #ea580c, 0 8px 22px rgba(234, 88, 12, 0.18);
+}
+
+.ganesh-menu-nav-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  background: transparent;
+  transition: background 0.2s ease;
+}
+
+.ganesh-menu-nav-card.active::after {
+  background: linear-gradient(90deg, #ea580c, #f59e0b);
+}
+
+.menu-nav-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.menu-nav-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.menu-nav-icon-wrap.icon-gold {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.menu-nav-icon-wrap.icon-rose {
+  background: #ffe4e6;
+  color: #e11d48;
+}
+
+.menu-nav-icon-wrap.icon-amber {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.menu-nav-icon-wrap.icon-blue {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.menu-nav-icon-wrap.icon-teal {
+  background: #dcfce7;
+  color: #10b981;
+}
+
+.menu-nav-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.18rem 0.55rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.menu-nav-badge.count-gold {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.menu-nav-badge.count-rose {
+  background: #ffe4e6;
+  color: #be123c;
+}
+
+.menu-nav-badge.count-amber {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.menu-nav-badge.count-blue {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.menu-nav-badge.count-teal {
+  background: #dcfce7;
+  color: #047857;
+}
+
+.menu-nav-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.ganesh-menu-nav-card.active .menu-nav-title {
+  color: #9a3412;
+}
+
+.menu-nav-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #64748b);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.menu-nav-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #ea580c;
+  border-top: 1px dashed #fed7aa;
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.ganesh-menu-nav-card:hover .menu-nav-footer {
+  color: #c2410c;
+}
+
 /* Tabs Navigation */
 .ganesh-tabs-container {
   display: flex;
@@ -2008,5 +2171,114 @@
 
   .ganesh-countdown-colon {
     font-size: 0.72rem;
+  }
+}
+
+/* ==========================================================================
+   PRINT ARCHANA & GOTHRAM REGISTRY PRINT RULES
+   ========================================================================== */
+.sankalpam-printable-sheet,
+.ganesh-print-sheet-content {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.ganesh-print-modal-header h3,
+.ganesh-modal-header.ganesh-print-modal-header h3 {
+  color: #7c2d12 !important;
+}
+
+.sankalpam-printable-sheet h2,
+.sankalpam-printable-sheet h3,
+.sankalpam-printable-sheet p,
+.sankalpam-printable-sheet span,
+.sankalpam-printable-sheet strong,
+.sankalpam-printable-sheet td,
+.sankalpam-printable-sheet th,
+.sankalpam-printable-sheet ol,
+.sankalpam-printable-sheet li {
+  color: #0f172a !important;
+}
+
+.sankalpam-printable-sheet h2 {
+  color: #7c2d12 !important;
+}
+
+.sankalpam-printable-sheet h3 {
+  color: #b45309 !important;
+}
+
+.sankalpam-printable-sheet p {
+  color: #475569 !important;
+}
+
+.sankalpam-printable-sheet th {
+  background-color: #fef3c7 !important;
+  color: #78350f !important;
+}
+
+.sankalpam-printable-sheet td {
+  color: #1e293b !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+
+  .ganesh-print-modal-overlay {
+    position: static !important;
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    inset: auto !important;
+    z-index: auto !important;
+  }
+
+  .ganesh-print-sheet-content {
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    background: #ffffff !important;
+  }
+
+  .sankalpam-printable-sheet {
+    color: #000000 !important;
+    background: #ffffff !important;
+    padding: 0 !important;
+  }
+
+  .sankalpam-printable-sheet table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  .sankalpam-printable-sheet th,
+  .sankalpam-printable-sheet td {
+    color: #000000 !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 6px 8px !important;
+  }
+
+  .sankalpam-printable-sheet th {
+    background-color: #fef3c7 !important;
+    color: #78350f !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }

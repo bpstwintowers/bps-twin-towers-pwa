@@ -1,913 +1,869 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Calendar,
   Clock,
-  Search,
-  ChevronDown,
+  MapPin,
+  Share2,
+  SlidersHorizontal,
+  Check,
   Sparkles,
-  Users,
-  CheckCircle,
-  Filter,
+  Calendar,
+  Flame,
+  Utensils,
+  Music,
+  X,
+  Phone,
+  MessageCircle,
   Award,
-  TrendingUp,
-  Receipt,
-  DollarSign,
-  Building2,
-  QrCode,
-  HeartHandshake,
-  Plus,
-  Edit2,
+  RefreshCw,
+  ArrowLeft,
+  Info,
 } from 'lucide-react';
-import {
-  fetchPublishedEvents,
-  type EventItem,
-} from '../../services/supabase/eventService';
-import { resolveUserAccess, type AccessInfo } from '../../services/supabase/registrationService';
-import { PoojaBookingModal } from './PoojaBookingModal';
-import { useSearch } from '../../context/SearchContext';
-import {
-  getGaneshContributions,
-  getGaneshExpenses,
-  getGaneshSankalpams,
-  calculateGaneshSummary,
-} from '../../services/ganeshService';
-import type {
-  GaneshContributionRecord,
-  GaneshExpenseRecord,
-  GaneshFinancialSummary,
-  GaneshSankalpamRecord,
-} from '../../types/ganesh';
-import { GaneshPaymentModal } from '../ganesh/components/GaneshPaymentModal';
-import { GaneshSankalpamForm } from '../ganesh/components/GaneshSankalpamForm';
-import { GaneshFlatPromptModal } from '../ganesh/components/GaneshFlatPromptModal';
+import { GaneshBottomNav } from '../ganesh/components/GaneshBottomNav';
+import { HeaderNavbar } from '../ganesh/components/HeaderNavbar';
+import { fetchLiveMasterEvents, type LiveMasterEventItem } from '../../services/liveSheetService';
 import './EventList.css';
 
-const CATEGORIES = [
-  { label: 'Category: All', value: 'ALL' },
-  { label: 'Festival & Celebrations', value: 'Festival' },
-  { label: 'Cultural & Music', value: 'Cultural' },
-  { label: 'Sports & Games', value: 'Sports' },
-  { label: 'Religious & Spiritual', value: 'Religious' },
-  { label: 'Kids & Teens', value: 'Kids' },
-  { label: 'Society Meetings', value: 'Meeting' },
+export interface FestivalEventItem {
+  id: string;
+  dayNumber: number;
+  dayLabel: string;
+  dateKey: 'sep14' | 'sep15' | 'sep16' | 'sep17' | 'sep18' | 'sep19';
+  month: string;
+  day: string;
+  title: string;
+  category: 'Rituals & Pooja' | 'Event Team';
+  categoryTagClass: 'tag-lavender' | 'tag-indigo' | 'tag-emerald' | 'tag-amber' | 'tag-rose';
+  accentClass: 'accent-gold' | 'accent-navy' | 'accent-emerald' | 'accent-purple' | 'accent-rose';
+  badgeTheme: 'badge-dark-navy' | 'badge-light-gray';
+  time: string;
+  location: string;
+  description: string;
+  rituals?: string[];
+  naivedyam?: string;
+  dressCode?: string;
+  spocName?: string;
+  spocPhone?: string;
+  attendeesCount?: number;
+  hasShareBtn?: boolean;
+  avatarUrls?: string[];
+}
+
+function mapLiveEventToFestivalEvent(item: LiveMasterEventItem): FestivalEventItem {
+  const isRitual = item.category === 'Rituals & Pooja';
+  return {
+    id: item.id,
+    dayNumber: item.dayNumber,
+    dayLabel: item.dayLabel,
+    dateKey: item.dateKey,
+    month: item.month,
+    day: item.day,
+    title: item.title,
+    category: item.category,
+    categoryTagClass: isRitual ? 'tag-amber' : 'tag-lavender',
+    accentClass: isRitual ? 'accent-gold' : 'accent-purple',
+    badgeTheme: isRitual ? 'badge-dark-navy' : 'badge-light-gray',
+    time: item.timeSlot,
+    location: item.location,
+    description: item.description,
+    rituals: item.rituals,
+    spocName: item.spocName,
+    spocPhone: item.spocPhone,
+    hasShareBtn: true,
+  };
+}
+
+const FESTIVAL_EVENTS_14_TO_19: FestivalEventItem[] = [
+  // ==========================================
+  // DAY 1: 14th Sep 2026 (Monday - Live Master Sheet Items)
+  // ==========================================
+  {
+    id: 'day1-pooja',
+    dayNumber: 1,
+    dayLabel: 'Day 1 • Mon, 14th Sep',
+    dateKey: 'sep14',
+    month: 'SEP',
+    day: '14',
+    title: 'Sandhya Pooja & Maha Aarti',
+    category: 'Rituals & Pooja',
+    categoryTagClass: 'tag-amber',
+    accentClass: 'accent-gold',
+    badgeTheme: 'badge-dark-navy',
+    time: '7:30 PM - 8:30 PM',
+    location: 'Main Ganesh Mandap',
+    description: 'Evening Ganapathi Pooja, Atharvashirsha chanting and Maha Aarti',
+    rituals: [
+      'Deeparadhana',
+      'Atharvashirsha Parayanam',
+      'Maha Mangala Aarti',
+    ],
+    dressCode: 'Traditional Festive Attire (Kurta / Saree)',
+    attendeesCount: 150,
+    hasShareBtn: true,
+  },
+  {
+    id: 'day1-dance',
+    dayNumber: 1,
+    dayLabel: 'Day 1 • Mon, 14th Sep',
+    dateKey: 'sep14',
+    month: 'SEP',
+    day: '14',
+    title: 'Classical Dance Performance – Ladies',
+    category: 'Event Team',
+    categoryTagClass: 'tag-lavender',
+    accentClass: 'accent-purple',
+    badgeTheme: 'badge-light-gray',
+    time: '8:30 PM - 8:50 PM',
+    location: 'Mandap Stage',
+    description: 'Classical Dance Performance by Society Ladies',
+    rituals: ['Stage Welcome', 'Classical Dance'],
+    spocName: 'Ananya Deshmukh (D-102)',
+    spocPhone: '+91 98450 45678',
+    attendeesCount: 95,
+    hasShareBtn: true,
+  },
+  {
+    id: 'day1-singing',
+    dayNumber: 1,
+    dayLabel: 'Day 1 • Mon, 14th Sep',
+    dateKey: 'sep14',
+    month: 'SEP',
+    day: '14',
+    title: 'Devotional Song Performance – Pradeep & Manjari Mam',
+    category: 'Event Team',
+    categoryTagClass: 'tag-lavender',
+    accentClass: 'accent-purple',
+    badgeTheme: 'badge-light-gray',
+    time: '8:50 PM - 9:15 PM',
+    location: 'Mandap Stage',
+    description: 'Devotional Song Performance by Pradeep & Manjari Mam',
+    rituals: ['Vocal Devotional Seva'],
+    spocName: 'Ananya Deshmukh (D-102)',
+    spocPhone: '+91 98450 45678',
+    attendeesCount: 110,
+    hasShareBtn: true,
+  },
+  {
+    id: 'day1-dinner',
+    dayNumber: 1,
+    dayLabel: 'Day 1 • Mon, 14th Sep',
+    dateKey: 'sep14',
+    month: 'SEP',
+    day: '14',
+    title: 'Community Dinner & Fellowship',
+    category: 'Event Team',
+    categoryTagClass: 'tag-lavender',
+    accentClass: 'accent-purple',
+    badgeTheme: 'badge-light-gray',
+    time: '9:15 PM onwards',
+    location: 'Dining Area',
+    description: 'Festive community dinner served for all residents and volunteers',
+    rituals: ['Community Dining'],
+    attendeesCount: 220,
+    hasShareBtn: true,
+  },
+  {
+    id: 'day1-games',
+    dayNumber: 1,
+    dayLabel: 'Day 1 • Mon, 14th Sep',
+    dateKey: 'sep14',
+    month: 'SEP',
+    day: '14',
+    title: 'Children Musical Chairs Activity',
+    category: 'Event Team',
+    categoryTagClass: 'tag-lavender',
+    accentClass: 'accent-purple',
+    badgeTheme: 'badge-light-gray',
+    time: '9:45 PM onwards',
+    location: 'Central Podium',
+    description: 'Recreational musical chairs game for children (subject to time availability)',
+    rituals: ['Kids Activity & Candies'],
+    attendeesCount: 65,
+    hasShareBtn: true,
+  },
 ];
 
-const SORT_OPTIONS = [
-  { label: 'Sort: Date (Nearest First)', value: 'date_asc' },
-  { label: 'Sort: Date (Latest First)', value: 'date_desc' },
-  { label: 'Sort: Name (A - Z)', value: 'name_asc' },
-  { label: 'Sort: Most Popular', value: 'popular' },
-];
+type DayFilter = 'all' | 'sep14' | 'sep15' | 'sep16' | 'sep17' | 'sep18' | 'sep19';
 
-// Fallback high-res festive imagery if banner_url is not set
-const DEFAULT_CATEGORY_IMAGES: Record<string, string> = {
-  Festival: 'https://images.unsplash.com/photo-1567591370504-20a89d1ec86e?w=800&auto=format&fit=crop&q=80',
-  Cultural: 'https://images.unsplash.com/photo-1532375810709-75b1da00537c?w=800&auto=format&fit=crop&q=80',
-  Sports: 'https://images.unsplash.com/photo-1526676037777-05a232554f77?w=800&auto=format&fit=crop&q=80',
-  Religious: 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?w=800&auto=format&fit=crop&q=80',
-  Kids: 'https://images.unsplash.com/photo-1472162072942-cd5147eb3902?w=800&auto=format&fit=crop&q=80',
-  Meeting: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&auto=format&fit=crop&q=80',
-  Default: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&auto=format&fit=crop&q=80',
-};
+function getDayFilterName(filter: DayFilter): string {
+  switch (filter) {
+    case 'sep14': return 'Day 1 (Mon, Sep 14)';
+    case 'sep15': return 'Day 2 (Tue, Sep 15)';
+    case 'sep16': return 'Day 3 (Wed, Sep 16)';
+    case 'sep17': return 'Day 4 (Thu, Sep 17)';
+    case 'sep18': return 'Day 5 (Fri, Sep 18)';
+    case 'sep19': return 'Day 6 (Sat, Sep 19)';
+    default: return 'All 6 Days';
+  }
+}
 
-// Preset contribution / participation metadata simulation
-const EVENT_STATS_MAP: Record<string, { raised: number; target: number; contributors: number }> = {
-  'Ganesh Chaturthi Festivities': { raised: 221546, target: 350000, contributors: 103 },
-  'Diwali Grand Celebration': { raised: 45000, target: 200000, contributors: 85 },
-  'Milad-un-Nabi Gathering': { raised: 30000, target: 40000, contributors: 62 },
-  'Independence Day Carnival': { raised: 35000, target: 35000, contributors: 180 },
-  'Community Sports Day': { raised: 25000, target: 50000, contributors: 50 },
-  'Navratri Festival Dandiya': { raised: 110000, target: 150000, contributors: 135 },
-};
+interface EventListProps {
+  embedded?: boolean;
+  onBackToHome?: () => void;
+}
 
-const ITEMS_PER_PAGE = 6;
-
-export const EventList: React.FC = () => {
+export const EventList: React.FC<EventListProps> = ({ embedded = false, onBackToHome }) => {
   const navigate = useNavigate();
-  const { searchQuery, setSearchQuery, setSearchPlaceholder } = useSearch();
+  const [eventsList, setEventsList] = useState<FestivalEventItem[]>(FESTIVAL_EVENTS_14_TO_19);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
+  const [activeDayFilter, setActiveDayFilter] = useState<DayFilter>('all');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [selectedEventModal, setSelectedEventModal] = useState<FestivalEventItem | null>(null);
 
-  const [events, setEvents] = useState<EventItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
-  const [selectedCategory, setSelectedCategory] = useState('ALL');
-  const [selectedSort, setSelectedSort] = useState('date_asc');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [activeAccess, setActiveAccess] = useState<AccessInfo[]>([]);
-  const [isPoojaModalOpen, setIsPoojaModalOpen] = useState(false);
-
-  // Ganesh Festival Real-Time State
-  const [contributions, setContributions] = useState<GaneshContributionRecord[]>([]);
-  const [expenses, setExpenses] = useState<GaneshExpenseRecord[]>([]);
-  const [sankalpams, setSankalpams] = useState<GaneshSankalpamRecord[]>([]);
-  const [summary, setSummary] = useState<GaneshFinancialSummary | null>(null);
-
-  // User Flat State
-  const [userFlat, setUserFlat] = useState<string>(() => {
-    return localStorage.getItem('bps_ganesh_user_flat') || '';
-  });
-  const [isFlatPromptOpen, setIsFlatPromptOpen] = useState(false);
-
-  // Ganesh Modals
-  const [isPayModalOpen, setIsPayModalOpen] = useState(false);
-  const [isSponsorModalOpen, setIsSponsorModalOpen] = useState(false);
-  const [isGothramModalOpen, setIsGothramModalOpen] = useState(false);
-
-  const loadGaneshData = () => {
-    const cList = getGaneshContributions();
-    const eList = getGaneshExpenses();
-    const sList = getGaneshSankalpams();
-    const sum = calculateGaneshSummary();
-
-    setContributions(cList);
-    setExpenses(eList);
-    setSankalpams(sList);
-    setSummary(sum);
+  const loadLiveEvents = async () => {
+    setIsSyncing(true);
+    try {
+      const liveItems = await fetchLiveMasterEvents();
+      if (liveItems && liveItems.length > 0) {
+        const mapped = liveItems.map(mapLiveEventToFestivalEvent);
+        setEventsList(mapped);
+        setLastSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      }
+    } catch (err) {
+      console.warn('Could not load live events from Master Portal:', err);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   useEffect(() => {
-    loadGaneshData();
-    const storedFlat = localStorage.getItem('bps_ganesh_user_flat');
-    if (!storedFlat) {
-      // If user hasn't set one yet, default to A8110 or prompt
-      localStorage.setItem('bps_ganesh_user_flat', 'A8110');
-      setUserFlat('A8110');
-    }
+    loadLiveEvents();
   }, []);
 
-  const activeFlatNumber = userFlat || (activeAccess[0]?.flat_number || 'A8110');
+  const categories = [
+    'ALL',
+    'Rituals & Pooja',
+    'Event Team',
+  ];
 
-  const userContributions = useMemo(() => {
-    if (!activeFlatNumber) return [];
-    return contributions.filter(
-      (c) => c.flatNo && c.flatNo.trim().toUpperCase() === activeFlatNumber.trim().toUpperCase()
-    );
-  }, [contributions, activeFlatNumber]);
+  const filteredEvents = useMemo(() => {
+    return eventsList.filter((event) => {
+      // Day filter (14th to 19th Sep)
+      if (activeDayFilter !== 'all' && event.dateKey !== activeDayFilter) return false;
 
-  const mySankalpam = useMemo(() => {
-    if (!activeFlatNumber) return null;
-    const target = activeFlatNumber.trim().toUpperCase().replace('-', '');
-    return (
-      sankalpams.find((s) => {
-        if (!s.flatNo) return false;
-        const f = s.flatNo.trim().toUpperCase().replace('-', '');
-        return f === target;
-      }) || null
-    );
-  }, [sankalpams, activeFlatNumber]);
-
-  const progressPercentage = summary
-    ? Math.min(100, Math.round((summary.totalCollections / summary.targetBudget) * 100))
-    : 63;
-
-  useEffect(() => {
-    setSearchPlaceholder('Search community events...');
-  }, [setSearchPlaceholder]);
-
-  const loadEvents = async () => {
-    try {
-      setLoading(true);
-      const [eventsData, accessData] = await Promise.all([
-        fetchPublishedEvents(selectedCategory === 'ALL' ? undefined : selectedCategory, searchQuery),
-        resolveUserAccess().catch(() => []),
-      ]);
-      setEvents(eventsData);
-      setActiveAccess(accessData);
-    } catch (err) {
-      console.error('Error loading events:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadEvents();
-  }, [selectedCategory]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      loadEvents();
-    }, 250);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  // Filter by upcoming / past & sort
-  const filteredAndSortedEvents = useMemo(() => {
-    const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
-
-    return events
-      .filter((ev) => {
-        const isPast = ev.start_date < todayStr || ev.status === 'Completed';
-        if (activeTab === 'upcoming') {
-          return !isPast || ev.status === 'Published' || ev.status === 'Registration Open';
-        } else {
-          return isPast || ev.status === 'Completed';
-        }
-      })
-      .sort((a, b) => {
-        if (selectedSort === 'date_asc') {
-          return a.start_date.localeCompare(b.start_date);
-        }
-        if (selectedSort === 'date_desc') {
-          return b.start_date.localeCompare(a.start_date);
-        }
-        if (selectedSort === 'name_asc') {
-          return a.title.localeCompare(b.title);
-        }
-        if (selectedSort === 'popular') {
-          return (b.confirmed_count || 0) - (a.confirmed_count || 0);
-        }
-        return 0;
-      });
-  }, [events, activeTab, selectedSort]);
-
-  // Pagination calculation
-  const totalItems = filteredAndSortedEvents.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedEvents = filteredAndSortedEvents.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
-  const formatEventDate = (dateStr: string, timeStr?: string) => {
-    try {
-      const d = new Date(dateStr);
-      const formattedDate = d.toLocaleDateString('en-US', {
-        month: 'short',
-        day: '2-digit',
-        year: 'numeric',
-      });
-      let formattedTime = '6:00 PM onwards';
-      if (timeStr) {
-        const [hours, minutes] = timeStr.split(':');
-        const h = parseInt(hours, 10);
-        const ampm = h >= 12 ? 'PM' : 'AM';
-        const formattedH = h % 12 || 12;
-        formattedTime = `${formattedH}:${minutes || '00'} ${ampm} onwards`;
+      // Category filter (support Rituals & Pooja, Event Team, or ALL)
+      if (selectedCategory !== 'ALL') {
+        if (selectedCategory === 'Rituals & Pooja' && event.category !== 'Rituals & Pooja') return false;
+        if (selectedCategory === 'Event Team' && event.category !== 'Event Team') return false;
       }
-      return `${formattedDate} • ${formattedTime}`;
-    } catch {
-      return dateStr;
+
+      return true;
+    });
+  }, [eventsList, activeDayFilter, selectedCategory]);
+
+  const handleShare = (e: React.MouseEvent, event: FestivalEventItem) => {
+    e.stopPropagation();
+    const shareUrl = `${window.location.origin}/events#${event.id}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl);
+      setCopiedId(event.id);
+      setTimeout(() => setCopiedId(null), 2000);
     }
   };
-
-  const getEventBannerUrl = (event: EventItem) => {
-    if (event.banner_url) return event.banner_url;
-    return DEFAULT_CATEGORY_IMAGES[event.category] || DEFAULT_CATEGORY_IMAGES.Default;
-  };
-
-  const getEventStatusBadge = (event: EventItem) => {
-    if (event.status === 'Completed') {
-      return <span className="event-status-pill-badge completed">Completed</span>;
-    }
-    const todayStr = new Date().toISOString().split('T')[0];
-    if (event.start_date === todayStr || event.status === 'Registration Open') {
-      return <span className="event-status-pill-badge active">Active</span>;
-    }
-    return <span className="event-status-pill-badge upcoming">Upcoming</span>;
-  };
-
-  const getEventBudgetProgress = (event: EventItem) => {
-    const stats = EVENT_STATS_MAP[event.title] || {
-      raised: (event.confirmed_count || 5) * 500,
-      target: (event.capacity || 100) * 500,
-      contributors: event.confirmed_count || 42,
-    };
-
-    const pct = Math.min(100, Math.round((stats.raised / (stats.target || 1)) * 100));
-
-    return {
-      raisedFormatted: `₹${stats.raised.toLocaleString('en-IN')}`,
-      targetFormatted: `₹${stats.target.toLocaleString('en-IN')}`,
-      percentage: pct,
-      contributors: stats.contributors,
-    };
-  };
-
-  const primaryFlat = activeAccess[0];
 
   return (
-    <div className="events-container animate-fade-in">
-      {/* =========================================================================
-          1. TOP CONTROLS & FILTER BAR
-         ========================================================================= */}
-      <div className="events-top-bar">
-        <div className="events-bar-left">
-          {/* Segmented Upcoming / Past Tabs */}
-          <div className="segmented-time-tabs">
-            <button
-              type="button"
-              className={`segmented-tab-btn ${activeTab === 'upcoming' ? 'active' : ''}`}
-              onClick={() => {
-                setActiveTab('upcoming');
-                setCurrentPage(1);
-              }}
-            >
-              Upcoming
-            </button>
-            <button
-              type="button"
-              className={`segmented-tab-btn ${activeTab === 'past' ? 'active' : ''}`}
-              onClick={() => {
-                setActiveTab('past');
-                setCurrentPage(1);
-              }}
-            >
-              Past
-            </button>
-          </div>
-        </div>
+    <div className={embedded ? 'fest-events-embedded-wrap' : 'festival-events-page-root'}>
+      {/* 1. UNIFIED TOP WHITE NAVBAR (Only on standalone page) */}
+      {!embedded && <HeaderNavbar />}
 
-        <div className="events-bar-right">
-
-          {/* Category Dropdown */}
-          <div className="event-filter-dropdown-wrap">
-            <select
-              className="event-filter-select"
-              value={selectedCategory}
-              onChange={(e) => {
-                setSelectedCategory(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              {CATEGORIES.map((cat) => (
-                <option key={cat.value} value={cat.value}>
-                  {cat.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown size={14} className="filter-select-arrow" />
-          </div>
-
-          {/* Sort Dropdown */}
-          <div className="event-filter-dropdown-wrap">
-            <select
-              className="event-filter-select"
-              value={selectedSort}
-              onChange={(e) => setSelectedSort(e.target.value)}
-            >
-              {SORT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown size={14} className="filter-select-arrow" />
-          </div>
-
-          {/* Puja Slot Action */}
+      {/* Embedded Back Button */}
+      {embedded && onBackToHome && (
+        <div style={{ padding: '0.25rem 0 0.75rem 0' }}>
           <button
             type="button"
-            className="btn-book-puja-slot"
-            onClick={() => setIsPoojaModalOpen(true)}
+            onClick={onBackToHome}
+            style={{
+              background: '#ffffff',
+              border: '1.5px solid #e2e8f0',
+              borderRadius: '12px',
+              padding: '0.45rem 0.95rem',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              color: '#0f172a',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            }}
           >
-            <Sparkles size={15} />
-            <span>Book Puja Slot</span>
+            <ArrowLeft size={16} color="#ea580c" />
+            <span>← Back to Festival Home</span>
           </button>
         </div>
-      </div>
+      )}
 
       {/* =========================================================================
-          2. LIVE GANESH UTSAV FINANCIAL SUMMARY & KPI METRICS (4 CARDS)
+          2. PAGE MAIN CONTENT
          ========================================================================= */}
-      {summary && (
-        <div className="event-metrics-grid">
-          {/* Card 1: Total Collections */}
-          <div className="metric-stat-card">
-            <div className="metric-icon-circle gold">
-              <Award size={22} />
-            </div>
-            <div className="metric-stat-content">
-              <span className="metric-stat-label">TOTAL COLLECTIONS</span>
-              <div className="metric-stat-value" style={{ color: '#b45309' }}>
-                ₹{summary.totalCollections.toLocaleString('en-IN')}
-              </div>
-              <span className="metric-stat-subtext">
-                {summary.totalContributorsCount} Residents + {summary.totalSponsorsCount} Sponsors
+      <main className="fest-events-body">
+        {/* Title Header Row with Filter Toggle & Live Sync Button */}
+        <div className="fest-title-header-row">
+          <div>
+            <h1 className="fest-main-title">Festival Events</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.15rem' }}>
+              <span style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 600 }}>
+                Master Festival Schedule (14th – 19th Sep 2026)
               </span>
-            </div>
-          </div>
-
-          {/* Card 2: Target Festival Budget */}
-          <div className="metric-stat-card">
-            <div className="metric-icon-circle orange">
-              <TrendingUp size={22} />
-            </div>
-            <div className="metric-stat-content">
-              <span className="metric-stat-label">TARGET FESTIVAL BUDGET</span>
-              <div className="metric-stat-value">
-                ₹{summary.targetBudget.toLocaleString('en-IN')}
-              </div>
-              <span className="metric-stat-subtext">{progressPercentage}% Target Achieved</span>
-            </div>
-          </div>
-
-          {/* Card 3: Expenses Incurred */}
-          <div className="metric-stat-card">
-            <div className="metric-icon-circle rose">
-              <Receipt size={22} />
-            </div>
-            <div className="metric-stat-content">
-              <span className="metric-stat-label">EXPENSES INCURRED</span>
-              <div className="metric-stat-value" style={{ color: '#be123c' }}>
-                ₹{summary.totalExpenses.toLocaleString('en-IN')}
-              </div>
-              <span className="metric-stat-subtext">{expenses.length} Verified Invoices</span>
-            </div>
-          </div>
-
-          {/* Card 4: Net Surplus Balance */}
-          <div className="metric-stat-card">
-            <div className="metric-icon-circle emerald">
-              <DollarSign size={22} />
-            </div>
-            <div className="metric-stat-content">
-              <span className="metric-stat-label">NET SURPLUS BALANCE</span>
-              <div
-                className="metric-stat-value"
-                style={{ color: summary.netBalance >= 0 ? '#047857' : '#e11d48' }}
-              >
-                ₹{summary.netBalance.toLocaleString('en-IN')}
-              </div>
-              <span className="metric-stat-subtext">Available Festival Reserve</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          3. COMMUNITY FUNDING GOAL PROGRESS & TOWER SPLIT
-         ========================================================================= */}
-      {summary && (
-        <div className="event-funding-card">
-          <div className="event-funding-header">
-            <div className="event-funding-title">
-              <TrendingUp size={18} color="#ea580c" />
-              <span>Community Funding Goal Progress</span>
-            </div>
-            <div className="event-funding-pct">
-              ₹{summary.totalCollections.toLocaleString('en-IN')} of ₹
-              {summary.targetBudget.toLocaleString('en-IN')} ({progressPercentage}%)
-            </div>
-          </div>
-
-          <div className="event-funding-track">
-            <div className="event-funding-fill" style={{ width: `${progressPercentage}%` }} />
-          </div>
-
-          <div className="event-tower-split-row">
-            <div className="event-tower-pill tower-a">
-              <Building2 size={15} /> Tower A: ₹{summary.towerAAmount.toLocaleString('en-IN')} (
-              {summary.towerACount} Flats)
-            </div>
-            <div className="event-tower-pill tower-b">
-              <Building2 size={15} /> Tower B: ₹{summary.towerBAmount.toLocaleString('en-IN')} (
-              {summary.towerBCount} Flats)
-            </div>
-            <div className="event-gothram-count-text">
-              🙏 {summary.sankalpamCount} Families Registered with Gothram
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          4. UNIFIED RESIDENT FLAT DASHBOARD CARD
-         ========================================================================= */}
-      {activeFlatNumber && (
-        <div className="flat-dashboard-card animate-fade-in">
-          {/* Header */}
-          <div className="flat-dashboard-header">
-            <div className="flat-dashboard-title-wrap">
-              <span style={{ fontSize: '1.4rem' }}>🌟</span>
-              <div>
-                <h3 className="flat-dashboard-title">
-                  Flat {activeFlatNumber.toUpperCase()} • Contributions & Sponsorships
-                </h3>
-                <span className="flat-dashboard-subtitle">
-                  {userContributions.length > 0
-                    ? `${userContributions.length} contribution entry recorded for your flat`
-                    : 'No contributions recorded yet for your flat'}
+              {lastSyncTime && (
+                <span style={{ fontSize: '0.74rem', color: '#16a34a', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e' }} />
+                  Synced {lastSyncTime}
                 </span>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <button
-                type="button"
-                onClick={() => setIsFlatPromptOpen(true)}
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid #fdba74',
-                  color: '#c2410c',
-                  padding: '0.35rem 0.75rem',
-                  borderRadius: '20px',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                }}
-              >
-                <Edit2 size={12} /> Switch Flat
-              </button>
-
-              {userContributions.length > 0 && (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    background: '#ffffff',
-                    padding: '0.4rem 0.85rem',
-                    borderRadius: '20px',
-                    border: '1.5px solid #fdba74',
-                  }}
-                >
-                  <span style={{ fontSize: '0.78rem', color: '#9a3412', fontWeight: 600 }}>Total:</span>
-                  <strong style={{ fontSize: '1.1rem', color: '#ea580c' }}>
-                    ₹{userContributions.reduce((s, c) => s + (c.amount || 0), 0).toLocaleString('en-IN')}
-                  </strong>
-                </div>
               )}
             </div>
           </div>
 
-          {/* User Contributions List (if any) or Call-to-Action buttons (if no contributions yet) */}
-          {userContributions.length > 0 ? (
-            <div
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button
+              type="button"
+              className="fest-filter-toggle-btn"
+              onClick={loadLiveEvents}
+              disabled={isSyncing}
+              title="Sync Live with Google Sheets Master Portal"
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                gap: '0.65rem',
-                marginTop: '0.85rem',
+                background: '#fff7ed',
+                borderColor: '#fed7aa',
+                color: '#ea580c',
               }}
             >
-              {userContributions.map((item) => (
-                <div
-                  key={item.id}
+              <RefreshCw size={17} className={isSyncing ? 'animate-spin' : ''} />
+            </button>
+
+            <button
+              type="button"
+              className={`fest-filter-toggle-btn ${isFilterOpen ? 'is-active' : ''}`}
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              title="Filter by Category"
+              aria-label="Filter"
+            >
+              <SlidersHorizontal size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* Category Filter Drawer / Bar (Conditional) */}
+        {isFilterOpen && (
+          <div className="fest-category-filter-bar animate-fade-in">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                className={`fest-cat-chip ${selectedCategory === cat ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {cat === 'ALL' ? 'All Categories' : cat}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* =======================================================================
+            3. HORIZONTAL DATE PILLS (14TH TO 19TH SEP)
+           ======================================================================= */}
+        <div className="fest-date-pills-scroll">
+          <button
+            type="button"
+            className={`fest-date-pill ${
+              activeDayFilter === 'all' ? 'is-today-active' : ''
+            }`}
+            onClick={() => setActiveDayFilter('all')}
+          >
+            All 6 Days
+          </button>
+
+          <button
+            type="button"
+            className={`fest-date-pill ${
+              activeDayFilter === 'sep14' ? 'is-today-active' : ''
+            }`}
+            onClick={() => setActiveDayFilter('sep14')}
+          >
+            Sep 14 (Day 1)
+          </button>
+
+          <button
+            type="button"
+            className={`fest-date-pill ${
+              activeDayFilter === 'sep15' ? 'is-tomorrow-active' : ''
+            }`}
+            onClick={() => setActiveDayFilter('sep15')}
+          >
+            Sep 15 (Day 2)
+          </button>
+
+          <button
+            type="button"
+            className={`fest-date-pill ${
+              activeDayFilter === 'sep16' ? 'is-active-generic' : ''
+            }`}
+            onClick={() => setActiveDayFilter('sep16')}
+          >
+            Sep 16 (Day 3)
+          </button>
+
+          <button
+            type="button"
+            className={`fest-date-pill ${
+              activeDayFilter === 'sep17' ? 'is-active-generic' : ''
+            }`}
+            onClick={() => setActiveDayFilter('sep17')}
+          >
+            Sep 17 (Day 4)
+          </button>
+
+          <button
+            type="button"
+            className={`fest-date-pill ${
+              activeDayFilter === 'sep18' ? 'is-active-generic' : ''
+            }`}
+            onClick={() => setActiveDayFilter('sep18')}
+          >
+            Sep 18 (Day 5)
+          </button>
+
+          <button
+            type="button"
+            className={`fest-date-pill ${
+              activeDayFilter === 'sep19' ? 'is-today-active' : ''
+            }`}
+            onClick={() => setActiveDayFilter('sep19')}
+          >
+            Sep 19 (Day 6)
+          </button>
+        </div>
+
+        {/* =======================================================================
+            4. SEQUENTIAL TIME EVENT CARDS LIST (MATCHING LIVE GOOGLE SHEET)
+           ======================================================================= */}
+        <div className="fest-cards-list">
+          {filteredEvents.length === 0 ? (
+            <div
+              style={{
+                background: '#ffffff',
+                borderRadius: '20px',
+                border: '1.5px dashed #cbd5e1',
+                padding: '2.5rem 1.25rem',
+                textAlign: 'center',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
+              }}
+            >
+              <div
+                style={{
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '50%',
+                  background: '#fff7ed',
+                  color: '#ea580c',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '0.85rem',
+                }}
+              >
+                <Calendar size={24} />
+              </div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.4rem' }}>
+                {getDayFilterName(activeDayFilter)} Schedule In Progress
+              </h3>
+              <p style={{ fontSize: '0.88rem', color: '#64748b', maxWidth: '420px', margin: '0 auto 1.25rem', lineHeight: 1.5 }}>
+                The Event & Cultural Committee is actively preparing the lineup for this day. Fixed daily rituals are confirmed below:
+              </p>
+
+              <div
+                style={{
+                  background: '#f8fafc',
+                  borderRadius: '14px',
+                  padding: '1rem 1.15rem',
+                  maxWidth: '420px',
+                  margin: '0 auto 1.5rem',
+                  textAlign: 'left',
+                  fontSize: '0.84rem',
+                  color: '#334155',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.5rem',
+                  border: '1px solid #e2e8f0',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ color: '#ea580c', fontWeight: 800 }}>🪔 7:30 PM:</span>
+                  <span>Daily Sandhya Pooja & Maha Aarti</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ color: '#16a34a', fontWeight: 800 }}>🍲 8:30 PM:</span>
+                  <span>Community Maha Prasadam Dinner</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.65rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={loadLiveEvents}
+                  disabled={isSyncing}
                   style={{
-                    background: '#ffffff',
+                    background: '#fff7ed',
+                    border: '1.5px solid #fed7aa',
                     borderRadius: '12px',
-                    padding: '0.75rem 0.95rem',
-                    border: '1px solid #fed7aa',
-                    display: 'flex',
-                    justifyContent: 'space-between',
+                    padding: '0.55rem 1rem',
+                    fontSize: '0.84rem',
+                    fontWeight: 700,
+                    color: '#ea580c',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
                     alignItems: 'center',
+                    gap: '0.4rem',
                   }}
                 >
-                  <div>
-                    <div style={{ fontWeight: 700, color: '#1e293b', fontSize: '0.92rem' }}>{item.donorName}</div>
-                    <div style={{ fontSize: '0.76rem', color: '#64748b' }}>
-                      {item.isSponsor ? `🎖️ Sponsor: ${item.sponsorCategory || 'Pooja Sponsor'}` : item.contributionType || 'General Contribution'}
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ea580c' }}>
-                      ₹{item.amount.toLocaleString('en-IN')}
-                    </div>
-                    {item.verified && (
-                      <span style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700 }}>● Verified</span>
-                    )}
-                  </div>
-                </div>
-              ))}
+                  <RefreshCw size={15} className={isSyncing ? 'animate-spin' : ''} />
+                  <span>{isSyncing ? 'Syncing...' : 'Sync Live Sheet'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveDayFilter('all');
+                    setSelectedCategory('ALL');
+                  }}
+                  style={{
+                    background: '#0f172a',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '0.55rem 1rem',
+                    fontSize: '0.84rem',
+                    fontWeight: 700,
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                  }}
+                >
+                  View All 6 Days
+                </button>
+              </div>
             </div>
           ) : (
-            <div className="flat-action-box">
-              <div>
-                <div className="flat-action-text-title">Join the Grand Utsav Celebration</div>
-                <div className="flat-action-text-sub">
-                  Support festival arrangements with voluntary contribution or seva sponsorship
-                </div>
-              </div>
+            <>
+              {filteredEvents.map((event) => (
+                <article key={event.id} className="fest-event-card">
+                  {/* Top Accent Stripe */}
+                  <div className={`fest-card-accent-top ${event.accentClass}`} />
 
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsPayModalOpen(true)}
-                  className="btn-flat-qr"
-                >
-                  <QrCode size={15} /> Contribute via QR Code
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setIsSponsorModalOpen(true)}
-                  className="btn-flat-sponsor"
-                >
-                  <Sparkles size={15} /> Become a Sponsor
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Divider */}
-          <div style={{ borderTop: '1.5px dashed #fdba74', margin: '0.85rem 0' }} />
-
-          {/* Sankalpam Section */}
-          {mySankalpam ? (
-            <div className="flat-sankalpam-section">
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.25rem' }}>
-                  <span style={{ fontSize: '1.2rem' }}>🙏</span>
-                  <h4 style={{ margin: 0, color: '#92400e', fontSize: '0.98rem', fontWeight: 800 }}>
-                    Gothram: {mySankalpam.gothram}
-                  </h4>
-                </div>
-                <div style={{ fontSize: '0.78rem', color: '#b45309', marginBottom: '0.35rem' }}>
-                  {mySankalpam.familyMembers?.length || 0} family members registered for daily Sankalpam
-                </div>
-                {mySankalpam.familyMembers && mySankalpam.familyMembers.length > 0 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-                    {mySankalpam.familyMembers.map((m) => (
+                  {/* Card Top Row: Tag + Date Badge */}
+                  <div className="fest-card-top-row">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                      <span className={`fest-team-tag ${event.categoryTagClass}`}>
+                        {event.category}
+                      </span>
                       <span
-                        key={m.id}
                         style={{
-                          background: '#ffffff',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          color: '#9a3412',
+                          background: '#fff7ed',
                           padding: '0.2rem 0.55rem',
-                          borderRadius: '6px',
-                          fontSize: '0.74rem',
-                          color: '#78350f',
+                          borderRadius: '9999px',
                           border: '1px solid #fed7aa',
                         }}
                       >
-                        {m.name} ({m.relationship})
+                        {event.dayLabel}
                       </span>
-                    ))}
+                    </div>
+
+                    <div className={`fest-date-badge-block ${event.badgeTheme}`}>
+                      <span className="fest-badge-month">{event.month}</span>
+                      <span className="fest-badge-day">{event.day}</span>
+                    </div>
                   </div>
-                )}
-              </div>
 
-              <button
-                type="button"
-                onClick={() => setIsGothramModalOpen(true)}
-                className="btn-flat-gothram"
-              >
-                <Edit2 size={13} /> Edit Gothram & Family
-              </button>
-            </div>
-          ) : (
-            <div className="flat-sankalpam-section">
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <span>🙏</span>
-                  <strong style={{ color: '#92400e', fontSize: '0.92rem' }}>
-                    Flat {activeFlatNumber.toUpperCase()} is not yet registered for Sankalpam
-                  </strong>
-                </div>
-                <div style={{ fontSize: '0.8rem', color: '#78350f', marginTop: '0.2rem' }}>
-                  Register your Gothram and family members for daily puja chanting & blessings.
-                </div>
-              </div>
+                  {/* Event Title */}
+                  <h2 className="fest-card-event-title">{event.title}</h2>
 
-              <button
-                type="button"
-                onClick={() => setIsGothramModalOpen(true)}
-                className="btn-flat-gothram"
-              >
-                + Register Gothram for Flat {activeFlatNumber.toUpperCase()}
-              </button>
-            </div>
+                  {/* Event Description */}
+                  <p className="fest-card-event-desc">{event.description}</p>
+
+                  {/* Metadata: Time & Location */}
+                  <div className="fest-card-meta-list">
+                    <div className="fest-meta-item">
+                      <Clock size={16} className="fest-meta-icon" style={{ color: '#ea580c' }} />
+                      <strong style={{ color: '#0f172a' }}>{event.time}</strong>
+                    </div>
+                    <div className="fest-meta-item">
+                      <MapPin size={16} className="fest-meta-icon" style={{ color: '#0284c7' }} />
+                      <span>{event.location}</span>
+                    </div>
+                  </div>
+
+                  {/* SPOC / Coordinator info if available */}
+                  {event.spocName && (
+                    <div
+                      style={{
+                        marginTop: '0.75rem',
+                        paddingTop: '0.65rem',
+                        borderTop: '1px solid #f1f5f9',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: '0.5rem',
+                        fontSize: '0.78rem',
+                      }}
+                    >
+                      <span style={{ color: '#64748b' }}>
+                        Coord: <strong style={{ color: '#0f172a' }}>{event.spocName}</strong>
+                      </span>
+                      {event.spocPhone && (
+                        <a
+                          href={`tel:${event.spocPhone.replace(/\s+/g, '')}`}
+                          style={{
+                            color: '#0284c7',
+                            fontWeight: 700,
+                            textDecoration: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                          }}
+                        >
+                          <Phone size={13} />
+                          {event.spocPhone}
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </article>
+              ))}
+
+              {/* Informative Footer Banner when viewing All Days */}
+              {activeDayFilter === 'all' && (
+                <div
+                  style={{
+                    background: '#f8fafc',
+                    borderRadius: '16px',
+                    border: '1px solid #e2e8f0',
+                    padding: '1rem 1.15rem',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.75rem',
+                    marginTop: '0.5rem',
+                  }}
+                >
+                  <Info size={20} color="#0284c7" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <div style={{ fontSize: '0.82rem', color: '#475569', lineHeight: 1.45 }}>
+                    <strong style={{ color: '#0f172a', display: 'block', marginBottom: '0.2rem' }}>
+                      Master Portal Live Sync Connected
+                    </strong>
+                    Showing 5 confirmed events scheduled for Day 1. Days 2 to 6 cultural activities and rituals will sync automatically as the Committee finalizes slots.
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
-      )}
+      </main>
 
-      {/* =========================================================================
-          5. EVENTS 3-COLUMN CARDS GRID
-         ========================================================================= */}
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#64748b' }}>
-          <div style={{ fontSize: '1.05rem', fontWeight: 600 }}>Loading community events...</div>
-        </div>
-      ) : paginatedEvents.length === 0 ? (
+      {/* =======================================================================
+          5. EVENT DETAILS MODAL POPUP
+         ======================================================================= */}
+      {selectedEventModal && (
         <div
-          style={{
-            textAlign: 'center',
-            padding: '3.5rem 1rem',
-            background: '#ffffff',
-            borderRadius: '16px',
-            border: '1px solid #e2e8f0',
-          }}
-        >
-          <Calendar size={44} style={{ color: '#94a3b8', margin: '0 auto 0.75rem', display: 'block' }} />
-          <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a', margin: '0 0 0.35rem' }}>
-            No Events Found
-          </h3>
-          <p style={{ fontSize: '0.85rem', color: '#64748b', maxWidth: '420px', margin: '0 auto' }}>
-            No community events match your search or filter criteria. Try switching between Upcoming and Past or clearing your search.
-          </p>
-        </div>
-      ) : (
-        <div className="events-card-grid">
-          {paginatedEvents.map((event) => {
-            const progress = getEventBudgetProgress(event);
-
-            return (
-              <div
-                key={event.id}
-                className="event-item-card"
-                onClick={() => navigate(`/events/${event.id}`)}
-              >
-                {/* Image Banner with Status Overlay */}
-                <div className="event-card-media">
-                  <img
-                    src={getEventBannerUrl(event)}
-                    alt={event.title}
-                    className="event-banner-image"
-                    loading="lazy"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        DEFAULT_CATEGORY_IMAGES[event.category] || DEFAULT_CATEGORY_IMAGES.Default;
-                    }}
-                  />
-                  {getEventStatusBadge(event)}
-                </div>
-
-                {/* Card Content */}
-                <div className="event-card-main-body">
-                  <h3 className="event-item-title" title={event.title}>
-                    {event.title}
-                  </h3>
-
-                  <div className="event-item-datetime">
-                    <Calendar size={13} style={{ color: '#00897b', flexShrink: 0 }} />
-                    <span>{formatEventDate(event.start_date, event.start_time)}</span>
-                  </div>
-
-                  <p className="event-item-description">
-                    {event.description ||
-                      'Join fellow residents and family members for this festive community gathering with special arrangements.'}
-                  </p>
-
-                  {/* Funding & Registration Progress Bar */}
-                  <div className="event-progress-section">
-                    <div className="event-progress-numbers">
-                      <span className="event-progress-left">
-                        {progress.raisedFormatted} / {progress.targetFormatted}
-                      </span>
-                      <span className="event-progress-pct">{progress.percentage}%</span>
-                    </div>
-
-                    <div className="event-progress-track">
-                      <div
-                        className="event-progress-fill"
-                        style={{ width: `${progress.percentage}%` }}
-                      />
-                    </div>
-
-                    <div className="event-progress-contributors">
-                      • {progress.contributors} active contributors
-                    </div>
-                  </div>
-
-                  {/* View Details Action Button */}
-                  <button
-                    type="button"
-                    className="btn-event-view-details"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/events/${event.id}`);
-                    }}
-                  >
-                    View Details
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* =========================================================================
-          3. PAGINATION FOOTER
-         ========================================================================= */}
-      {totalItems > 0 && (
-        <div className="events-pagination-footer">
-          <div className="events-pagination-count">
-            Showing {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, totalItems)} of {totalItems} community events
-          </div>
-
-          <div className="events-pagination-nav">
-            <button
-              type="button"
-              className="pagination-btn"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            >
-              Previous
-            </button>
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <button
-                key={pageNum}
-                type="button"
-                className={`pagination-btn ${pageNum === currentPage ? 'active' : ''}`}
-                onClick={() => setCurrentPage(pageNum)}
-              >
-                {pageNum}
-              </button>
-            ))}
-
-            <button
-              type="button"
-              className="pagination-btn"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* POOJA MODAL */}
-      <PoojaBookingModal
-        isOpen={isPoojaModalOpen}
-        onClose={() => setIsPoojaModalOpen(false)}
-        flatId={primaryFlat?.flat_id}
-        flatNumber={primaryFlat?.flat_number}
-      />
-
-      {/* GANESH PAYMENT MODAL */}
-      <GaneshPaymentModal
-        isOpen={isPayModalOpen}
-        onClose={() => setIsPayModalOpen(false)}
-        onSuccess={() => {
-          setIsPayModalOpen(false);
-          loadGaneshData();
-        }}
-        isSponsorship={false}
-      />
-
-      {/* GANESH SPONSOR MODAL */}
-      <GaneshPaymentModal
-        isOpen={isSponsorModalOpen}
-        onClose={() => setIsSponsorModalOpen(false)}
-        onSuccess={() => {
-          setIsSponsorModalOpen(false);
-          loadGaneshData();
-        }}
-        isSponsorship={true}
-      />
-
-      {/* GANESH GOTHRAM SANKALPAM MODAL */}
-      {isGothramModalOpen && (
-        <div
+          className="no-print"
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            zIndex: 1200,
+            background: 'rgba(15, 23, 42, 0.65)',
             backdropFilter: 'blur(4px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 9999,
             padding: '1rem',
           }}
-          onClick={() => setIsGothramModalOpen(false)}
+          onClick={() => setSelectedEventModal(null)}
         >
           <div
+            className="animate-fade-in"
             style={{
               background: '#ffffff',
-              borderRadius: '20px',
-              maxWidth: '850px',
+              borderRadius: '24px',
+              maxWidth: '520px',
               width: '100%',
               maxHeight: '90vh',
               overflowY: 'auto',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.25)',
+              border: '1px solid #fed7aa',
               padding: '1.5rem',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              position: 'relative',
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <GaneshSankalpamForm
-              sankalpams={sankalpams}
-              contributions={contributions}
-              expenses={expenses}
-              userFlat={activeFlatNumber}
-              userName=""
-              isAddModalOpen={true}
-              onCloseAddModal={() => setIsGothramModalOpen(false)}
-              onRefresh={() => {
-                loadGaneshData();
-                setIsGothramModalOpen(false);
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setSelectedEventModal(null)}
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: '#f1f5f9',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: '#64748b',
               }}
-            />
+            >
+              <X size={18} />
+            </button>
+
+            {/* Header Badge */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.6rem' }}>
+              <span className={`fest-team-tag ${selectedEventModal.categoryTagClass}`}>
+                {selectedEventModal.category}
+              </span>
+              <span
+                style={{
+                  fontSize: '0.76rem',
+                  fontWeight: 700,
+                  color: '#9a3412',
+                  background: '#fff7ed',
+                  padding: '0.2rem 0.55rem',
+                  borderRadius: '9999px',
+                }}
+              >
+                {selectedEventModal.dayLabel}
+              </span>
+            </div>
+
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 900, color: '#0f172a', margin: '0 0 0.5rem' }}>
+              {selectedEventModal.title}
+            </h2>
+
+            <p style={{ fontSize: '0.92rem', color: '#475569', lineHeight: 1.5, margin: '0 0 1.25rem' }}>
+              {selectedEventModal.description}
+            </p>
+
+            {/* Timings & Location Card */}
+            <div
+              style={{
+                background: '#f8fafc',
+                borderRadius: '16px',
+                padding: '1rem',
+                border: '1px solid #e2e8f0',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.65rem',
+                marginBottom: '1.25rem',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <Clock size={18} color="#ea580c" />
+                <div>
+                  <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 700 }}>TIMING</div>
+                  <strong style={{ fontSize: '0.95rem', color: '#0f172a' }}>{selectedEventModal.time}</strong>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <MapPin size={18} color="#0284c7" />
+                <div>
+                  <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 700 }}>VENUE / LOCATION</div>
+                  <strong style={{ fontSize: '0.95rem', color: '#0f172a' }}>{selectedEventModal.location}</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Rituals & Program List (if any) */}
+            {selectedEventModal.rituals && selectedEventModal.rituals.length > 0 && (
+              <div style={{ marginBottom: '1.25rem' }}>
+                <h4 style={{ fontSize: '0.86rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.5rem' }}>
+                  🪔 Rituals &amp; Highlights:
+                </h4>
+                <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#334155', fontSize: '0.85rem', lineHeight: 1.6 }}>
+                  {selectedEventModal.rituals.map((r, i) => (
+                    <li key={i}>{r}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Naivedyam & Dress Code */}
+            {(selectedEventModal.naivedyam || selectedEventModal.dressCode) && (
+              <div
+                style={{
+                  background: '#fffbeb',
+                  borderRadius: '14px',
+                  padding: '0.85rem 1rem',
+                  border: '1px solid #fde68a',
+                  marginBottom: '1.25rem',
+                  fontSize: '0.84rem',
+                  color: '#92400e',
+                }}
+              >
+                {selectedEventModal.naivedyam && (
+                  <div style={{ marginBottom: selectedEventModal.dressCode ? '0.35rem' : '0' }}>
+                    <strong>🍽️ Naivedyam: </strong> {selectedEventModal.naivedyam}
+                  </div>
+                )}
+                {selectedEventModal.dressCode && (
+                  <div>
+                    <strong>👗 Dress Code: </strong> {selectedEventModal.dressCode}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* SPOC Contact */}
+            {selectedEventModal.spocName && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: '#f1f5f9',
+                  borderRadius: '14px',
+                  padding: '0.75rem 1rem',
+                  border: '1px solid #e2e8f0',
+                  marginTop: '1rem',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700 }}>LEAD SPOC</div>
+                  <strong style={{ fontSize: '0.9rem', color: '#0f172a' }}>{selectedEventModal.spocName}</strong>
+                </div>
+
+                {selectedEventModal.spocPhone && (
+                  <a
+                    href={`https://wa.me/91${selectedEventModal.spocPhone}?text=Hi%20${selectedEventModal.spocName},%20regarding%20${selectedEventModal.title}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      background: '#25D366',
+                      color: '#ffffff',
+                      textDecoration: 'none',
+                      borderRadius: '10px',
+                      padding: '0.4rem 0.75rem',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.3rem',
+                    }}
+                  >
+                    <MessageCircle size={14} /> WhatsApp
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* GANESH FLAT PROMPT MODAL */}
-      <GaneshFlatPromptModal
-        isOpen={isFlatPromptOpen}
-        onClose={() => setIsFlatPromptOpen(false)}
-        currentFlat={activeFlatNumber}
-        onSelectFlat={(flat: string) => {
-          setUserFlat(flat);
-          localStorage.setItem('bps_ganesh_user_flat', flat);
-          setIsFlatPromptOpen(false);
-        }}
-      />
+      {/* Floating Festival Bottom Navigation (Standalone Route Only) */}
+      {!embedded && <GaneshBottomNav activeTab="pooja" />}
     </div>
   );
 };

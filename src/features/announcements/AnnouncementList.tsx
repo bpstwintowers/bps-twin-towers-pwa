@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Megaphone,
   ArrowLeft,
@@ -17,10 +17,19 @@ import {
   type AnnouncementItem,
   type AnnouncementCategory,
 } from '../../services/supabase/communicationService';
+import { HeaderNavbar } from '../ganesh/components/HeaderNavbar';
+import { GaneshBottomNav } from '../ganesh/components/GaneshBottomNav';
 import './AnnouncementList.css';
 
-export const AnnouncementList: React.FC = () => {
+interface AnnouncementListProps {
+  embedded?: boolean;
+  onBackToHome?: () => void;
+}
+
+export const AnnouncementList: React.FC<AnnouncementListProps> = ({ embedded = false, onBackToHome }) => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const isFestivalRoute = location.pathname === '/ganesh-updates' || embedded;
   const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [loading, setLoading] = useState(true);
@@ -67,7 +76,37 @@ export const AnnouncementList: React.FC = () => {
   );
 
   return (
-    <div className="announcements-container">
+    <div className={`announcements-container ${isFestivalRoute ? 'is-festival-page' : ''}`} style={isFestivalRoute ? { paddingBottom: '90px' } : undefined}>
+      {/* HeaderNavbar (Standalone festival route only) */}
+      {!embedded && isFestivalRoute && <HeaderNavbar />}
+
+      {/* Embedded Back Button */}
+      {embedded && onBackToHome && (
+        <div style={{ padding: '0.25rem 0 0.75rem 0' }}>
+          <button
+            type="button"
+            onClick={onBackToHome}
+            style={{
+              background: '#ffffff',
+              border: '1.5px solid #e2e8f0',
+              borderRadius: '12px',
+              padding: '0.45rem 0.95rem',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              color: '#0f172a',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            }}
+          >
+            <ArrowLeft size={16} color="#ea580c" />
+            <span>← Back to Festival Home</span>
+          </button>
+        </div>
+      )}
+
       <div className="notif-content">
         {/* Category Pills */}
         <div className="notif-category-pills">
@@ -204,6 +243,7 @@ export const AnnouncementList: React.FC = () => {
           </div>
         )}
       </div>
+      {!embedded && isFestivalRoute && <GaneshBottomNav />}
     </div>
   );
 };

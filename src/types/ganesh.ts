@@ -37,6 +37,7 @@ export interface GaneshSankalpamRecord {
   contactMobile?: string;
   gothram: string;
   familyMembers: GaneshFamilyMember[];
+  membersCount?: number;
   preferredPujaDate?: string;
   specialPrayers?: string;
   prasadOptIn?: boolean;
@@ -45,13 +46,14 @@ export interface GaneshSankalpamRecord {
 
 export type GaneshExpenseCategory =
   | 'Idol & Visarjan'
+  | 'Pandal & Decoration'
   | 'Priest & Puja Samagri'
   | 'Mahaprasadam & Food'
-  | 'Pandal & Decoration'
   | 'Sound & Lighting'
   | 'Cultural Events & Gifts'
   | 'Security & Cleaning'
-  | 'Misc & Contingency';
+  | 'Misc & Contingency'
+  | 'Celebrations';
 
 export interface GaneshExpenseRecord {
   id: string;

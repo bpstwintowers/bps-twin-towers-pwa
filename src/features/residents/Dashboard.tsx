@@ -10,6 +10,11 @@ import {
   Info,
   Clock,
   ArrowRight,
+  Droplets,
+  Sparkles,
+  ThumbsUp,
+  Vote,
+  Flame,
 } from 'lucide-react';
 import './Dashboard.css';
 
@@ -176,6 +181,281 @@ export const ResidentDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Municipal Water Connection Initiative Spotlight Banner */}
+      <section
+        className="dashboard-water-spotlight animate-fade-in"
+        style={{
+          background: 'linear-gradient(135deg, #0f172a 0%, #0f3742 50%, #0d9488 100%)',
+          borderRadius: 'var(--radius-xl, 16px)',
+          padding: '1.5rem',
+          color: '#ffffff',
+          boxShadow: '0 8px 24px -4px rgba(13, 148, 136, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1.25rem',
+          flexWrap: 'wrap',
+          cursor: 'pointer',
+        }}
+        onClick={() => navigate('/water-initiative')}
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', maxWidth: '680px' }}>
+          <div
+            style={{
+              width: '46px',
+              height: '46px',
+              borderRadius: '12px',
+              background: 'rgba(56, 189, 248, 0.2)',
+              border: '1px solid rgba(56, 189, 248, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#38bdf8',
+              flexShrink: 0,
+            }}
+          >
+            <Droplets size={24} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <span
+                style={{
+                  background: 'rgba(13, 148, 136, 0.35)',
+                  border: '1px solid rgba(94, 234, 212, 0.4)',
+                  color: '#5eead4',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  padding: '0.15rem 0.55rem',
+                  borderRadius: '9999px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                Active Society Initiative
+              </span>
+              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>BPS Water Task Force</span>
+            </div>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
+              Municipal Water Connection Strategy Hub
+            </h3>
+            <p style={{ fontSize: '0.88rem', color: '#cbd5e1', margin: 0, lineHeight: 1.45 }}>
+              Post your thoughts, legal advice, and builder negotiation ideas to help secure our municipal
+              water line. Upvote community proposals!
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button
+            type="button"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              background: '#0d9488',
+              color: '#ffffff',
+              border: 'none',
+              padding: '0.65rem 1.15rem',
+              borderRadius: '10px',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 4px 12px rgba(13, 148, 136, 0.4)',
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate('/water-initiative');
+            }}
+          >
+            <span>Explore & Post Strategy</span>
+            <ArrowRight size={15} />
+          </button>
+        </div>
+      </section>
+
+      {/* Resident Pulse & Satisfaction Survey Banner */}
+      <section
+        className="dashboard-water-spotlight animate-fade-in"
+        style={{
+          background: 'linear-gradient(135deg, #042f2e 0%, #0f766e 60%, #0284c7 100%)',
+          borderRadius: 'var(--radius-xl, 16px)',
+          padding: '1.4rem 1.5rem',
+          color: '#ffffff',
+          boxShadow: '0 8px 24px -4px rgba(15, 118, 110, 0.25)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1.25rem',
+          flexWrap: 'wrap',
+          cursor: 'pointer',
+          marginTop: '1.25rem',
+        }}
+        onClick={() => navigate('/surveys')}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', maxWidth: '640px' }}>
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              background: 'rgba(255, 255, 255, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+            }}
+          >
+            <Vote size={24} color="#ffffff" />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  color: '#ffffff',
+                  padding: '0.15rem 0.55rem',
+                  borderRadius: '9999px',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                }}
+              >
+                Active Society Pulse Poll
+              </span>
+              <span style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>Tower A & B</span>
+            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
+              Essential Services & Lift Maintenance Survey (2 Mins)
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: '#e2e8f0', margin: 0, lineHeight: 1.4 }}>
+              Rate water timing, lift performance, and security diligence to guide the upcoming MC maintenance review.
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button
+            type="button"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              background: '#ffffff',
+              color: '#0f766e',
+              border: 'none',
+              padding: '0.65rem 1.15rem',
+              borderRadius: '10px',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate('/surveys');
+            }}
+          >
+            <span>Take Quick Survey</span>
+            <ArrowRight size={15} />
+          </button>
+        </div>
+      </section>
+
+      {/* Ganesh Utsav Pooja Schedule & SPOCs Spotlight Banner */}
+      <section
+        className="dashboard-water-spotlight animate-fade-in"
+        style={{
+          background: 'linear-gradient(135deg, #78350f 0%, #b45309 45%, #ea580c 100%)',
+          borderRadius: 'var(--radius-xl, 16px)',
+          padding: '1.4rem 1.5rem',
+          color: '#ffffff',
+          boxShadow: '0 8px 24px -4px rgba(180, 83, 9, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1.25rem',
+          flexWrap: 'wrap',
+          cursor: 'pointer',
+          marginTop: '1.25rem',
+          border: '1.5px solid #fde68a',
+        }}
+        onClick={() => navigate('/pooja-schedule')}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', maxWidth: '640px' }}>
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              border: '1px solid rgba(255, 255, 255, 0.35)',
+            }}
+          >
+            <Flame size={24} color="#fef08a" />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span
+                style={{
+                  background: 'rgba(254, 240, 138, 0.25)',
+                  color: '#fef08a',
+                  padding: '0.15rem 0.55rem',
+                  borderRadius: '9999px',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  border: '1px solid rgba(254, 240, 138, 0.4)',
+                }}
+              >
+                14th – 19th Sep 2026
+              </span>
+              <span style={{ fontSize: '0.8rem', color: '#fed7aa' }}>Tower A &amp; B Mandap</span>
+            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
+              Pooja Schedule (14th–19th) &amp; Committee SPOC Directory
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: '#fef3c7', margin: 0, lineHeight: 1.4 }}>
+              Daily morning Abhishekam (7:30 AM), evening Maha Aarti (7:00 PM), Annadanam feast (17th), and dedicated team SPOC contacts.
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button
+            type="button"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              background: '#ffffff',
+              color: '#9a3412',
+              border: 'none',
+              padding: '0.65rem 1.15rem',
+              borderRadius: '10px',
+              fontWeight: 800,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate('/pooja-schedule');
+            }}
+          >
+            <span>View Schedule &amp; SPOCs</span>
+            <ArrowRight size={15} />
+          </button>
+        </div>
+      </section>
 
       {/* Upcoming Community Events Section */}
       <section className="dashboard-events-section animate-fade-in">

@@ -18,6 +18,9 @@ import {
   Shield,
   Eye,
   EyeOff,
+  Vote,
+  Droplets,
+  Flame,
 } from 'lucide-react';
 import {
   getMenuVisibility,
@@ -113,6 +116,12 @@ export const MenuVisibilityModal: React.FC<MenuVisibilityModalProps> = ({
         return <Bell size={18} />;
       case 'UserCheck':
         return <UserCheck size={18} />;
+      case 'Vote':
+        return <Vote size={18} />;
+      case 'Droplets':
+        return <Droplets size={18} />;
+      case 'Flame':
+        return <Flame size={18} />;
       default:
         return <Sliders size={18} />;
     }

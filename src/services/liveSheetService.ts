@@ -9,11 +9,44 @@ import type {
 } from '../types/ganesh';
 
 // Live Google Sheets Feeds
-export const GOOGLE_SHEET_CONTRIBUTIONS_CSV_URL =
+export const GOOGLE_SHEET_CONTRIBUTIONS_STORAGE_KEY = 'bps_ganesh_contributions_sheet_url';
+export const DEFAULT_CONTRIBUTIONS_SHEET_URL =
   'https://docs.google.com/spreadsheets/d/1ExhYq2D0bCV2R8J9IJpRcAER9LGPBkVZ/gviz/tq?tqx=out:csv&gid=960844894';
 
-export const GOOGLE_SHEET_GOTHRAM_CSV_URL =
+export function getContributionsSheetUrl(): string {
+  return localStorage.getItem(GOOGLE_SHEET_CONTRIBUTIONS_STORAGE_KEY) || DEFAULT_CONTRIBUTIONS_SHEET_URL;
+}
+
+export function setContributionsSheetUrl(url: string): void {
+  localStorage.setItem(GOOGLE_SHEET_CONTRIBUTIONS_STORAGE_KEY, url.trim());
+}
+
+export const GOOGLE_SHEET_GOTHRAM_STORAGE_KEY = 'bps_ganesh_gothram_sheet_url';
+export const DEFAULT_GOTHRAM_SHEET_URL =
   'https://docs.google.com/spreadsheets/d/1LKO614ka9F_G9B2OG-wqsZCT9Bk-c2COc1mpFPFT-M4/gviz/tq?tqx=out:csv&gid=984412802';
+
+export function getGothramSheetUrl(): string {
+  return localStorage.getItem(GOOGLE_SHEET_GOTHRAM_STORAGE_KEY) || DEFAULT_GOTHRAM_SHEET_URL;
+}
+
+export function setGothramSheetUrl(url: string): void {
+  localStorage.setItem(GOOGLE_SHEET_GOTHRAM_STORAGE_KEY, url.trim());
+}
+
+export const MASTER_PORTAL_STORAGE_KEY = 'bps_ganesh_master_portal_url';
+export const DEFAULT_MASTER_PORTAL_SPREADSHEET_URL =
+  'https://docs.google.com/spreadsheets/d/19wJOLle-co42OSM083JZWSrD_IIAOy6wUmoWsRVeM1M/edit?usp=sharing';
+
+export function getMasterPortalSheetUrl(): string {
+  return localStorage.getItem(MASTER_PORTAL_STORAGE_KEY) || DEFAULT_MASTER_PORTAL_SPREADSHEET_URL;
+}
+
+export function setMasterPortalSheetUrl(url: string): void {
+  localStorage.setItem(MASTER_PORTAL_STORAGE_KEY, url.trim());
+}
+
+export const GOOGLE_SHEET_CONTRIBUTIONS_CSV_URL = DEFAULT_CONTRIBUTIONS_SHEET_URL;
+export const GOOGLE_SHEET_GOTHRAM_CSV_URL = DEFAULT_GOTHRAM_SHEET_URL;
 
 export const GOOGLE_FORM_STORAGE_KEY = 'bps_ganesh_google_form_url';
 export const DEFAULT_GOOGLE_FORM_URL =
@@ -136,9 +169,10 @@ export function getCachedGothram(): GaneshSankalpamRecord[] {
 export async function fetchLiveContributions(): Promise<GaneshContributionRecord[]> {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-    const res = await fetch(GOOGLE_SHEET_CONTRIBUTIONS_CSV_URL, {
+    const targetUrl = normalizeGoogleSheetCsvUrl(getContributionsSheetUrl());
+    const res = await fetch(targetUrl, {
       cache: 'no-cache',
       signal: controller.signal,
     });
@@ -260,9 +294,10 @@ export async function fetchLiveContributions(): Promise<GaneshContributionRecord
 export async function fetchLiveGothramResponses(): Promise<GaneshSankalpamRecord[]> {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-    const res = await fetch(GOOGLE_SHEET_GOTHRAM_CSV_URL, {
+    const targetUrl = normalizeGoogleSheetCsvUrl(getGothramSheetUrl());
+    const res = await fetch(targetUrl, {
       cache: 'no-cache',
       signal: controller.signal,
     });
@@ -273,54 +308,91 @@ export async function fetchLiveGothramResponses(): Promise<GaneshSankalpamRecord
 
     if (rows.length <= 1) return [];
 
+    // Locate columns dynamically from header
+    let headerIdx = 0;
+    let blockCol = 1;
+    let flatCol = 2;
+    let dateCol = 3;
+    let gothramCol = 4;
+    let countCol = 5;
+    let namesCol = 6;
+
+    for (let i = 0; i < Math.min(rows.length, 5); i++) {
+      const r = rows[i].map((c) => c.toLowerCase().trim());
+      const b = r.findIndex((c) => c.includes('block') || c.includes('tower'));
+      const f = r.findIndex((c) => c.includes('flat') || c.includes('unit'));
+      const g = r.findIndex((c) => c.includes('gothram') || c.includes('gotra'));
+      const cnt = r.findIndex((c) => c.includes('count'));
+      const n = r.findIndex((c) => (c.includes('name') || c.includes('member')) && !c.includes('count'));
+      const d = r.findIndex((c) => c.includes('date') || c.includes('pooja') || c.includes('day'));
+
+      if (f !== -1 && g !== -1) {
+        headerIdx = i;
+        if (b !== -1) blockCol = b;
+        flatCol = f;
+        gothramCol = g;
+        if (cnt !== -1) countCol = cnt;
+        if (n !== -1) namesCol = n;
+        if (d !== -1) dateCol = d;
+        break;
+      }
+    }
+
     const records: GaneshSankalpamRecord[] = [];
 
-    // Header expected: Timestamp, Block, Flat Number, Pooja Date, Family Gothram, Count, Names
-    for (let i = 1; i < rows.length; i++) {
+    for (let i = headerIdx + 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row.length < 3) continue;
+      if (row.length < 2) continue;
 
       const timestamp = row[0] || '';
-      const block = (row[1] || '').toUpperCase().trim();
-      let flatNum = (row[2] || '').toUpperCase().trim();
-      const poojaDate = row[3] || '';
-      const gothram = row[4] || '';
-      const memberNamesRaw = row[6] || '';
+      const rawBlock = (row[blockCol] || '').toUpperCase().trim();
+      let rawFlat = (row[flatCol] || '').toUpperCase().trim();
+      const poojaDate = (row[dateCol] || '').trim();
+      const rawGothram = (row[gothramCol] || '').trim();
+      const rawCount = (row[countCol] || '').trim();
+      const rawNames = (row[namesCol] || '').trim();
 
-      if (!flatNum && !gothram && !memberNamesRaw) continue;
+      if (!rawFlat && !rawGothram && !rawNames) continue;
 
-      // Ensure flat starts with Tower prefix (e.g. 1102 -> A1102)
-      if (block && !flatNum.startsWith('A') && !flatNum.startsWith('B')) {
-        flatNum = `${block}${flatNum}`;
+      let cleanFlat = rawFlat.replace(/[\s-]/g, '').replace(/^FLAT/i, '');
+      let cleanBlock = rawBlock.replace(/[\s-]/g, '').replace(/^BLOCK/i, '').replace(/^TOWER/i, '');
+
+      if (!cleanFlat && cleanBlock) {
+        cleanFlat = cleanBlock;
+      } else if (cleanBlock && !cleanFlat.startsWith('A') && !cleanFlat.startsWith('B')) {
+        cleanFlat = `${cleanBlock}${cleanFlat}`;
       }
 
-      const tower: 'A' | 'B' | 'Other' = flatNum.startsWith('A')
+      const tower: 'A' | 'B' | 'Other' = cleanFlat.startsWith('A')
         ? 'A'
-        : flatNum.startsWith('B')
+        : cleanFlat.startsWith('B')
           ? 'B'
           : 'Other';
 
-      // Parse family members by newline, comma, or 'and'
-      const rawNamesList = memberNamesRaw
-        .split(/[\n\r,]+/)
-        .map((n) => n.trim())
-        .filter((n) => n.length > 0);
+      // Parse member names (splitting by newlines, commas, semicolons)
+      const rawNamesList = rawNames
+        .split(/[\n\r,;]+/)
+        .map((n) => n.trim().replace(/^and\s+/i, '').replace(/^[0-9]+[.)]\s*/, ''))
+        .filter((n) => n.length > 0 && isNaN(Number(n)));
 
       const familyMembers = rawNamesList.map((name, idx) => ({
         id: `fam-${i}-${idx}`,
-        name: name.replace(/^and\s+/i, '').trim(),
+        name,
       }));
 
-      const primaryName = familyMembers.length > 0 ? familyMembers[0].name : `Flat ${flatNum}`;
+      const parsedCount = parseInt(rawCount, 10);
+      const effectiveCount = !isNaN(parsedCount) && parsedCount > 0 ? parsedCount : familyMembers.length;
+      const primaryName = familyMembers.length > 0 ? familyMembers[0].name : `Flat ${cleanFlat}`;
 
       records.push({
         id: `gothram-${i}`,
-        flatNo: flatNum,
+        flatNo: cleanFlat,
         tower,
         primaryResidentName: primaryName,
-        gothram: gothram.trim() || 'General / Shiva-Vishnu',
+        gothram: rawGothram || 'General / Shiva-Vishnu',
         familyMembers,
-        preferredPujaDate: poojaDate.trim() || undefined,
+        membersCount: effectiveCount,
+        preferredPujaDate: poojaDate || undefined,
         submittedAt: timestamp || new Date().toISOString(),
       });
     }
@@ -341,22 +413,9 @@ const EXPENSES_STORAGE_KEY = 'bps_ganesh_live_expenses';
 const DEFAULT_EXPENSES: GaneshExpenseRecord[] = [
   {
     id: 'exp-1',
-    title: 'Pandal & Stage Decoration Setup',
-    category: 'Pandal & Decoration',
-    amount: 45000,
-    paidTo: 'Sri Balaji Pandal Works',
-    paymentMode: 'Bank Transfer',
-    expenseDate: '2026-09-08',
-    invoiceNo: 'INV-7701',
-    status: 'Paid',
-    notes: 'Advance 50% paid for 5 days shamiana & lighting',
-    createdAt: '2026-09-08T10:00:00.000Z',
-  },
-  {
-    id: 'exp-2',
     title: 'Eco-Friendly Clay Ganesh Idol Advance',
     category: 'Idol & Visarjan',
-    amount: 18000,
+    amount: 22500,
     paidTo: 'Dhoolpet Murti Arts',
     paymentMode: 'UPI',
     expenseDate: '2026-09-06',
@@ -366,26 +425,75 @@ const DEFAULT_EXPENSES: GaneshExpenseRecord[] = [
     createdAt: '2026-09-06T10:00:00.000Z',
   },
   {
+    id: 'exp-2',
+    title: 'Mahaprasadam cook Advance',
+    category: 'Mahaprasadam & Food',
+    amount: 5000,
+    paidTo: 'mallela pentaiah',
+    paymentMode: 'UPI',
+    expenseDate: '2026-09-10',
+    invoiceNo: '',
+    status: 'Pending Reimbursement',
+    notes: 'balance need to pay',
+    createdAt: '2026-09-10T10:00:00.000Z',
+  },
+  {
     id: 'exp-3',
-    title: 'Daily Archana Flowers & Garlands',
-    category: 'Priest & Puja Samagri',
-    amount: 12500,
-    paidTo: 'Gudimalkapur Flower Market',
-    paymentMode: 'Cash',
-    expenseDate: '2026-09-09',
-    invoiceNo: 'VCH-12',
+    title: 'Band ganesh entry',
+    category: 'Sound & Lighting',
+    amount: 3000,
+    paidTo: 'band',
+    paymentMode: 'UPI',
+    expenseDate: '2026-09-10',
+    invoiceNo: '',
     status: 'Paid',
-    notes: 'Bulk booking for 5 festival days',
-    createdAt: '2026-09-09T10:00:00.000Z',
+    notes: '3members',
+    createdAt: '2026-09-10T10:00:00.000Z',
+  },
+  {
+    id: 'exp-4',
+    title: 'ganesh entry (fruits, pooja items, flowers, sweets etc)',
+    category: 'Priest & Puja Samagri',
+    amount: 752,
+    paidTo: 'pooja items store',
+    paymentMode: 'UPI',
+    expenseDate: '2026-09-10',
+    invoiceNo: '',
+    status: 'Paid',
+    notes: 'fruits kanduva flowers sweets',
+    createdAt: '2026-09-10T10:00:00.000Z',
+  },
+  {
+    id: 'exp-5',
+    title: 'ganesh entry fire crackers',
+    category: 'Sound & Lighting',
+    amount: 4600,
+    paidTo: 'shanti fire works',
+    paymentMode: 'UPI',
+    expenseDate: '2026-09-10',
+    invoiceNo: '',
+    status: 'Paid',
+    notes: '5items, 60shot, 30shot, 2shot, 5000wala, pots',
+    createdAt: '2026-09-10T10:00:00.000Z',
   },
 ];
 
 export const GOOGLE_SHEET_EXPENSES_STORAGE_KEY = 'bps_ganesh_expense_sheet_url';
 export const DEFAULT_EXPENSE_SHEET_URL =
-  'https://docs.google.com/spreadsheets/d/1S1jLDNtDtoen4xCufk3z5ks-kEHDtfWGvjDMpjN0I0g/edit?gid=0#gid=0';
+  'https://docs.google.com/spreadsheets/d/19wJOLle-co42OSM083JZWSrD_IIAOy6wUmoWsRVeM1M/gviz/tq?tqx=out:csv&sheet=Expenses';
 
 export function getExpenseSheetUrl(): string {
-  return localStorage.getItem(GOOGLE_SHEET_EXPENSES_STORAGE_KEY) || DEFAULT_EXPENSE_SHEET_URL;
+  const stored = localStorage.getItem(GOOGLE_SHEET_EXPENSES_STORAGE_KEY);
+  if (
+    !stored ||
+    stored.includes('1S1jLDNtDtoen4xCufk3z5ks-kEHDtfWGvjDMpjN0I0g') ||
+    stored.includes('script.google.com') ||
+    stored.includes('AKfycbxsn0bLVTyEm5R8bR4N')
+  ) {
+    localStorage.setItem(GOOGLE_SHEET_EXPENSES_STORAGE_KEY, DEFAULT_EXPENSE_SHEET_URL);
+    return DEFAULT_EXPENSE_SHEET_URL;
+  }
+  return stored;
 }
 
 export function setExpenseSheetUrl(url: string): void {
@@ -396,8 +504,13 @@ export function setExpenseSheetUrl(url: string): void {
  * Normalizes any Google Sheet URL (Sharing link, Edit link, or PubHTML)
  * into a direct downloadable CSV URL.
  */
-export function normalizeGoogleSheetCsvUrl(rawUrl: string): string {
-  if (!rawUrl || !rawUrl.trim()) return '';
+export function normalizeGoogleSheetCsvUrl(rawUrl: string, defaultTab?: string): string {
+  if (!rawUrl || !rawUrl.trim() || rawUrl.includes('script.google.com')) {
+    if (defaultTab) {
+      return `https://docs.google.com/spreadsheets/d/${MASTER_PORTAL_SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(defaultTab)}`;
+    }
+    return '';
+  }
   const trimmed = rawUrl.trim();
 
   // If already a tq/csv link
@@ -414,6 +527,16 @@ export function normalizeGoogleSheetCsvUrl(rawUrl: string): string {
   const match = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (match && match[1]) {
     const sheetId = match[1];
+
+    const sheetParamMatch = trimmed.match(/[?&]sheet=([^&#]+)/);
+    if (sheetParamMatch && sheetParamMatch[1]) {
+      return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetParamMatch[1]}`;
+    }
+
+    if (sheetId === MASTER_PORTAL_SPREADSHEET_ID && defaultTab) {
+      return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(defaultTab)}`;
+    }
+
     let gid = '0';
     const gidMatch = trimmed.match(/[#&?]gid=([0-9]+)/);
     if (gidMatch && gidMatch[1]) {
@@ -447,11 +570,7 @@ export function getGaneshExpenses(): GaneshExpenseRecord[] {
  */
 export async function fetchLiveExpenses(): Promise<GaneshExpenseRecord[]> {
   const customUrl = getExpenseSheetUrl();
-  if (!customUrl) {
-    return getCachedExpenses();
-  }
-
-  const csvUrl = normalizeGoogleSheetCsvUrl(customUrl);
+  const csvUrl = normalizeGoogleSheetCsvUrl(customUrl, 'Expenses');
 
   try {
     const controller = new AbortController();
@@ -470,48 +589,96 @@ export async function fetchLiveExpenses(): Promise<GaneshExpenseRecord[]> {
 
     if (rows.length < 2) return getCachedExpenses();
 
-    const headers = rows[0].map((h) => h.toLowerCase().trim());
-    const findIdx = (keywords: string[]) =>
-      headers.findIndex((h) => keywords.some((k) => h.includes(k)));
+    // 1. Robust Header Row Detection (Avoid Top KPI / Total Cards)
+    let headerIdx = -1;
+    for (let r = 0; r < rows.length; r++) {
+      const rowLower = rows[r].map((c) => c.toLowerCase().trim());
+      if (
+        rowLower.some((c) => c === 'expense title' || c === 'title') ||
+        (rowLower.some((c) => c === 'category') &&
+          rowLower.some((c) => c.includes('vendor') || c.includes('paid')))
+      ) {
+        headerIdx = r;
+        break;
+      }
+    }
 
-    const titleIdx = findIdx(['title', 'item', 'description', 'particulars', 'expense']);
-    const categoryIdx = findIdx(['category', 'type', 'head']);
-    const amountIdx = findIdx(['amount', 'cost', 'price', 'rs', 'inr', 'total']);
-    const paidToIdx = findIdx(['paid to', 'vendor', 'payee', 'name', 'recipient', 'beneficiary']);
-    const modeIdx = findIdx(['mode', 'payment mode', 'method', 'via']);
-    const dateIdx = findIdx(['date', 'time', 'timestamp']);
-    const invoiceIdx = findIdx(['invoice', 'bill', 'receipt', 'voucher', 'ref']);
-    const statusIdx = findIdx(['status', 'state']);
-    const notesIdx = findIdx(['note', 'notes', 'remarks', 'comment', 'approved']);
+    // Default indices if headers row isn't explicit
+    let titleIdx = 1;
+    let categoryIdx = 2;
+    let amountIdx = 3;
+    let paidToIdx = 4;
+    let modeIdx = 5;
+    let dateIdx = 6;
+    let statusIdx = 7;
+    let invoiceIdx = 8;
+    let notesIdx = 9;
+
+    if (headerIdx !== -1) {
+      const h = rows[headerIdx].map((c) => c.toLowerCase().trim());
+      const findCol = (keywords: string[]) =>
+        h.findIndex((c) =>
+          keywords.some(
+            (k) => c === k || (c.includes(k) && !c.includes('total'))
+          )
+        );
+
+      const t = findCol(['expense title', 'title', 'particulars', 'item', 'description']);
+      if (t !== -1) titleIdx = t;
+
+      const cat = findCol(['category', 'head', 'type']);
+      if (cat !== -1) categoryIdx = cat;
+
+      const amt = findCol(['amount', 'cost', 'price', 'rs', 'inr']);
+      if (amt !== -1) amountIdx = amt;
+
+      const p = findCol(['vendor / paid to', 'vendor', 'paid to', 'payee', 'name']);
+      if (p !== -1) paidToIdx = p;
+
+      const m = findCol(['payment mode', 'mode', 'method']);
+      if (m !== -1) modeIdx = m;
+
+      const d = findCol(['expense date', 'date', 'time', 'timestamp']);
+      if (d !== -1) dateIdx = d;
+
+      const s = findCol(['status', 'state']);
+      if (s !== -1) statusIdx = s;
+
+      const inv = findCol(['invoice no', 'invoice', 'bill', 'receipt', 'voucher', 'inv']);
+      if (inv !== -1) invoiceIdx = inv;
+
+      const n = findCol(['notes', 'note', 'remarks', 'comment', 'approved']);
+      if (n !== -1) notesIdx = n;
+    }
 
     const validExpenses: GaneshExpenseRecord[] = [];
 
-    for (let i = 1; i < rows.length; i++) {
+    for (let i = headerIdx + 1; i < rows.length; i++) {
       const row = rows[i];
       if (!row || row.length === 0) continue;
 
-      const title = (titleIdx !== -1 ? row[titleIdx] : row[1]) || '';
-      if (!title || title.trim() === '') continue;
-
-      // Skip summary / total rows
-      const lowerTitle = title.toLowerCase().trim();
+      const title = (row[titleIdx] || row[1] || '').trim();
       if (
-        lowerTitle === 'total' ||
-        lowerTitle === 'subtotal' ||
-        lowerTitle === 'grand total' ||
-        lowerTitle.startsWith('total ')
+        !title ||
+        title.toLowerCase().startsWith('total') ||
+        title.includes('₹35,852') ||
+        title.toLowerCase() === 'grand total'
       ) {
         continue;
       }
 
+      // Check Category
+      const rawCategory = (row[categoryIdx] || row[2] || '').trim();
+      if (rawCategory.toLowerCase().includes('total')) {
+        continue;
+      }
+
       // Parse Amount
-      const rawAmt = (amountIdx !== -1 ? row[amountIdx] : row[3]) || '0';
-      const cleanAmtStr = rawAmt.replace(/[^0-9.]/g, '');
-      const amount = parseFloat(cleanAmtStr) || 0;
+      const rawAmt = (row[amountIdx] || row[3] || '').replace(/[^0-9.]/g, '');
+      const amount = parseFloat(rawAmt) || 0;
       if (amount <= 0) continue;
 
       // Category parsing
-      const rawCategory = (categoryIdx !== -1 ? row[categoryIdx] : row[2]) || '';
       let category: GaneshExpenseCategory = 'Misc & Contingency';
       const catLower = rawCategory.toLowerCase();
       if (catLower.includes('idol') || catLower.includes('visarjan') || catLower.includes('murti')) {
@@ -528,43 +695,46 @@ export async function fetchLiveExpenses(): Promise<GaneshExpenseRecord[]> {
         category = 'Cultural Events & Gifts';
       } else if (catLower.includes('security') || catLower.includes('clean') || catLower.includes('guard')) {
         category = 'Security & Cleaning';
+      } else if (catLower.includes('celebration')) {
+        category = 'Celebrations';
+      } else if (catLower.includes('misc') || catLower.includes('contingency') || catLower.includes('other')) {
+        category = 'Misc & Contingency';
       }
 
       // Payment Mode
-      const rawMode = (modeIdx !== -1 ? row[modeIdx] : '') || 'UPI';
-      const modeLower = rawMode.toLowerCase();
+      const rawMode = (row[modeIdx] || row[5] || '').toLowerCase();
       let paymentMode: GaneshPaymentMode = 'UPI';
-      if (modeLower.includes('cash')) paymentMode = 'Cash';
-      else if (modeLower.includes('bank') || modeLower.includes('neft') || modeLower.includes('rtgs') || modeLower.includes('transfer')) paymentMode = 'Bank Transfer';
-      else if (modeLower.includes('cheque') || modeLower.includes('check')) paymentMode = 'Cheque';
+      if (rawMode.includes('cash')) paymentMode = 'Cash';
+      else if (rawMode.includes('bank') || rawMode.includes('neft') || rawMode.includes('rtgs') || rawMode.includes('transfer')) paymentMode = 'Bank Transfer';
+      else if (rawMode.includes('cheque') || rawMode.includes('check')) paymentMode = 'Cheque';
 
       // Date
-      const rawDate = (dateIdx !== -1 ? row[dateIdx] : '') || new Date().toISOString().split('T')[0];
+      const rawDate = (row[dateIdx] || row[6] || '').trim() || new Date().toISOString().split('T')[0];
 
       // Status
-      const rawStatus = (statusIdx !== -1 ? row[statusIdx] : '') || 'Paid';
+      const rawStatus = (row[statusIdx] || row[7] || '').trim().toLowerCase();
       let status: 'Paid' | 'Pending Reimbursement' | 'Planned' = 'Paid';
-      if (rawStatus.toLowerCase().includes('reimburse') || rawStatus.toLowerCase().includes('pending')) {
+      if (rawStatus.includes('reimburse') || rawStatus.includes('pending')) {
         status = 'Pending Reimbursement';
-      } else if (rawStatus.toLowerCase().includes('plan')) {
+      } else if (rawStatus.includes('plan')) {
         status = 'Planned';
       }
 
-      const paidTo = (paidToIdx !== -1 ? row[paidToIdx] : '') || 'Vendor';
-      const invoiceNo = (invoiceIdx !== -1 ? row[invoiceIdx] : undefined);
-      const notes = (notesIdx !== -1 ? row[notesIdx] : undefined);
+      const paidTo = (row[paidToIdx] || row[4] || '').trim() || 'Vendor';
+      const invoiceNo = (row[invoiceIdx] || row[8] || '').trim();
+      const notes = (row[notesIdx] || row[9] || '').trim();
 
       validExpenses.push({
         id: `live-exp-${i}`,
         title: title.trim(),
         category,
         amount,
-        paidTo: paidTo.trim(),
+        paidTo,
         paymentMode,
-        expenseDate: rawDate.trim(),
-        invoiceNo: invoiceNo?.trim(),
+        expenseDate: rawDate,
+        invoiceNo: invoiceNo && invoiceNo !== '-' ? invoiceNo : undefined,
         status,
-        notes: notes?.trim(),
+        notes: notes && notes !== '-' ? notes : undefined,
         createdAt: new Date().toISOString(),
       });
     }
@@ -580,11 +750,12 @@ export async function fetchLiveExpenses(): Promise<GaneshExpenseRecord[]> {
   }
 }
 
-export function addGaneshExpense(expense: Omit<GaneshExpenseRecord, 'id'>): GaneshExpenseRecord {
+export function addGaneshExpense(expense: Omit<GaneshExpenseRecord, 'id'> | Omit<GaneshExpenseRecord, 'id' | 'createdAt'>): GaneshExpenseRecord {
   const current = getGaneshExpenses();
   const newRec: GaneshExpenseRecord = {
     ...expense,
     id: `exp-${Date.now()}`,
+    createdAt: ('createdAt' in expense && expense.createdAt) ? expense.createdAt : new Date().toISOString(),
   };
   const updated = [newRec, ...current];
   localStorage.setItem(EXPENSES_STORAGE_KEY, JSON.stringify(updated));
@@ -614,28 +785,29 @@ export function updateGaneshExpense(id: string, updatedFields: Partial<GaneshExp
 }
 
 export async function syncExpenseToGoogleSheet(expense: GaneshExpenseRecord): Promise<void> {
-  const webhookUrl = getAppsScriptUrl();
+  const webhookUrl = getExpensesAppsScriptUrl();
   if (!webhookUrl) return;
 
   try {
+    const payload = {
+      action: 'saveExpense',
+      invoiceNo: expense.invoiceNo || `INV-${Date.now()}`,
+      title: expense.title,
+      category: expense.category,
+      amount: expense.amount,
+      paidTo: expense.paidTo || '',
+      paymentMode: expense.paymentMode || 'UPI',
+      expenseDate: expense.expenseDate || new Date().toISOString().split('T')[0],
+      status: expense.status || 'Paid',
+      notes: expense.notes || '',
+      approvedBy: expense.approvedBy || '',
+    };
+
     await fetch(webhookUrl, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        action: 'saveExpense',
-        expenseId: expense.id,
-        title: expense.title,
-        category: expense.category,
-        amount: expense.amount,
-        paidTo: expense.paidTo,
-        paymentMode: expense.paymentMode,
-        expenseDate: expense.expenseDate,
-        invoiceNo: expense.invoiceNo || '',
-        status: expense.status,
-        notes: expense.notes || '',
-        approvedBy: expense.approvedBy || '',
-      }),
+      body: JSON.stringify(payload),
     });
   } catch (err) {
     console.warn('Could not sync expense to webhook:', err);
@@ -667,7 +839,7 @@ export function addGaneshContribution(contribution: Omit<GaneshContributionRecor
 
 export const APPS_SCRIPT_STORAGE_KEY = 'bps_ganesh_apps_script_url';
 export const DEFAULT_APPS_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycbxRGpinnY0Smkl1C2_mvljN9Z303okeR7asK7Cee7SJE4ItJc2U1x8mbhUcq9O8eMn0/exec';
+  'https://script.google.com/macros/s/AKfycbwWButnA4pf1IuiHaIl_gidgFn7ToiPFIQaOpcBAn_KvdwfJyA6MNk2uV3H66p-h2gb/exec';
 
 export function getAppsScriptUrl(): string {
   return localStorage.getItem(APPS_SCRIPT_STORAGE_KEY) || DEFAULT_APPS_SCRIPT_URL;
@@ -677,65 +849,46 @@ export function setAppsScriptUrl(url: string): void {
   localStorage.setItem(APPS_SCRIPT_STORAGE_KEY, url.trim());
 }
 
+export const CULTURAL_APPS_SCRIPT_STORAGE_KEY = 'bps_ganesh_cultural_apps_script_url';
+export const DEFAULT_CULTURAL_APPS_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbwWButnA4pf1IuiHaIl_gidgFn7ToiPFIQaOpcBAn_KvdwfJyA6MNk2uV3H66p-h2gb/exec';
+export const EXPENSES_APPS_SCRIPT_STORAGE_KEY = 'bps_ganesh_expenses_apps_script_url';
+export const DEFAULT_EXPENSES_APPS_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbwWButnA4pf1IuiHaIl_gidgFn7ToiPFIQaOpcBAn_KvdwfJyA6MNk2uV3H66p-h2gb/exec';
+
+export function getCulturalAppsScriptUrl(): string {
+  const stored = localStorage.getItem(CULTURAL_APPS_SCRIPT_STORAGE_KEY);
+  if (!stored || stored.includes('AKfycbxRGpinnY0Smkl1C2_') || stored.includes('AKfycbw1JOhnsIXKfitrckZv') || stored.includes('AKfycbyK_c-t9brIJicFnVr')) {
+    localStorage.setItem(CULTURAL_APPS_SCRIPT_STORAGE_KEY, DEFAULT_CULTURAL_APPS_SCRIPT_URL);
+    return DEFAULT_CULTURAL_APPS_SCRIPT_URL;
+  }
+  return stored;
+}
+
+export function setCulturalAppsScriptUrl(url: string): void {
+  localStorage.setItem(CULTURAL_APPS_SCRIPT_STORAGE_KEY, url.trim());
+}
+
+export function getExpensesAppsScriptUrl(): string {
+  const stored = localStorage.getItem(EXPENSES_APPS_SCRIPT_STORAGE_KEY);
+  if (!stored || stored.includes('AKfycbxRGpinnY0Smkl1C2_') || stored.includes('AKfycbyK_c-t9brIJicFnVr') || stored.includes('AKfycbw1JOhnsIXKfitrckZv')) {
+    localStorage.setItem(EXPENSES_APPS_SCRIPT_STORAGE_KEY, DEFAULT_EXPENSES_APPS_SCRIPT_URL);
+    return DEFAULT_EXPENSES_APPS_SCRIPT_URL;
+  }
+  return stored;
+}
+
+export function setExpensesAppsScriptUrl(url: string): void {
+  localStorage.setItem(EXPENSES_APPS_SCRIPT_STORAGE_KEY, url.trim());
+}
+
 export async function submitGothramToGoogleSheet(sankalpam: Omit<GaneshSankalpamRecord, 'id' | 'submittedAt' | 'tower'>): Promise<{ success: boolean; message: string }> {
-  // 1. First save to local cache for immediate optimistic UI update
+  // Gothram Pooja is managed exclusively via the official Google Form (no Apps Script)
   addGaneshSankalpam(sankalpam);
-
-  const webhookUrl = getAppsScriptUrl();
-  const rawFlat = sankalpam.flatNo.toUpperCase().trim();
-  const blockMatch = rawFlat.match(/^([AB])/i);
-  const block = blockMatch ? blockMatch[1].toUpperCase() : 'A';
-  const flatNumber = rawFlat.replace(/^[AB]/i, '').trim() || rawFlat;
-
-  const membersText = sankalpam.familyMembers
-    .map((m) => {
-      let line = m.name;
-      if (m.relationship && m.relationship !== 'Self') line += ` (${m.relationship})`;
-      if (m.nakshatram) line += ` - ${m.nakshatram}`;
-      return line;
-    })
-    .join('\n');
-
-  const payload = {
-    timestamp: new Date().toLocaleString('en-US'),
-    block,
-    flatNumber,
-    poojaDate: sankalpam.preferredPujaDate || 'All Festival Days',
-    gothram: sankalpam.gothram,
-    count: sankalpam.familyMembers.length,
-    names: membersText,
-    primaryResident: sankalpam.primaryResidentName,
+  return {
+    success: true,
+    message: 'Saved locally. Responses are synced live from the Google Form sheet.',
   };
-
-  if (!webhookUrl) {
-    return {
-      success: true,
-      message: 'Saved locally. (To sync with Google Sheets, add your Apps Script URL in Settings)',
-    };
-  }
-
-  try {
-    // Submit to Google Apps Script Web App
-    await fetch(webhookUrl, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    return {
-      success: true,
-      message: 'Successfully submitted directly to Google Sheet!',
-    };
-  } catch (err) {
-    console.error('Failed to post to Google Apps Script Webhook:', err);
-    return {
-      success: false,
-      message: 'Failed to send to Google Sheet webhook, but saved locally.',
-    };
-  }
 }
 
 export function addGaneshSankalpam(sankalpam: Omit<GaneshSankalpamRecord, 'id' | 'submittedAt' | 'tower'>): GaneshSankalpamRecord {
@@ -854,4 +1007,687 @@ export function exportGaneshSankalpamCSV(sankalpams: GaneshSankalpamRecord[]): s
     `"${s.familyMembers.map((m) => m.name).join('; ').replace(/"/g, '""')}"`,
   ]);
   return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+}
+
+// ============================================================================
+// 6. BPS GANESH UTSAV 2026 - MASTER PORTAL LIVE GOOGLE SHEET SYNC
+// ============================================================================
+export const MASTER_PORTAL_SPREADSHEET_ID = '19wJOLle-co42OSM083JZWSrD_IIAOy6wUmoWsRVeM1M';
+export const MASTER_PORTAL_URL = 'https://docs.google.com/spreadsheets/d/19wJOLle-co42OSM083JZWSrD_IIAOy6wUmoWsRVeM1M/edit?usp=sharing';
+
+export function getMasterSheetCsvUrl(tabName: 'Events' | 'Event Team' | 'Cultural' | 'Prasadam' | 'Expenses'): string {
+  return `https://docs.google.com/spreadsheets/d/${MASTER_PORTAL_SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
+}
+
+export interface LiveMasterEventItem {
+  id: string;
+  dayNumber: number;
+  dateStr?: string;
+  dayLabel: string;
+  dateKey: 'sep14' | 'sep15' | 'sep16' | 'sep17' | 'sep18' | 'sep19';
+  month: string;
+  day: string;
+  title: string;
+  category: 'Rituals & Pooja' | 'Event Team';
+  timeSlot: string;
+  location: string;
+  description: string;
+  rituals?: string[];
+  spocName?: string;
+  spocPhone?: string;
+}
+
+export interface LiveMasterTeamItem {
+  teamName: string;
+  teamPurpose: string;
+  spocName: string;
+  flatNo: string;
+  tower: string;
+  phone: string;
+}
+
+export interface LiveMasterCulturalItem {
+  id: string;
+  date: string;
+  timeSlot: string;
+  durationMins?: string;
+  performanceTitle: string;
+  performers: string;
+  flatNo: string;
+  actCategory: string;
+  description: string;
+}
+
+export interface LiveMasterPrasadamItem {
+  dayNumber: number;
+  date: string;
+  occasionTitle: string;
+  mealType: string;
+  menuItems: string;
+  specialHighlight?: string;
+  sponsorName?: string;
+}
+
+export function getEventDateMeta(dayNum: number): {
+  dateKey: 'sep14' | 'sep15' | 'sep16' | 'sep17' | 'sep18' | 'sep19';
+  month: string;
+  day: string;
+  dayLabel: string;
+} {
+  switch (dayNum) {
+    case 1:
+      return { dateKey: 'sep14', month: 'SEP', day: '14', dayLabel: 'Day 1 • Mon, 14th Sep' };
+    case 2:
+      return { dateKey: 'sep15', month: 'SEP', day: '15', dayLabel: 'Day 2 • Tue, 15th Sep' };
+    case 3:
+      return { dateKey: 'sep16', month: 'SEP', day: '16', dayLabel: 'Day 3 • Wed, 16th Sep' };
+    case 4:
+      return { dateKey: 'sep17', month: 'SEP', day: '17', dayLabel: 'Day 4 • Thu, 17th Sep' };
+    case 5:
+      return { dateKey: 'sep18', month: 'SEP', day: '18', dayLabel: 'Day 5 • Fri, 18th Sep' };
+    case 6:
+      return { dateKey: 'sep19', month: 'SEP', day: '19', dayLabel: 'Day 6 • Sat, 19th Sep' };
+    default:
+      return { dateKey: 'sep14', month: 'SEP', day: '14', dayLabel: `Day ${dayNum}` };
+  }
+}
+
+/**
+ * Fetches and parses live Events from the Master Portal sheet
+ */
+export async function fetchLiveMasterEvents(): Promise<LiveMasterEventItem[]> {
+  try {
+    const res = await fetch(getMasterSheetCsvUrl('Events'));
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const csvText = await res.text();
+    const rows = parseCSV(csvText);
+
+    const items: LiveMasterEventItem[] = [];
+    let startParsing = false;
+
+    for (let rIdx = 0; rIdx < rows.length; rIdx++) {
+      const row = rows[rIdx];
+      if (!row || row.length < 4) continue;
+
+      const col0 = (row[0] || '').trim().toLowerCase();
+      const col2 = (row[2] || '').trim().toLowerCase();
+      const col3 = (row[3] || '').trim().toLowerCase();
+
+      if (col0.includes('day number') || col2.includes('day label') || col3.includes('event title')) {
+        startParsing = true;
+        continue;
+      }
+
+      if (startParsing) {
+        const rawDay = (row[0] || '').trim();
+        const dayMatch = rawDay.match(/\d+/);
+        const dayNum = dayMatch ? parseInt(dayMatch[0], 10) : 1;
+        const dateStr = (row[1] || '').trim();
+
+        const title = (row[3] || '').trim();
+        if (!title || title.toLowerCase().includes('schedule') || title.toLowerCase().includes('utsav')) {
+          continue;
+        }
+
+        const rawCat = (row[4] || '').trim().toLowerCase();
+        const category: 'Rituals & Pooja' | 'Event Team' =
+          rawCat.includes('ritual') || rawCat.includes('pooja') ? 'Rituals & Pooja' : 'Event Team';
+
+        const timeSlot = (row[5] || '').trim();
+        const location = (row[6] || 'Main Ganesh Mandap').trim();
+        const description = (row[7] || '').trim();
+        const rawRituals = (row[8] || '').trim();
+        const rituals = rawRituals
+          ? rawRituals.split(/[,;\n]/).map((s) => s.trim()).filter(Boolean)
+          : undefined;
+
+        const rawSpoc = (row[9] || '').trim();
+        const spocName = rawSpoc && rawSpoc !== '-' ? rawSpoc : undefined;
+        const rawPhone = (row[10] || '').trim();
+        const spocPhone = rawPhone && rawPhone !== '-' ? rawPhone : undefined;
+
+        const meta = getEventDateMeta(dayNum);
+
+        items.push({
+          id: `live-event-d${dayNum}-${rIdx}`,
+          dayNumber: dayNum,
+          dateStr,
+          dayLabel: meta.dayLabel,
+          dateKey: meta.dateKey,
+          month: meta.month,
+          day: meta.day,
+          title,
+          category,
+          timeSlot,
+          location,
+          description,
+          rituals,
+          spocName,
+          spocPhone,
+        });
+      }
+    }
+    return items;
+  } catch (err) {
+    console.warn('Could not fetch live Master Events from Google Sheets, using fallback:', err);
+    return [];
+  }
+}
+
+/**
+ * Fetches and parses live Prasadam menu from the Master Portal sheet
+ */
+export async function fetchLiveMasterPrasadam(): Promise<LiveMasterPrasadamItem[]> {
+  try {
+    const res = await fetch(getMasterSheetCsvUrl('Prasadam'));
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const csvText = await res.text();
+    const rows = parseCSV(csvText);
+
+    const items: LiveMasterPrasadamItem[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (!row || row.length < 3) continue;
+      const dayMatch = (row[0] || '').match(/\d+/);
+      const dayNum = dayMatch ? parseInt(dayMatch[0], 10) : i;
+
+      items.push({
+        dayNumber: dayNum,
+        date: (row[1] || '').trim(),
+        occasionTitle: (row[2] || '').trim(),
+        mealType: (row[3] || 'Night Dinner (9:00 PM onwards)').trim(),
+        menuItems: (row[4] || '').trim(),
+        specialHighlight: (row[5] || '').trim(),
+        sponsorName: (row[6] || '').trim(),
+      });
+    }
+    return items;
+  } catch (err) {
+    console.warn('Could not fetch live Prasadam from Google Sheets:', err);
+    return [];
+  }
+}
+
+export interface LiveMasterTeamGroup {
+  name: string;
+  purpose: string;
+  spocs: {
+    name: string;
+    flatNo: string;
+    tower: string;
+    phone?: string;
+  }[];
+}
+
+/**
+ * Fetches and parses live Event Teams & SPOC directory from the Master Portal sheet
+ */
+export async function fetchLiveMasterTeams(): Promise<LiveMasterTeamGroup[]> {
+  try {
+    const res = await fetch(getMasterSheetCsvUrl('Event Team'));
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const csvText = await res.text();
+    const rows = parseCSV(csvText);
+
+    let startParsing = false;
+    const teamMap: Record<string, LiveMasterTeamGroup> = {};
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      if (!row || row.length < 3) continue;
+
+      const col0 = (row[0] || '').trim().toLowerCase();
+      const col2 = (row[2] || '').trim().toLowerCase();
+
+      if (col0.includes('team name') || col2.includes('spoc name')) {
+        startParsing = true;
+        continue;
+      }
+
+      if (startParsing) {
+        const teamName = (row[0] || '').trim();
+        if (!teamName || teamName.toLowerCase().includes('directory') || teamName.toLowerCase().includes('utsav')) {
+          continue;
+        }
+
+        const teamPurpose = (row[1] || '').trim();
+        const spocName = (row[2] || '').trim();
+        const flatNo = (row[3] || '').trim();
+        const tower = (row[4] || '').trim();
+        const rawPhone = (row[5] || '').trim();
+        const phone = rawPhone && rawPhone !== '-' ? rawPhone : undefined;
+
+        if (!teamMap[teamName]) {
+          teamMap[teamName] = {
+            name: teamName,
+            purpose: teamPurpose,
+            spocs: [],
+          };
+        }
+
+        if (spocName) {
+          teamMap[teamName].spocs.push({
+            name: spocName,
+            flatNo,
+            tower,
+            phone,
+          });
+        }
+      }
+    }
+
+    return Object.values(teamMap);
+  } catch (err) {
+    console.warn('Could not fetch live Event Team from Google Sheets:', err);
+    return [];
+  }
+}
+
+/**
+ * Fetches and parses live Cultural performances from the Master Portal sheet
+ */
+export async function fetchLiveMasterCultural(): Promise<LiveMasterCulturalItem[]> {
+  try {
+    const res = await fetch(getMasterSheetCsvUrl('Cultural'));
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const csvText = await res.text();
+    const rows = parseCSV(csvText);
+
+    let startParsing = false;
+    const items: LiveMasterCulturalItem[] = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      if (!row || row.length < 3) continue;
+
+      const col0 = (row[0] || '').trim().toLowerCase();
+      const col1 = (row[1] || '').trim().toLowerCase();
+      const col2 = (row[2] || '').trim().toLowerCase();
+
+      if (
+        col0.includes('date') ||
+        col1.includes('time') ||
+        col2.includes('performance title') ||
+        col2.includes('title')
+      ) {
+        startParsing = true;
+        continue;
+      }
+
+      if (startParsing) {
+        const date = (row[0] || '').trim();
+        const timeSlot = (row[1] || '').trim();
+        const performanceTitle = (row[2] || '').trim();
+
+        if (
+          !performanceTitle ||
+          performanceTitle.toLowerCase().includes('utsav') ||
+          performanceTitle.toLowerCase().includes('schedule')
+        ) {
+          continue;
+        }
+
+        const rawDuration = (row[3] || '').trim();
+        const durationMins = rawDuration ? `${rawDuration} Mins` : undefined;
+        const performers = (row[4] || '').trim();
+        const flatNo = (row[5] || '').trim();
+        const actCategory = (row[6] || '').trim();
+        const description = (row[7] || '').trim();
+
+        items.push({
+          id: `live-cultural-${i}`,
+          date,
+          timeSlot,
+          durationMins,
+          performanceTitle,
+          performers,
+          flatNo,
+          actCategory: actCategory || 'Cultural Performance',
+          description,
+        });
+      }
+    }
+    return items;
+  } catch (err) {
+    console.warn('Could not fetch live Cultural from Google Sheets:', err);
+    return [];
+  }
+}
+
+export interface CulturalRegistrationEntry {
+  id: string;
+  fullName: string;
+  flatNo: string;
+  mobile: string;
+  actType: string;
+  preferredDate: string;
+  duration?: string;
+  actDescription?: string;
+  registeredAt: string;
+}
+
+/**
+ * Submits a cultural performance registration entry to both local storage and Google Sheets webhook
+ */
+export async function submitCulturalEntryToGoogleSheet(
+  entry: Omit<CulturalRegistrationEntry, 'id' | 'registeredAt'>
+): Promise<{ success: boolean; message: string; entry: CulturalRegistrationEntry }> {
+  const newEntry: CulturalRegistrationEntry = {
+    ...entry,
+    id: `cultural-reg-${Date.now()}`,
+    registeredAt: new Date().toISOString(),
+  };
+
+  try {
+    const existing = JSON.parse(localStorage.getItem('bps_cultural_registrations') || '[]');
+    localStorage.setItem('bps_cultural_registrations', JSON.stringify([newEntry, ...existing]));
+  } catch (e) {
+    console.warn('Failed saving cultural registration locally', e);
+  }
+
+  const webhookUrl = getCulturalAppsScriptUrl();
+  if (!webhookUrl) {
+    return {
+      success: true,
+      message: 'Registration saved locally. You can also share details with the Cultural SPOC.',
+      entry: newEntry,
+    };
+  }
+
+  try {
+    const payload = {
+      action: 'saveCulturalEntry',
+      timestamp: new Date().toLocaleString('en-US'),
+      fullName: entry.fullName,
+      flatNo: entry.flatNo,
+      mobile: entry.mobile,
+      actType: entry.actType,
+      preferredDate: entry.preferredDate,
+      duration: entry.duration || '15 mins',
+      description: entry.actDescription || '',
+    };
+
+    await fetch(webhookUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    return {
+      success: true,
+      message: 'Submitted directly to Google Sheet and Cultural Committee!',
+      entry: newEntry,
+    };
+  } catch (err) {
+    console.warn('Failed posting cultural registration to webhook:', err);
+    return {
+      success: true,
+      message: 'Saved locally. You can also share details with the Cultural Committee on WhatsApp.',
+      entry: newEntry,
+    };
+  }
+}
+
+// ============================================================================
+// 7. TODAY'S COMBINED SCHEDULE (EVENTS & CULTURAL MERGE + TIME SORTING)
+// ============================================================================
+
+export interface TodayCombinedScheduleItem {
+  id: string;
+  source: 'event' | 'cultural' | 'both';
+  title: string;
+  timeSlot: string;
+  startTimeMinutes: number;
+  category: string;
+  location?: string;
+  description: string;
+  performers?: string;
+  durationMins?: string;
+  rituals?: string[];
+  spocName?: string;
+  spocPhone?: string;
+  iconType: 'pooja' | 'cultural' | 'prasadam' | 'activity' | 'event';
+}
+
+/**
+ * Robustly parses time string to minutes from midnight (0-1440) for chronological sorting.
+ * e.g. "7:30 PM - 8:30 PM" -> 1170, "08:30 PM" -> 1230, "9:15 PM onwards" -> 1275, "6:00 AM" -> 360
+ */
+export function parseTimeToMinutes(timeStr: string): number {
+  if (!timeStr) return 9999;
+  const match = timeStr.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)/i);
+  if (!match) return 9999;
+  let hours = parseInt(match[1], 10);
+  const minutes = match[2] ? parseInt(match[2], 10) : 0;
+  const period = match[3].toLowerCase();
+
+  if (period === 'pm' && hours < 12) hours += 12;
+  if (period === 'am' && hours === 12) hours = 0;
+
+  return hours * 60 + minutes;
+}
+
+export function getScheduleIconType(item: { title: string; category?: string; actCategory?: string; source?: string }): 'pooja' | 'cultural' | 'prasadam' | 'activity' | 'event' {
+  const text = `${item.title} ${item.category || ''} ${item.actCategory || ''}`.toLowerCase();
+  if (text.includes('pooja') || text.includes('aarti') || text.includes('havan') || text.includes('sthapana') || text.includes('visarjan') || text.includes('rituals')) {
+    return 'pooja';
+  }
+  if (text.includes('prasadam') || text.includes('dinner') || text.includes('food') || text.includes('lunch') || text.includes('meal') || text.includes('fellowship')) {
+    return 'prasadam';
+  }
+  if (text.includes('dance') || text.includes('song') || text.includes('singing') || text.includes('music') || text.includes('cultural') || text.includes('drama') || text.includes('skit') || text.includes('performance') || text.includes('vocal')) {
+    return 'cultural';
+  }
+  if (text.includes('chair') || text.includes('quiz') || text.includes('game') || text.includes('activity') || text.includes('competition') || text.includes('children') || text.includes('rangoli')) {
+    return 'activity';
+  }
+  return 'event';
+}
+
+function normalizeDateMatch(dateStr1: string, dateStr2: string): boolean {
+  if (!dateStr1 || !dateStr2) return false;
+  const clean1 = dateStr1.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  const clean2 = dateStr2.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (clean1 === clean2) return true;
+  if (clean1.includes(clean2) || clean2.includes(clean1)) return true;
+
+  const extractDayMonth = (d: string) => {
+    const m = d.match(/(\d{4})-(\d{2})-(\d{2})/) || d.match(/(\d{2})[-/](\d{2})[-/](\d{4})/);
+    if (m) {
+      if (m[1].length === 4) return `${m[2]}-${m[3]}`;
+      return `${m[2]}-${m[1]}`;
+    }
+    const num = d.match(/\d+/);
+    return num ? num[0] : '';
+  };
+  return extractDayMonth(dateStr1) === extractDayMonth(dateStr2);
+}
+
+/**
+ * Fetches and combines Events & Cultural performances for a given date (defaults to Today / Day 1: 2026-09-14)
+ * and sorts all schedule items chronologically by time.
+ */
+export async function fetchTodayCombinedSchedule(targetDate?: string): Promise<{
+  dateLabel: string;
+  targetDate: string;
+  dayNumber: number;
+  items: TodayCombinedScheduleItem[];
+}> {
+  try {
+    const [events, culturalList] = await Promise.all([
+      fetchLiveMasterEvents(),
+      fetchLiveMasterCultural(),
+    ]);
+
+    let effectiveDate = targetDate || new Date().toISOString().split('T')[0];
+
+    // Find matching events for this date
+    let matchedEvents = events.filter((e) => {
+      if (e.dateStr && normalizeDateMatch(e.dateStr, effectiveDate)) return true;
+      if (e.dateKey && normalizeDateMatch(e.dateKey, effectiveDate)) return true;
+      return false;
+    });
+
+    let matchedCultural = culturalList.filter((c) => {
+      return normalizeDateMatch(c.date, effectiveDate);
+    });
+
+    // If today is outside festival dates or no events matched, fallback to Day 1 (2026-09-14)
+    if (matchedEvents.length === 0 && matchedCultural.length === 0) {
+      effectiveDate = '2026-09-14';
+      matchedEvents = events.filter((e) => e.dayNumber === 1 || (e.dateStr && e.dateStr.includes('14')));
+      matchedCultural = culturalList.filter((c) => c.date.includes('14') || c.date.includes('2026-09-14'));
+    }
+
+    const dayNum = matchedEvents[0]?.dayNumber || 1;
+    const dateLabel = matchedEvents[0]?.dayLabel || 'Day 1 • Mon, 14th Sep';
+
+    const combined: TodayCombinedScheduleItem[] = [];
+    const usedCulturalIds = new Set<string>();
+
+    // 1. Process Events and cross-reference with Cultural items
+    for (const evt of matchedEvents) {
+      const normEvtTitle = evt.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+      // Look for a cultural match
+      const cultMatch = matchedCultural.find((c) => {
+        const normCultTitle = c.performanceTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
+        return normEvtTitle.includes(normCultTitle) || normCultTitle.includes(normEvtTitle);
+      });
+
+      if (cultMatch) {
+        usedCulturalIds.add(cultMatch.id);
+        const timeSlot = cultMatch.timeSlot || evt.timeSlot;
+        combined.push({
+          id: `combined-${evt.id}-${cultMatch.id}`,
+          source: 'both',
+          title: cultMatch.performanceTitle || evt.title,
+          timeSlot,
+          startTimeMinutes: parseTimeToMinutes(timeSlot),
+          category: cultMatch.actCategory || evt.category,
+          location: evt.location || 'Mandap Stage',
+          description: cultMatch.description || evt.description,
+          performers: cultMatch.performers,
+          durationMins: cultMatch.durationMins,
+          rituals: evt.rituals,
+          spocName: evt.spocName,
+          spocPhone: evt.spocPhone,
+          iconType: getScheduleIconType({ title: evt.title, category: evt.category, actCategory: cultMatch.actCategory }),
+        });
+      } else {
+        combined.push({
+          id: evt.id,
+          source: 'event',
+          title: evt.title,
+          timeSlot: evt.timeSlot,
+          startTimeMinutes: parseTimeToMinutes(evt.timeSlot),
+          category: evt.category,
+          location: evt.location,
+          description: evt.description,
+          rituals: evt.rituals,
+          spocName: evt.spocName,
+          spocPhone: evt.spocPhone,
+          iconType: getScheduleIconType({ title: evt.title, category: evt.category }),
+        });
+      }
+    }
+
+    // 2. Add remaining standalone Cultural performances
+    for (const cult of matchedCultural) {
+      if (!usedCulturalIds.has(cult.id)) {
+        combined.push({
+          id: cult.id,
+          source: 'cultural',
+          title: cult.performanceTitle,
+          timeSlot: cult.timeSlot,
+          startTimeMinutes: parseTimeToMinutes(cult.timeSlot),
+          category: cult.actCategory || 'Cultural Performance',
+          location: 'Mandap Stage',
+          description: cult.description,
+          performers: cult.performers,
+          durationMins: cult.durationMins,
+          iconType: getScheduleIconType({ title: cult.performanceTitle, actCategory: cult.actCategory }),
+        });
+      }
+    }
+
+    // 3. Sort by startTimeMinutes chronologically ascending
+    combined.sort((a, b) => a.startTimeMinutes - b.startTimeMinutes);
+
+    return {
+      dateLabel,
+      targetDate: effectiveDate,
+      dayNumber: dayNum,
+      items: combined,
+    };
+  } catch (err) {
+    console.warn('Error fetching today combined schedule:', err);
+    return {
+      dateLabel: 'Day 1 • Mon, 14th Sep',
+      targetDate: '2026-09-14',
+      dayNumber: 1,
+      items: [
+        {
+          id: 'fb-1',
+          source: 'event',
+          title: 'Sandhya Pooja & Maha Aarti',
+          timeSlot: '7:30 PM - 8:30 PM',
+          startTimeMinutes: 19 * 60 + 30,
+          category: 'Rituals & Pooja',
+          location: 'Main Ganesh Mandap',
+          description: 'Evening sandhya deepa aarti & community pushpanjali.',
+          iconType: 'pooja',
+        },
+        {
+          id: 'fb-2',
+          source: 'cultural',
+          title: 'Classical Dance Performance – Ladies',
+          timeSlot: '8:30 PM - 8:50 PM',
+          startTimeMinutes: 20 * 60 + 30,
+          category: 'Classical Dance',
+          performers: 'Society Ladies',
+          durationMins: '10 Mins',
+          location: 'Mandap Stage',
+          description: 'Traditional Bharatanatyam opening performance.',
+          iconType: 'cultural',
+        },
+        {
+          id: 'fb-3',
+          source: 'cultural',
+          title: 'Devotional Song Performance – Pradeep & Manjari Mam',
+          timeSlot: '8:50 PM - 9:15 PM',
+          startTimeMinutes: 20 * 60 + 50,
+          category: 'Vocal Performance',
+          performers: 'Pradeep & Manjari Mam',
+          durationMins: '15 Mins',
+          location: 'Mandap Stage',
+          description: 'Ganesh devotional keerthanas & bhajan recital.',
+          iconType: 'cultural',
+        },
+        {
+          id: 'fb-4',
+          source: 'event',
+          title: 'Community Dinner & Fellowship',
+          timeSlot: '9:15 PM onwards',
+          startTimeMinutes: 21 * 60 + 15,
+          category: 'Mahaprasadam',
+          location: 'Community Dining Area',
+          description: 'Delicious hot dinner & community prasadam for all towers.',
+          iconType: 'prasadam',
+        },
+        {
+          id: 'fb-5',
+          source: 'event',
+          title: 'Children Musical Chairs Activity',
+          timeSlot: '9:45 PM onwards',
+          startTimeMinutes: 21 * 60 + 45,
+          category: 'Fun & Games',
+          location: 'Central Podium',
+          description: 'Fun musical chair game for kids with festive prizes.',
+          iconType: 'activity',
+        },
+      ],
+    };
+  }
 }

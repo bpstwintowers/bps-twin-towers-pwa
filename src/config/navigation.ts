@@ -12,6 +12,9 @@ import {
   Award,
   Sparkles,
   HandHelping,
+  Droplets,
+  Vote,
+  Flame,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -38,6 +41,13 @@ export const NAVIGATION_ITEMS: NavItemConfig[] = [
     exact: true,
   },
   {
+    id: 'water-initiative',
+    label: 'Water Initiative',
+    path: '/water-initiative',
+    icon: Droplets,
+    section: 'general',
+  },
+  {
     id: 'events',
     label: 'Events & Festivals',
     path: '/events',
@@ -49,6 +59,13 @@ export const NAVIGATION_ITEMS: NavItemConfig[] = [
     label: 'Ganesh Utsav 2026',
     path: '/ganesh-utsav',
     icon: Sparkles,
+    section: 'general',
+  },
+  {
+    id: 'pooja-schedule',
+    label: 'Pooja & SPOC Details',
+    path: '/pooja-schedule',
+    icon: Flame,
     section: 'general',
   },
   {
@@ -81,9 +98,16 @@ export const NAVIGATION_ITEMS: NavItemConfig[] = [
   },
   {
     id: 'volunteers',
-    label: 'Volunteer Ops',
+    label: 'Teams & SPOCs',
     path: '/volunteers',
-    icon: HeartHandshake,
+    icon: Users,
+    section: 'general',
+  },
+  {
+    id: 'surveys',
+    label: 'Resident Surveys',
+    path: '/surveys',
+    icon: Vote,
     section: 'general',
   },
   {

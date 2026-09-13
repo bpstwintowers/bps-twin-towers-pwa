@@ -32,6 +32,33 @@ const EventDetails = lazy(() =>
 const GaneshContributionPage = lazy(() =>
   import('../../features/ganesh/GaneshContributionPage').then((m) => ({ default: m.GaneshContributionPage }))
 );
+const PoojaSchedulePage = lazy(() =>
+  import('../../features/ganesh/PoojaSchedulePage').then((m) => ({ default: m.PoojaSchedulePage }))
+);
+const GaneshPrasadamPage = lazy(() =>
+  import('../../features/ganesh/GaneshPrasadamPage').then((m) => ({ default: m.GaneshPrasadamPage }))
+);
+const GaneshVolunteerPage = lazy(() =>
+  import('../../features/ganesh/GaneshVolunteerPage').then((m) => ({ default: m.GaneshVolunteerPage }))
+);
+const GaneshCulturalPage = lazy(() =>
+  import('../../features/ganesh/GaneshCulturalPage').then((m) => ({ default: m.GaneshCulturalPage }))
+);
+const GaneshFundsPage = lazy(() =>
+  import('../../features/ganesh/GaneshFundsPage').then((m) => ({ default: m.GaneshFundsPage }))
+);
+const GaneshSponsorsPage = lazy(() =>
+  import('../../features/ganesh/GaneshSponsorsPage').then((m) => ({ default: m.GaneshSponsorsPage }))
+);
+const GaneshAuctionPage = lazy(() =>
+  import('../../features/ganesh/GaneshAuctionPage').then((m) => ({ default: m.GaneshAuctionPage }))
+);
+const GaneshExpensesPage = lazy(() =>
+  import('../../features/ganesh/GaneshExpensesPage').then((m) => ({ default: m.GaneshExpensesPage }))
+);
+const WaterInitiativePage = lazy(() =>
+  import('../../features/waterInitiative/WaterInitiativePage').then((m) => ({ default: m.WaterInitiativePage }))
+);
 const DonationList = lazy(() =>
   import('../../features/donations/DonationList').then((m) => ({ default: m.DonationList }))
 );
@@ -46,6 +73,9 @@ const NotificationCenter = lazy(() =>
 );
 const AnnouncementList = lazy(() =>
   import('../../features/announcements/AnnouncementList').then((m) => ({ default: m.AnnouncementList }))
+);
+const ResidentSurveys = lazy(() =>
+  import('../../features/surveys/ResidentSurveys').then((m) => ({ default: m.ResidentSurveys }))
 );
 const NotificationPreferences = lazy(() =>
   import('../../features/settings/NotificationPreferences').then((m) => ({ default: m.NotificationPreferences }))
@@ -163,6 +193,58 @@ const GaneshPortalRoute: React.FC = () => {
   return <GaneshContributionPage isRegisteredUser={false} />;
 };
 
+const PoojaPortalRoute: React.FC = () => {
+  const [session, setSession] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) return <PageLoader />;
+
+  return <EventList />;
+};
+
+const WaterPortalRoute: React.FC = () => {
+  const [session, setSession] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) return <PageLoader />;
+
+  if (session) {
+    return (
+      <AppLayout>
+        <WaterInitiativePage isRegisteredUser={true} />
+      </AppLayout>
+    );
+  }
+
+  return <WaterInitiativePage isRegisteredUser={false} />;
+};
+
 export const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
@@ -173,9 +255,25 @@ export const AppRouter: React.FC = () => {
             <Route path="/register" element={<RegistrationFlow />} />
             <Route path="/registration-status" element={<RegistrationStatus />} />
 
-            {/* Hybrid Ganesh Festival Routes (Accessible publicly by guests and authenticated residents) */}
+            {/* Hybrid Open Community Routes (Accessible publicly by all residents/guests and authenticated residents) */}
             <Route path="/ganesh-utsav" element={<GaneshPortalRoute />} />
             <Route path="/ganesh-contributions" element={<GaneshPortalRoute />} />
+            <Route path="/events" element={<PoojaPortalRoute />} />
+            <Route path="/pooja-schedule" element={<PoojaPortalRoute />} />
+            <Route path="/pooja-details" element={<PoojaPortalRoute />} />
+            <Route path="/pooja-timeline" element={<PoojaSchedulePage />} />
+            <Route path="/ganesh-events" element={<PoojaPortalRoute />} />
+            <Route path="/ganesh-prasadam" element={<GaneshPrasadamPage />} />
+            <Route path="/ganesh-volunteers" element={<GaneshVolunteerPage />} />
+            <Route path="/ganesh-spocs" element={<GaneshVolunteerPage />} />
+            <Route path="/ganesh-cultural" element={<GaneshCulturalPage />} />
+            <Route path="/ganesh-funds" element={<GaneshFundsPage />} />
+            <Route path="/ganesh-expenses" element={<GaneshExpensesPage />} />
+            <Route path="/ganesh-sponsors" element={<GaneshSponsorsPage />} />
+            <Route path="/ganesh-auction" element={<GaneshAuctionPage />} />
+            <Route path="/ganesh-updates" element={<AnnouncementList />} />
+            <Route path="/water-initiative" element={<WaterPortalRoute />} />
+            <Route path="/water-strategy" element={<WaterPortalRoute />} />
 
           {/* Protected Routes (Authenticated inside Main AppLayout) */}
           <Route element={<ProtectedRoute />}>
@@ -190,6 +288,7 @@ export const AppRouter: React.FC = () => {
               <Route path="/sponsors" element={<SponsorList />} />
               <Route path="/notifications" element={<NotificationCenter />} />
               <Route path="/announcements" element={<AnnouncementList />} />
+              <Route path="/surveys" element={<ResidentSurveys />} />
               <Route path="/settings/notifications" element={<NotificationPreferences />} />
               <Route path="/my-visitors" element={<VisitorManagement />} />
               <Route path="/security" element={<SecurityConsole />} />

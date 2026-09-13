@@ -1,0 +1,241 @@
+/* ==========================================================================
+   GANESH FESTIVAL MOBILE BOTTOM NAVIGATION BAR & MORE DRAWER
+   ========================================================================== */
+
+.ganesh-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 990;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid #e2e8f0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.07);
+  padding: 0.35rem 0.5rem;
+  padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
+}
+
+.ganesh-bottom-nav-inner {
+  max-width: 650px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.ganesh-tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.35rem 0.65rem;
+  border-radius: 12px;
+  color: #64748b;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 58px;
+}
+
+.ganesh-tab-item:hover {
+  color: #1e293b;
+  background: #f8fafc;
+}
+
+.ganesh-tab-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.ganesh-tab-item:hover .ganesh-tab-icon-wrap {
+  transform: translateY(-2px);
+}
+
+.ganesh-tab-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Active State */
+.ganesh-tab-item.is-active {
+  color: #1e3a8a;
+}
+
+.ganesh-tab-item.is-active .ganesh-tab-icon-wrap {
+  color: #1e3a8a;
+  transform: translateY(-2px) scale(1.05);
+}
+
+.ganesh-tab-item.is-active .ganesh-tab-label {
+  font-weight: 800;
+  color: #1e3a8a;
+}
+
+/* Add bottom padding to containers using the bottom nav */
+.has-bottom-nav {
+  padding-bottom: 5.5rem !important;
+}
+
+/* ==========================================================================
+   MORE DRAWER / BOTTOM SHEET
+   ========================================================================== */
+.ganesh-more-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.ganesh-more-drawer {
+  background: #ffffff;
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 1.5rem 1.25rem 2rem 1.25rem;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ganesh-more-handle {
+  width: 40px;
+  height: 4px;
+  background: #cbd5e1;
+  border-radius: 999px;
+  margin: 0 auto 1.1rem auto;
+}
+
+.ganesh-more-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ganesh-more-title-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.more-sheet-title {
+  font-family: 'Cinzel', 'Georgia', serif, system-ui;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.more-sheet-subtitle {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.ganesh-more-close {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.15s ease;
+}
+
+.ganesh-more-close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.ganesh-more-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.ganesh-more-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.ganesh-more-card:hover {
+  background: #fff7ed;
+  border-color: #fdba74;
+  transform: translateX(4px);
+}
+
+.ganesh-more-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ganesh-more-text {
+  flex: 1;
+}
+
+.ganesh-more-text h4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 0.15rem 0;
+}
+
+.ganesh-more-text p {
+  font-size: 0.76rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.ganesh-more-arrow {
+  color: #94a3b8;
+  transition: transform 0.2s ease;
+}
+
+.ganesh-more-card:hover .ganesh-more-arrow {
+  transform: translateX(3px);
+  color: #ea580c;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

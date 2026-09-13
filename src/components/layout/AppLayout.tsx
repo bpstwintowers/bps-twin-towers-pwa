@@ -221,6 +221,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     const path = location.pathname;
     if (path === '/') return 'Dashboard';
     if (path === '/permissions' || path.startsWith('/permissions')) return 'Roles & Permissions';
+    if (path.startsWith('/water-initiative') || path.startsWith('/water-strategy')) return 'Municipal Water Initiative';
     if (path === '/events-manage' || path.startsWith('/admin/events')) return 'Event Management';
     if (path === '/facilities-manage' || path.startsWith('/admin/facilities')) return 'Facility Bookings Admin';
     if (path === '/complaints-manage' || path.startsWith('/admin/complaints')) return 'Complaints Console';
@@ -230,12 +231,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     if (path === '/communications-manage' || path.startsWith('/admin/communications')) return 'Notice Board Admin';
     if (path === '/visitors-manage' || path.startsWith('/admin/visitors')) return 'Gate & Visitor Admin';
     if (path.startsWith('/events')) return 'Events & Festivals';
+    if (path.startsWith('/pooja')) return 'Pooja Schedule & SPOC Details';
     if (path.startsWith('/ganesh')) return 'Ganesh Utsav 2026';
     if (path.startsWith('/facilities') || path.startsWith('/my-bookings')) return 'Amenities & Bookings';
     if (path.startsWith('/complaints')) return 'Maintenance & Complaints';
     if (path.startsWith('/my-visitors')) return 'Visitor Passes';
     if (path.startsWith('/donations')) return 'My Contributions';
     if (path.startsWith('/volunteers')) return 'Volunteer Opportunities';
+    if (path.startsWith('/surveys')) return 'Resident Surveys & Polls';
     if (path.startsWith('/sponsors')) return 'Society Sponsorships';
     if (path.startsWith('/announcements')) return 'Announcements & Notices';
     if (path.startsWith('/notifications')) return 'Notification Center';

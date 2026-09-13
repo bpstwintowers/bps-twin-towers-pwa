@@ -1,0 +1,922 @@
+/* ==========================================================================
+   BPS GANESH UTSAV 2026 - SACRED MAHA PRASADAM STYLES (NEW DESIGN MOCKUP)
+   ========================================================================== */
+
+.prasadam-page-root {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.prasadam-page-root.has-bottom-nav {
+  padding-bottom: 95px;
+}
+
+.prasadam-container {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 0.75rem 0.85rem 2.5rem 0.85rem;
+}
+
+/* 0. Top Breadcrumb Bar */
+.prasadam-breadcrumb-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding: 0 0.15rem;
+}
+
+.breadcrumb-left {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.breadcrumb-divider {
+  color: #cbd5e1;
+  font-size: 0.75rem;
+}
+
+.breadcrumb-active {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.breadcrumb-satvik-pill {
+  background: #fef9c3;
+  border: 1px solid #fde047;
+  color: #854d0e;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* 1. Dark Hero Card */
+.prasadam-hero-dark-card {
+  background: linear-gradient(145deg, #1e1b4b 0%, #172554 50%, #0f172a 100%);
+  border-radius: 24px;
+  padding: 1.4rem 1.25rem 1.25rem 1.25rem;
+  color: #ffffff;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.25);
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.prasadam-hero-dark-card::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(234, 88, 12, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(254, 240, 138, 0.12);
+  border: 1px solid rgba(254, 240, 138, 0.3);
+  color: #fde047;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
+}
+
+.hero-main-title {
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.15;
+  font-family: Georgia, 'Cinzel', serif;
+  letter-spacing: -0.01em;
+}
+
+.hero-desc-text {
+  font-size: 0.84rem;
+  color: #cbd5e1;
+  line-height: 1.45;
+  margin: 0 0 1.2rem 0;
+  font-weight: 400;
+}
+
+/* 3 Column Metric Stats on Hero */
+.hero-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 0.85rem 0.5rem;
+  text-align: center;
+  margin-bottom: 1.15rem;
+}
+
+.hero-metric-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-metric-val {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-bottom: 0.15rem;
+}
+
+.hero-metric-label {
+  font-size: 0.64rem;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Hero Action Buttons */
+.hero-action-buttons-row {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.btn-hero-sponsor {
+  flex: 2;
+  background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+  color: #ffffff;
+  border: none;
+  padding: 0.68rem 1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.btn-hero-sponsor:active {
+  transform: scale(0.98);
+}
+
+.btn-hero-spoc {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 0.68rem 1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: background 0.15s ease;
+}
+
+.btn-hero-spoc:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* 2. Official Google Sheets Sync Banner Card */
+.sheets-sync-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.15rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.sheets-sync-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sheets-icon-preview {
+  width: 38px;
+  height: 42px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.sheet-header-stripe {
+  height: 10px;
+  background: #ea580c;
+}
+
+.sheet-rows-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px;
+}
+
+.sheet-row-line {
+  height: 2px;
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.sheets-sync-text-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.sheets-sync-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #b45309;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sheets-sync-title {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.sheets-sync-subtext {
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.sheets-sync-btn-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.sheets-sync-btn-circle:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* 3. Section Title Bar & Filter Pills */
+.schedule-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.schedule-title {
+  font-size: 1.12rem;
+  font-weight: 900;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.schedule-sessions-badge {
+  background: #ffedd5;
+  color: #c2410c;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+}
+
+.prasadam-filter-tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  scrollbar-width: none;
+}
+
+.prasadam-filter-tabs-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.day-filter-chip {
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.day-filter-chip.active {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
+}
+
+/* 4. Schedule Day Cards List */
+.prasadam-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.prasadam-schedule-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1.15rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  position: relative;
+  transition: transform 0.15s ease;
+}
+
+.card-top-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.card-day-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-day-badge-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ede9fe;
+  color: #6d28d9;
+  font-size: 0.7rem;
+  font-weight: 900;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 1px solid #ddd6fe;
+}
+
+.card-day-badge-circle span:first-child {
+  font-size: 0.58rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.card-date-subtext {
+  font-size: 0.76rem;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.card-category-pill {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.card-category-pill.cultural {
+  background: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.card-category-pill.daily {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.card-category-pill.bhog {
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1px solid #fde047;
+}
+
+.card-category-pill.tiffin {
+  background: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.card-category-pill.laddu {
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1px solid #fde047;
+}
+
+.card-event-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.25;
+}
+
+/* Satvik Prasadam Menu Box */
+.card-prasadam-menu-box {
+  background: #fff7ed;
+  border: 1px solid #ffedd5;
+  border-radius: 14px;
+  padding: 0.85rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.menu-dish-icon-box {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fed7aa;
+  color: #c2410c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.menu-dish-content-wrap {
+  flex: 1;
+}
+
+.menu-label-tag {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #b45309;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+}
+
+.menu-main-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.35;
+  margin-bottom: 0.25rem;
+}
+
+.menu-sub-accompaniment {
+  font-size: 0.74rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Card Timing & Context Row */
+.card-timing-context-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 0.65rem;
+}
+
+.timing-left-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.context-right-item {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+/* Card Sponsor Footer */
+.card-sponsor-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.65rem;
+  border-top: 1px solid #f1f5f9;
+  font-size: 0.72rem;
+}
+
+.sponsor-bottom-left {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #475569;
+}
+
+.sponsor-status-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #c2410c;
+  background: #ffedd5;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+/* 5. GRAND COMMUNITY ANNADANAM (DAY 5 GOLDEN FEAST CARD) */
+.grand-annadanam-golden-card {
+  background: #ffffff;
+  border: 2px solid #f59e0b;
+  border-radius: 20px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 28px rgba(245, 158, 11, 0.14);
+  position: relative;
+  overflow: hidden;
+}
+
+.grand-card-top-tags-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.grand-utsav-pill {
+  background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.grand-feast-tag {
+  background: #ffedd5;
+  color: #c2410c;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.grand-feast-main-title {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0 0 0.85rem 0;
+  line-height: 1.2;
+}
+
+/* Blue Navy Lunch Banner */
+.grand-lunch-navy-banner {
+  background: linear-gradient(135deg, #1e1b4b 0%, #1e293b 100%);
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 0.75rem 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.lunch-navy-left {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.lunch-navy-pill-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+}
+
+/* 9-Course Thali 2-Column Grid */
+.thali-menu-grid-section {
+  margin-bottom: 0.85rem;
+}
+
+.thali-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #b45309;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.65rem;
+}
+
+.thali-items-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.thali-item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.thali-special-sweet-box {
+  background: #fff7ed;
+  border: 1px dashed #fdba74;
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #9a3412;
+}
+
+/* Grand Location & Free Token Row */
+.grand-location-token-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 0.65rem;
+  font-size: 0.75rem;
+}
+
+.grand-location-left {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.grand-token-right {
+  font-weight: 800;
+  color: #16a34a;
+  background: #dcfce7;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+}
+
+/* 6. Prasadam Guidelines & Protocol Card */
+.guidelines-protocol-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1.25rem;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.guidelines-top-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.guidelines-main-title {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+}
+
+.guidelines-subtitle {
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.protocol-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.protocol-item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.protocol-icon-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+
+.protocol-content-text h5 {
+  margin: 0 0 0.2rem 0;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.protocol-content-text p {
+  margin: 0;
+  font-size: 0.74rem;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+/* 7. Food Committee Coordinators */
+.food-committee-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+}
+
+.committee-tag-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #b45309;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+.committee-main-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0 0 0.5rem 0;
+}
+
+.committee-desc-text {
+  font-size: 0.76rem;
+  color: #64748b;
+  line-height: 1.45;
+  margin: 0 0 1rem 0;
+}
+
+.coordinators-contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.coordinator-contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 0.65rem 0.85rem;
+}
+
+.coordinator-left-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.coordinator-avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.coordinator-name-text {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.coordinator-sub-text {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.coordinator-call-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffedd5;
+  border: 1px solid #fed7aa;
+  color: #ea580c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.coordinator-call-btn:hover {
+  background: #ea580c;
+  color: #ffffff;
+}
+
+/* 8. Footer Blessing */
+.prasadam-footer-blessing {
+  text-align: center;
+  padding: 1rem 0 1.5rem 0;
+}
+
+.blessing-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.blessing-quote {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #0f172a;
+  font-family: Georgia, serif;
+  margin-bottom: 0.25rem;
+}
+
+.blessing-sub {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 600;
+}

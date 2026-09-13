@@ -1,5 +1,5 @@
-import React from 'react';
-import { Printer, X } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Printer, X, Calendar } from 'lucide-react';
 import type {
   GaneshSankalpamRecord,
   GaneshContributionRecord,
@@ -25,6 +25,26 @@ export const GaneshPrintModal: React.FC<Props> = ({
   contributions,
   expenses,
 }) => {
+  const [selectedPoojaDate, setSelectedPoojaDate] = useState<string>('ALL');
+
+  const availablePoojaDates = useMemo(() => {
+    const set = new Set<string>();
+    sankalpams.forEach((s) => {
+      if (s.preferredPujaDate && s.preferredPujaDate.trim()) {
+        set.add(s.preferredPujaDate.trim());
+      }
+    });
+    return Array.from(set).sort();
+  }, [sankalpams]);
+
+  const filteredSankalpams = useMemo(() => {
+    if (selectedPoojaDate === 'ALL') return sankalpams;
+    return sankalpams.filter((s) => {
+      if (!s.preferredPujaDate) return false;
+      return s.preferredPujaDate.trim() === selectedPoojaDate.trim();
+    });
+  }, [sankalpams, selectedPoojaDate]);
+
   if (!isOpen || !printType) return null;
 
   const totalContributions = contributions.reduce((sum, c) => sum + (c.amount || 0), 0);
@@ -61,28 +81,75 @@ export const GaneshPrintModal: React.FC<Props> = ({
           padding: 0,
           borderRadius: '16px',
           overflow: 'hidden',
+          backgroundColor: '#ffffff',
+          color: '#0f172a',
         }}
       >
         {/* Modal Top Bar (Hidden during Print) */}
         <div
-          className="ganesh-modal-header no-print"
+          className="ganesh-modal-header no-print ganesh-print-modal-header"
           style={{
-            padding: '1rem 1.5rem',
+            padding: '0.85rem 1.35rem',
             background: '#fff7ed',
-            borderBottom: '1px solid #fed7aa',
+            borderBottom: '1.5px solid #fed7aa',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '0.75rem',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <Printer size={20} color="#ea580c" />
-            <h3 style={{ margin: 0, color: '#9a3412', fontSize: '1.2rem', fontWeight: 800 }}>
+            <h3
+              style={{
+                margin: 0,
+                color: '#7c2d12',
+                fontSize: '1.2rem',
+                fontWeight: 900,
+                letterSpacing: '-0.01em',
+              }}
+            >
               {getTitle()}
             </h3>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+            {/* Medium size Pooja Date Filter Dropdown in Header */}
+            {printType === 'pujari' && (
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <select
+                  id="pooja-date-select"
+                  value={selectedPoojaDate}
+                  onChange={(e) => setSelectedPoojaDate(e.target.value)}
+                  style={{
+                    background: '#ffffff',
+                    border: '1.5px solid #ea580c',
+                    color: '#7c2d12',
+                    padding: '0.45rem 0.85rem',
+                    borderRadius: '8px',
+                    fontSize: '0.88rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    outline: 'none',
+                    minWidth: '220px',
+                    boxShadow: '0 1px 3px rgba(234, 88, 12, 0.1)',
+                  }}
+                  title="Filter by Pooja Date"
+                >
+                  <option value="ALL">🗓️ All Dates ({sankalpams.length} Families)</option>
+                  {availablePoojaDates.map((date) => {
+                    const count = sankalpams.filter((s) => s.preferredPujaDate === date).length;
+                    return (
+                      <option key={date} value={date}>
+                        🗓️ {date} ({count} Families)
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            )}
+
             <button
               type="button"
               className="btn-festive-primary"
@@ -91,10 +158,15 @@ export const GaneshPrintModal: React.FC<Props> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.4rem',
-                padding: '0.5rem 1.2rem',
-                fontSize: '0.9rem',
+                padding: '0.45rem 1.1rem',
+                fontSize: '0.88rem',
                 background: '#ea580c',
                 color: '#ffffff',
+                fontWeight: 700,
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(234, 88, 12, 0.25)',
               }}
             >
               <Printer size={16} /> Print Document
@@ -126,9 +198,10 @@ export const GaneshPrintModal: React.FC<Props> = ({
         {/* Modal Body - Pure Printable Sheet Content */}
         <div
           style={{
-            padding: '2rem',
+            padding: '1.75rem',
             overflowY: 'auto',
             background: '#ffffff',
+            color: '#0f172a',
             flex: 1,
           }}
         >
@@ -136,56 +209,83 @@ export const GaneshPrintModal: React.FC<Props> = ({
               1. PUJARI GOTHRAM PRINT SHEET
              ======================================================== */}
           {printType === 'pujari' && (
-            <div className="sankalpam-printable-sheet">
+            <div className="sankalpam-printable-sheet" style={{ color: '#0f172a' }}>
+              {/* Printable Header */}
               <div style={{ textAlign: 'center', borderBottom: '2px solid #b45309', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
                 <h2 style={{ margin: 0, color: '#7c2d12', fontSize: '1.8rem', fontWeight: 800 }}>
                   🕉️ BPS TWIN TOWERS - GANESH UTSAV 2026
                 </h2>
                 <h3 style={{ margin: '0.3rem 0', color: '#b45309', fontSize: '1.25rem', fontWeight: 700 }}>
-                  Pujari Archana & Gothram Registry
+                  Pujari Archana &amp; Gothram Registry
                 </h3>
                 <p style={{ margin: 0, color: '#475569', fontSize: '0.9rem' }}>
                   Official resident names and Gothrams for Vedic Mantrocharana and Archana
                 </p>
-                <div style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#047857', fontWeight: 700 }}>
-                  Total Registered Families: {sankalpams.length}
+                <div
+                  style={{
+                    marginTop: '0.5rem',
+                    fontSize: '0.88rem',
+                    color: '#047857',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.75rem',
+                  }}
+                >
+                  <span>
+                    Total Registered Families: <strong>{filteredSankalpams.length}</strong>
+                  </span>
+                  {selectedPoojaDate !== 'ALL' && (
+                    <span style={{ color: '#b45309' }}>
+                      • Date: <strong>{selectedPoojaDate}</strong>
+                    </span>
+                  )}
                 </div>
               </div>
 
               <div className="ganesh-table-container">
-                <table className="ganesh-table" style={{ width: '100%' }}>
+                <table className="ganesh-table" style={{ width: '100%', borderCollapse: 'collapse', color: '#0f172a' }}>
                   <thead>
-                    <tr style={{ background: '#fef3c7' }}>
-                      <th style={{ width: '55px', textAlign: 'center' }}>Sl No</th>
-                      <th style={{ width: '85px', textAlign: 'center' }}>Flat</th>
-                      <th style={{ width: '180px' }}>Gothram</th>
-                      <th style={{ width: '200px' }}>Primary Resident / Yajamana</th>
-                      <th>Family Members</th>
+                    <tr style={{ background: '#fef3c7', borderBottom: '2px solid #fde68a' }}>
+                      <th style={{ width: '50px', textAlign: 'center', color: '#78350f', padding: '0.75rem 0.5rem', fontWeight: 800 }}>Sl No</th>
+                      <th style={{ width: '85px', textAlign: 'center', color: '#78350f', padding: '0.75rem 0.5rem', fontWeight: 800 }}>Flat</th>
+                      <th style={{ width: '180px', color: '#78350f', padding: '0.75rem 0.5rem', fontWeight: 800 }}>Gothram</th>
+                      <th style={{ width: '200px', color: '#78350f', padding: '0.75rem 0.5rem', fontWeight: 800 }}>Primary Resident / Yajamana</th>
+                      <th style={{ color: '#78350f', padding: '0.75rem 0.5rem', fontWeight: 800 }}>Family Members</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {sankalpams.map((item, idx) => (
-                      <tr key={item.id}>
-                        <td style={{ fontWeight: 700, textAlign: 'center' }}>{idx + 1}</td>
-                        <td style={{ textAlign: 'center' }}>
-                          <strong>{item.flatNo}</strong>
-                        </td>
-                        <td style={{ fontWeight: 800, color: '#9a3412' }}>{item.gothram}</td>
-                        <td>
-                          <strong>{item.primaryResidentName}</strong>
-                        </td>
-                        <td>
-                          <ol style={{ margin: 0, paddingLeft: '1.2rem', lineHeight: '1.4' }}>
-                            {item.familyMembers.map((m) => (
-                              <li key={m.id}>
-                                <strong>{m.name}</strong> {m.relationship ? `(${m.relationship})` : ''}{' '}
-                                {m.nakshatram ? ` [${m.nakshatram}]` : ''}
-                              </li>
-                            ))}
-                          </ol>
+                    {filteredSankalpams.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                          No registered families found for this date.
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      filteredSankalpams.map((item, idx) => (
+                        <tr key={item.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                          <td style={{ fontWeight: 700, textAlign: 'center', color: '#334155', padding: '0.75rem 0.5rem' }}>{idx + 1}</td>
+                          <td style={{ textAlign: 'center', color: '#0f172a', padding: '0.75rem 0.5rem' }}>
+                            <strong style={{ fontSize: '0.95rem' }}>{item.flatNo}</strong>
+                          </td>
+                          <td style={{ fontWeight: 800, color: '#9a3412', padding: '0.75rem 0.5rem' }}>{item.gothram}</td>
+                          <td style={{ color: '#0f172a', padding: '0.75rem 0.5rem' }}>
+                            <strong style={{ fontSize: '0.92rem' }}>{item.primaryResidentName}</strong>
+                          </td>
+                          <td style={{ color: '#1e293b', padding: '0.75rem 0.5rem' }}>
+                            <ol style={{ margin: 0, paddingLeft: '1.2rem', lineHeight: '1.4', color: '#1e293b' }}>
+                              {item.familyMembers.map((m) => (
+                                <li key={m.id} style={{ color: '#1e293b', marginBottom: '2px' }}>
+                                  <strong style={{ color: '#0f172a' }}>{m.name}</strong> {m.relationship ? `(${m.relationship})` : ''}{' '}
+                                  {m.nakshatram ? ` [${m.nakshatram}]` : ''}
+                                </li>
+                              ))}
+                            </ol>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

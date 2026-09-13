@@ -1,0 +1,760 @@
+/* ==========================================================================
+   BPS TWIN TOWERS - GRAND GANESH UTSAV POOJA SCHEDULE & SPOC DIRECTORY
+   ========================================================================== */
+
+.pooja-page-root {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   1. ROYAL FESTIVAL HERO BANNER
+   ========================================================================== */
+.pooja-hero-banner {
+  background: linear-gradient(135deg, #78350f 0%, #b45309 40%, #ea580c 80%, #d97706 100%);
+  border-radius: 20px;
+  padding: 2rem 2.25rem;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 14px 32px -8px rgba(180, 83, 9, 0.35), 0 6px 12px -4px rgba(234, 88, 12, 0.2);
+  border: 2px solid #fde68a;
+}
+
+.pooja-hero-banner::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(254, 240, 138, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.pooja-hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.pooja-hero-text {
+  max-width: 680px;
+}
+
+.pooja-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(254, 240, 138, 0.22);
+  border: 1px solid rgba(254, 240, 138, 0.45);
+  color: #fef08a;
+  padding: 0.3rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.65rem;
+}
+
+.pooja-hero-title {
+  font-family: 'Cinzel', 'Georgia', serif, system-ui;
+  font-size: 1.95rem;
+  font-weight: 900;
+  line-height: 1.2;
+  margin: 0 0 0.4rem 0;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  letter-spacing: -0.01em;
+}
+
+.pooja-hero-desc {
+  font-size: 0.92rem;
+  color: #fef3c7;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.pooja-hero-action-buttons {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pooja-hero-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  color: #9a3412;
+  border: none;
+  padding: 0.7rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.pooja-hero-cta-btn:hover {
+  transform: translateY(-2px);
+  background: #fef3c7;
+  color: #78350f;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.pooja-hero-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  padding: 0.7rem 1.15rem;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.pooja-hero-secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* ==========================================================================
+   2. MAIN SECTION NAVIGATION (POOJA DATES VS TEAMS/SPOCS)
+   ========================================================================== */
+.pooja-nav-tabs-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--outline-variant, #e5e7eb);
+  border-radius: 16px;
+  padding: 0.6rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.pooja-main-tabs-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pooja-main-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--on-surface-variant, #475569);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pooja-main-tab-btn:hover {
+  background: var(--surface-container-low, #f8fafc);
+  color: var(--on-surface, #1e293b);
+}
+
+.pooja-main-tab-btn.active {
+  background: linear-gradient(135deg, #fff7ed, #fef3c7);
+  border-color: #f59e0b;
+  color: #b45309;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+
+.pooja-sub-counter-badge {
+  background: #ea580c;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+}
+
+/* ==========================================================================
+   3. DAILY QUICK RULES & TIMINGS CARD
+   ========================================================================== */
+.daily-ritual-rules-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.rule-metric-box {
+  background: var(--surface, #ffffff);
+  border: 1.5px solid #fed7aa;
+  border-radius: 14px;
+  padding: 1.15rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  box-shadow: 0 2px 6px rgba(234, 88, 12, 0.05);
+}
+
+.rule-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rule-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #b45309;
+  margin: 0 0 0.2rem 0;
+}
+
+.rule-value {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--on-surface, #1e293b);
+  margin: 0 0 0.2rem 0;
+}
+
+.rule-note {
+  font-size: 0.78rem;
+  color: var(--on-surface-variant, #475569);
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* ==========================================================================
+   4. DAY-BY-DAY DATE SELECTOR STRIP (SEP 14 - SEP 19)
+   ========================================================================== */
+.pooja-dates-carousel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.date-pill-card {
+  background: var(--surface, #ffffff);
+  border: 1.5px solid var(--outline-variant, #e5e7eb);
+  border-radius: 14px;
+  padding: 0.85rem 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.date-pill-card:hover {
+  border-color: #f59e0b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+}
+
+.date-pill-card.active {
+  background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+  border-color: #ea580c;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.2);
+}
+
+.date-pill-daynum {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #b45309;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.date-pill-date {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--on-surface, #1e293b);
+}
+
+.date-pill-card.active .date-pill-date {
+  color: #9a3412;
+}
+
+.date-pill-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  background: #fed7aa;
+  color: #9a3412;
+  margin-top: 0.2rem;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   5. SELECTED DAY DETAILED SCHEDULE CARD
+   ========================================================================== */
+.day-details-main-card {
+  background: var(--surface, #ffffff);
+  border: 1.5px solid #fed7aa;
+  border-radius: 20px;
+  padding: 1.75rem;
+  box-shadow: 0 6px 20px rgba(180, 83, 9, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.day-details-header {
+  border-bottom: 1.5px solid #fed7aa;
+  padding-bottom: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.day-details-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ea580c;
+  background: #ffedd5;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  display: inline-block;
+  margin-bottom: 0.4rem;
+}
+
+.day-details-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--on-surface, #1e293b);
+  margin: 0 0 0.35rem 0;
+}
+
+.day-details-subtitle {
+  font-size: 0.88rem;
+  color: var(--on-surface-variant, #475569);
+  margin: 0;
+}
+
+/* Day Sessions: Morning vs Evening Columns */
+.day-sessions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.session-box {
+  background: #fffdfa;
+  border: 1.5px solid #fed7aa;
+  border-radius: 16px;
+  padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.session-box.morning {
+  border-color: #fed7aa;
+  background: linear-gradient(180deg, #fffaf5 0%, #ffffff 100%);
+}
+
+.session-box.evening {
+  border-color: #cbd5e1;
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.session-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.session-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.session-time-pill {
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: #fef3c7;
+  color: #b45309;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ritual-steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ritual-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--on-surface, #1e293b);
+  line-height: 1.4;
+}
+
+.ritual-step-bullet {
+  color: #ea580c;
+  font-weight: 800;
+  font-size: 1rem;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.session-naivedyam-box {
+  background: rgba(254, 240, 138, 0.3);
+  border: 1px dashed #d97706;
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.8rem;
+  color: #78350f;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.session-dresscode-box {
+  font-size: 0.78rem;
+  color: var(--on-surface-variant, #475569);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* Day Footer Highlights */
+.day-special-highlight-card {
+  background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  padding: 0.85rem 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.highlight-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.85rem;
+  color: #78350f;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   6. COMMITTEES, TEAMS & SPOC DIRECTORY
+   ========================================================================== */
+.spoc-directory-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.spoc-filter-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.spoc-search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface, #ffffff);
+  border: 1.5px solid var(--outline-variant, #e5e7eb);
+  border-radius: 12px;
+  padding: 0.55rem 0.95rem;
+  width: 100%;
+  max-width: 340px;
+}
+
+.spoc-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.88rem;
+  color: var(--on-surface, #1e293b);
+  width: 100%;
+}
+
+.team-pill-filter-bar {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  width: 100%;
+}
+
+.team-pill-btn {
+  white-space: nowrap;
+  padding: 0.45rem 0.95rem;
+  border-radius: 9999px;
+  border: 1px solid var(--outline-variant, #e5e7eb);
+  background: var(--surface, #ffffff);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--on-surface-variant, #475569);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.team-pill-btn:hover {
+  border-color: #ea580c;
+  color: #ea580c;
+}
+
+.team-pill-btn.active {
+  background: #ea580c;
+  color: #ffffff;
+  border-color: #ea580c;
+  box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
+}
+
+/* Teams Grid */
+.teams-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.team-block-card {
+  background: var(--surface, #ffffff);
+  border: 1.5px solid #fed7aa;
+  border-radius: 18px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.team-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.team-block-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin: 0 0 0.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.team-block-desc {
+  font-size: 0.84rem;
+  color: var(--on-surface-variant, #475569);
+  margin: 0;
+  max-width: 650px;
+}
+
+/* SPOCs Cards inside team */
+.spocs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.spoc-card {
+  border: 1.5px solid var(--outline-variant, #e5e7eb);
+  border-radius: 14px;
+  padding: 1.15rem;
+  background: var(--surface-container-low, #f8fafc);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.spoc-card:hover {
+  border-color: #ea580c;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.1);
+}
+
+.spoc-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.spoc-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--on-surface, #1e293b);
+  margin: 0;
+}
+
+.spoc-role {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #b45309;
+  margin: 0.15rem 0 0 0;
+}
+
+.spoc-flat-badge {
+  background: #1e3a8a;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.spoc-responsibilities-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.spoc-resp-item {
+  font-size: 0.78rem;
+  color: var(--on-surface-variant, #475569);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  line-height: 1.35;
+}
+
+/* SPOC Action Buttons (Call & WhatsApp) */
+.spoc-contact-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  border-top: 1px solid var(--outline-variant, #e5e7eb);
+  padding-top: 0.75rem;
+}
+
+.spoc-call-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.spoc-call-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.spoc-whatsapp-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem;
+  border-radius: 8px;
+  border: 1px solid #16a34a;
+  background: #16a34a;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+}
+
+.spoc-whatsapp-btn:hover {
+  background: #15803d;
+}
+
+/* Responsive Rules */
+@media (max-width: 640px) {
+  .pooja-hero-banner {
+    padding: 1.5rem 1.25rem;
+  }
+  .pooja-hero-title {
+    font-size: 1.5rem;
+  }
+  .pooja-hero-action-buttons {
+    width: 100%;
+  }
+  .pooja-hero-cta-btn,
+  .pooja-hero-secondary-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  .day-details-main-card {
+    padding: 1.25rem 1rem;
+  }
+}

@@ -480,6 +480,12 @@ export function addGaneshExpense(
 
   const updated = [newRecord, ...current];
   saveGaneshExpenses(updated);
+  
+  // Sync to live Google Sheet Apps Script webhook
+  import('./liveSheetService').then(({ syncExpenseToGoogleSheet }) => {
+    syncExpenseToGoogleSheet(newRecord);
+  }).catch(() => {});
+
   return newRecord;
 }
 

@@ -1,15 +1,514 @@
 /* ==========================================================================
-   COMMUNITY EVENTS LIST — MATCHING CIVIC DESIGN SPEC
+   FESTIVAL EVENTS & COMMUNITY EVENTS — MODERN MOBILE MOCKUP STYLING
    ========================================================================== */
 
-.events-container {
-  max-width: 1200px;
+.festival-events-page-root {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  padding-bottom: 90px;
+}
+
+/* ==========================================================================
+   1. ROYAL NAVY BRANDING HEADER
+   ========================================================================== */
+.fest-navy-header {
+  background: linear-gradient(180deg, #091136 0%, #0d1a4d 100%);
+  color: #ffffff;
+  padding: 0.85rem 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(9, 17, 54, 0.25);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.fest-navy-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fest-brand-logo-frame {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(251, 191, 36, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+.fest-brand-name {
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.fest-user-profile-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #0d1a4d;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease;
+}
+
+.fest-user-profile-btn:hover {
+  transform: scale(1.05);
+}
+
+/* ==========================================================================
+   2. PAGE TITLE & FILTER ROW
+   ========================================================================== */
+.fest-events-body {
+  max-width: 600px;
   margin: 0 auto;
-  padding-bottom: 3.5rem;
+  padding: 1.25rem 1.15rem 2rem;
+}
+
+.fest-title-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.15rem;
+}
+
+.fest-main-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.fest-filter-toggle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fest-filter-toggle-btn:hover,
+.fest-filter-toggle-btn.is-active {
+  background: #0f174a;
+  color: #ffffff;
+  border-color: #0f174a;
+}
+
+/* Category Filter Drawer / Bar */
+.fest-category-filter-bar {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.fest-cat-chip {
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fest-cat-chip.active {
+  background: #ea580c;
+  color: #ffffff;
+  border-color: #ea580c;
+}
+
+/* ==========================================================================
+   3. HORIZONTAL DATE FILTER PILLS
+   ========================================================================== */
+.fest-date-pills-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.35rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.fest-date-pills-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.fest-date-pill {
+  flex-shrink: 0;
+  padding: 0.55rem 1.25rem;
+  border-radius: 9999px;
+  border: none;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.fest-date-pill:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* Pill Variations */
+.fest-date-pill.is-today-active {
+  background: #08113b;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(8, 17, 59, 0.3);
+}
+
+.fest-date-pill.is-tomorrow-active {
+  background: #1e296a;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(30, 41, 106, 0.25);
+}
+
+.fest-date-pill.is-active-generic {
+  background: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+}
+
+/* ==========================================================================
+   4. EVENT CARDS (MATCHING MOCKUP)
+   ========================================================================== */
+.fest-cards-list {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
+
+.fest-event-card {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  position: relative;
+  overflow: hidden;
+  padding: 1.35rem 1.25rem 1.15rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fest-event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(15, 23, 42, 0.08);
+}
+
+/* Top Accent Stripe */
+.fest-card-accent-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+}
+
+.accent-gold {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.accent-navy {
+  background: linear-gradient(90deg, #1e296a, #3b82f6);
+}
+
+.accent-emerald {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.accent-purple {
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+}
+
+.accent-rose {
+  background: linear-gradient(90deg, #f43f5e, #fb7185);
+}
+
+/* Card Top Row */
+.fest-card-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+/* Category Pill Tag */
+.fest-team-tag {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.tag-lavender {
+  background: #ede9fe;
+  color: #6366f1;
+}
+
+.tag-indigo {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.tag-emerald {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.tag-amber {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.tag-rose {
+  background: #ffe4e6;
+  color: #e11d48;
+}
+
+/* Date Badge Block */
+.fest-date-badge-block {
+  width: 50px;
+  height: 54px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.badge-dark-navy {
+  background: #1b265b;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(27, 38, 91, 0.25);
+}
+
+.badge-dark-navy .fest-badge-month {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #93c5fd;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: -2px;
+}
+
+.badge-dark-navy .fest-badge-day {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.badge-light-gray {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+}
+
+.badge-light-gray .fest-badge-month {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: -2px;
+}
+
+.badge-light-gray .fest-badge-day {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1;
+}
+
+/* Event Title & Description */
+.fest-card-event-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+.fest-card-event-desc {
+  font-size: 0.88rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Event Meta: Time & Location */
+.fest-card-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 1.25rem;
+}
+
+.fest-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.fest-meta-icon {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+/* Bottom Action Row */
+.fest-card-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f8fafc;
+}
+
+/* Avatar Stack */
+.fest-avatar-stack-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.fest-avatar-stack {
+  display: flex;
+  align-items: center;
+}
+
+.fest-avatar-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  margin-left: -8px;
+  object-fit: cover;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fest-avatar-circle:first-child {
+  margin-left: 0;
+}
+
+.fest-avatar-more-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1.5px solid #ffffff;
+  border-radius: 9999px;
+  padding: 0.15rem 0.45rem;
+  margin-left: -6px;
+}
+
+/* Share Button */
+.fest-card-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fest-card-share-btn:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+/* View Details Action Button */
+.fest-btn-view-details {
+  background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  padding: 0.65rem 1.35rem;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fest-btn-view-details:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.45);
+}
+
+.fest-btn-view-details:active {
+  transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .fest-events-body {
+    padding: 1rem 0.9rem 1.5rem;
+  }
+
+  .fest-event-card {
+    border-radius: 20px;
+    padding: 1.15rem 1rem 1rem;
+  }
+
+  .fest-card-event-title {
+    font-size: 1.15rem;
+  }
+}
+
 
 /* ==========================================================================
    1. TOP CONTROLS & FILTER BAR

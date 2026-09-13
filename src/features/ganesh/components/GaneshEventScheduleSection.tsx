@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Calendar,
   Clock,
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export const GaneshEventScheduleSection: React.FC<Props> = ({ onOpenContributeModal }) => {
+  const navigate = useNavigate();
   const [isFlyerModalOpen, setIsFlyerModalOpen] = useState(false);
 
   return (
@@ -378,6 +380,31 @@ export const GaneshEventScheduleSection: React.FC<Props> = ({ onOpenContributeMo
             >
               <QrCode size={16} />
               <span>Contribute via QR / UPI</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/pooja-schedule')}
+              className="btn-festive-secondary"
+              style={{
+                width: '100%',
+                padding: '0.65rem 1rem',
+                fontSize: '0.85rem',
+                fontWeight: 800,
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #1e3a8a, #0f172a)',
+                color: '#fef08a',
+                border: '1.5px solid #fde047',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.45rem',
+                boxShadow: '0 4px 12px rgba(30, 58, 138, 0.25)',
+              }}
+            >
+              <Flame size={15} color="#fde047" />
+              <span>Pooja Schedule &amp; SPOCs (14–19 Sep)</span>
             </button>
 
             <button

@@ -24,6 +24,7 @@ import {
 import {
   submitGothramToGoogleSheet,
   getGoogleFormUrl,
+  isFlatMatching,
 } from '../../../services/liveSheetService';
 
 interface Props {
@@ -86,8 +87,8 @@ export const GaneshSankalpamForm: React.FC<Props> = ({
   };
 
   const mySankalpam = useMemo(() => {
-    if (!userFlat) return null;
-    return sankalpams.find((s) => s.flatNo.trim().toUpperCase() === userFlat.trim().toUpperCase());
+    if (!userFlat || userFlat === 'GUEST') return null;
+    return sankalpams.find((s) => isFlatMatching(s.flatNo, userFlat)) || null;
   }, [sankalpams, userFlat]);
 
   useEffect(() => {
@@ -203,7 +204,7 @@ export const GaneshSankalpamForm: React.FC<Props> = ({
     <div>
       {/* POPUP MODAL: ADD / UPDATE GOTHRAM & FAMILY */}
       {isModalOpen && (
-        <div className="ganesh-modal-overlay" onClick={() => setIsModalOpen(false)}>
+        <div className="ganesh-modal-overlay" onClick={() => setIsModalOpen(false)} style={{ zIndex: 1250 }}>
           <div
             className="ganesh-modal-content"
             onClick={(e) => e.stopPropagation()}
@@ -538,10 +539,10 @@ export const GaneshSankalpamForm: React.FC<Props> = ({
             <table className="ganesh-table">
               <thead>
                 <tr style={{ background: '#fef3c7' }}>
-                  <th style={{ width: '60px' }}>Sl No</th>
-                  <th style={{ width: '90px' }}>Flat</th>
+                  <th style={{ width: '50px', textAlign: 'center' }}>Sl No</th>
+                  <th style={{ width: '85px', textAlign: 'center' }}>Flat</th>
                   <th style={{ width: '180px' }}>Gothram</th>
-                  <th style={{ width: '180px' }}>Family Head / Resident</th>
+                  <th style={{ width: '200px' }}>Family Head / Resident</th>
                   <th>Family Members</th>
                 </tr>
               </thead>
@@ -549,7 +550,7 @@ export const GaneshSankalpamForm: React.FC<Props> = ({
                 {filteredSankalpams.map((item, idx) => (
                   <tr key={item.id}>
                     <td style={{ fontWeight: 700, textAlign: 'center' }}>{idx + 1}</td>
-                    <td>
+                    <td style={{ textAlign: 'center' }}>
                       <strong>{item.flatNo}</strong>
                     </td>
                     <td style={{ fontWeight: 800, color: '#9a3412' }}>{item.gothram}</td>

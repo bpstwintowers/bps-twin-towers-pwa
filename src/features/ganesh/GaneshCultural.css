@@ -1,0 +1,562 @@
+/* ==========================================================================
+   BPS Twin Towers - Ganesh Utsav Cultural Programme Page Styles
+   Matching mobile app mockup: Hero banner, Vertical Timeline, Registration Form
+   ========================================================================== */
+
+.cultural-page-root {
+  min-height: 100vh;
+  background-color: #f1f5f9;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #1e293b;
+  padding-bottom: 90px;
+}
+
+/* Top Navigation Bar */
+.cultural-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: #09142e;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 16px rgba(9, 20, 46, 0.25);
+}
+
+.cultural-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.cultural-back-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cultural-back-btn:hover,
+.cultural-back-btn:active {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-2px);
+}
+
+.cultural-nav-title {
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cultural-nav-badge {
+  background: #f97316;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.cultural-dashboard-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #e2e8f0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Page Container */
+.cultural-main-container {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 1rem 0.85rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Hero Stage Banner */
+.cultural-hero-card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(9, 20, 46, 0.18);
+  min-height: 190px;
+  background: #09142e;
+}
+
+.cultural-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.cultural-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(9, 20, 46, 0.55) 0%,
+    rgba(9, 20, 46, 0.3) 40%,
+    rgba(9, 20, 46, 0.92) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.25rem;
+  color: #ffffff;
+}
+
+.cultural-hero-lineup-pill {
+  align-self: flex-start;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow: 0 3px 10px rgba(249, 115, 22, 0.45);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.cultural-hero-title {
+  font-size: 1.85rem;
+  font-weight: 900;
+  line-height: 1.15;
+  margin: 0 0 0.4rem 0;
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.cultural-hero-sub {
+  font-size: 0.82rem;
+  color: #e2e8f0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Vertical Timeline Container & Nodes
+   ========================================================================== */
+.cultural-timeline-wrap {
+  position: relative;
+  padding-left: 68px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Continuous vertical timeline connector line */
+.cultural-timeline-wrap::before {
+  content: '';
+  position: absolute;
+  left: 28px;
+  top: 18px;
+  bottom: 30px;
+  width: 2px;
+  background: #cbd5e1;
+  border-radius: 2px;
+  z-index: 1;
+}
+
+/* Single Timeline Entry */
+.timeline-entry {
+  position: relative;
+}
+
+/* Left Node (Circle Icon + Time Badge) */
+.timeline-node-col {
+  position: absolute;
+  left: -68px;
+  top: 0;
+  width: 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 2;
+}
+
+.timeline-circle-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  color: #ffffff;
+  border: 2.5px solid #ffffff;
+  z-index: 3;
+  position: relative;
+}
+
+.timeline-circle-icon.indigo {
+  background: #1e1b4b;
+}
+
+.timeline-circle-icon.slate {
+  background: #334155;
+}
+
+.timeline-circle-icon.teal {
+  background: #475569;
+}
+
+.timeline-circle-icon.star-gold {
+  background: #92400e;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.45);
+}
+
+.timeline-time-label {
+  margin-top: 0.45rem;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.3rem 0.2rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 3;
+}
+
+.time-badge-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.time-badge-inner .time-val {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.time-badge-inner .time-to {
+  font-size: 0.52rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: lowercase;
+  line-height: 1;
+}
+
+/* Timeline Card */
+.timeline-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 1.1rem 1.15rem;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.timeline-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.09);
+}
+
+/* Top Colored Stripes matching mockup */
+.timeline-card.stripe-orange {
+  border-top: 3.5px solid #f97316;
+}
+
+.timeline-card.stripe-coral {
+  border-top: 3.5px solid #fb923c;
+}
+
+.timeline-card.stripe-yellow {
+  border-top: 3.5px solid #eab308;
+}
+
+/* Special Finale Card (Dark Navy Royal Card) */
+.timeline-card.is-special-card {
+  background: linear-gradient(145deg, #09142e 0%, #162047 100%);
+  border: 1px solid #1e295b;
+  box-shadow: 0 8px 24px rgba(9, 20, 46, 0.35);
+  color: #ffffff;
+}
+
+.timeline-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.timeline-card-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.is-special-card .timeline-card-title {
+  color: #ffffff;
+  font-size: 1.15rem;
+}
+
+.duration-pill {
+  background: #e0e7ff;
+  color: #4338ca;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.is-special-card .duration-pill {
+  background: rgba(255, 255, 255, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.timeline-card-desc {
+  font-size: 0.84rem;
+  color: #475569;
+  line-height: 1.4;
+  margin: 0 0 0.85rem 0;
+}
+
+.is-special-card .timeline-card-desc {
+  color: #cbd5e1;
+}
+
+/* Performer Tag Pill */
+.performer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.performer-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.performer-avatar.orange {
+  background: #f97316;
+}
+
+.performer-avatar.indigo {
+  background: #4f46e5;
+  border-radius: 4px;
+}
+
+.performer-avatar.yellow {
+  background: #eab308;
+}
+
+.is-special-card .performer-pill {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.is-special-card .performer-avatar.star {
+  background: transparent;
+  color: #fbbf24;
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   "Want to perform?" Registration Form Card
+   ========================================================================== */
+.cultural-form-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 1.4rem;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.cultural-form-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-header-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+  flex-shrink: 0;
+}
+
+.form-header-title {
+  margin: 0;
+  font-size: 1.28rem;
+  font-weight: 900;
+  color: #0f172a;
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+}
+
+.form-header-sub {
+  margin: 0.15rem 0 0 0;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.cultural-form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.form-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.form-input::placeholder {
+  color: #94a3b8;
+}
+
+.form-input:focus,
+.form-select:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+.form-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.cultural-submit-btn {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.85rem;
+  background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #78350f 100%);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 14px rgba(120, 53, 15, 0.35);
+  transition: all 0.2s ease;
+}
+
+.cultural-submit-btn:hover {
+  background: linear-gradient(135deg, #854d0e 0%, #a16207 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(120, 53, 15, 0.45);
+}
+
+.cultural-submit-btn:active {
+  transform: translateY(1px);
+}
+
+/* Success Banner */
+.cultural-success-banner {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 14px;
+  padding: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: #166534;
+}
+
+.cultural-success-title {
+  font-weight: 800;
+  font-size: 0.9rem;
+  margin: 0 0 0.2rem 0;
+}
+
+.cultural-success-sub {
+  font-size: 0.8rem;
+  margin: 0;
+  color: #15803d;
+}

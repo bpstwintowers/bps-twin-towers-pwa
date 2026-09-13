@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Sparkles,
   HeartHandshake,
@@ -14,6 +15,17 @@ import {
   X,
   RefreshCw,
   ExternalLink,
+  Calendar,
+  Clock,
+  Phone,
+  MessageCircle,
+  Search,
+  CheckCircle2,
+  ChevronRight,
+  Shirt,
+  Utensils,
+  PartyPopper,
+  ArrowLeft,
 } from 'lucide-react';
 import type {
   GaneshContributionRecord,
@@ -21,6 +33,12 @@ import type {
   GaneshFinancialSummary,
   GaneshSankalpamRecord,
 } from '../../types/ganesh';
+import {
+  POOJA_SCHEDULE_DAYS,
+  COMMITTEE_TEAMS,
+  type PoojaDaySchedule,
+} from './poojaScheduleData';
+import './PoojaSchedule.css';
 import {
   fetchLiveContributions,
   fetchLiveGothramResponses,
@@ -46,16 +64,43 @@ import { GaneshFlatPromptModal } from './components/GaneshFlatPromptModal';
 import { GoogleFormEmbedModal } from './components/GoogleFormEmbedModal';
 import { GoogleSheetsSyncModal } from './components/GoogleSheetsSyncModal';
 import { GaneshBannerOverlay } from './components/GaneshBannerOverlay';
+import { GaneshQuickActions } from './components/GaneshQuickActions';
+import { GaneshBottomNav } from './components/GaneshBottomNav';
+import { EventList } from '../events/EventList';
+import { GaneshFundsPage } from './GaneshFundsPage';
+import { GaneshVolunteerPage } from './GaneshVolunteerPage';
+import { GaneshPrasadamPage } from './GaneshPrasadamPage';
+import { GaneshCulturalPage } from './GaneshCulturalPage';
+import { GaneshAuctionPage } from './GaneshAuctionPage';
+import { GaneshSponsorsPage } from './GaneshSponsorsPage';
+import { AnnouncementList } from '../announcements/AnnouncementList';
 import './GaneshContribution.css';
 
-type ActiveTab = 'contributions' | 'sankalpam' | 'expenses';
+type ActiveTab =
+  | 'home'
+  | 'contributions'
+  | 'funds'
+  | 'expenses'
+  | 'pooja'
+  | 'volunteers'
+  | 'prasadam'
+  | 'cultural'
+  | 'auction'
+  | 'sponsors'
+  | 'updates'
+  | 'spocs'
+  | 'sankalpam';
 
 interface Props {
   isRegisteredUser?: boolean;
 }
 
 export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRegisteredProp }) => {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('contributions');
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
+    if (window.location.pathname === '/ganesh-contributions') return 'contributions';
+    return 'home';
+  });
   const [sankalpamViewMode, setSankalpamViewMode] = useState<'families' | 'pujari' | 'expenses' | 'contributions'>('families');
   const [isGothramModalOpen, setIsGothramModalOpen] = useState(false);
   const [isGoogleFormModalOpen, setIsGoogleFormModalOpen] = useState(false);
@@ -74,7 +119,12 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
   const [isFlatPromptOpen, setIsFlatPromptOpen] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
 
-  const scrollToTabs = (tab: 'contributions' | 'expenses' | 'sankalpam') => {
+  // Embedded Pooja Schedule & SPOC Filters State
+  const [selectedPoojaDay, setSelectedPoojaDay] = useState<number>(1);
+  const [selectedTeamFilter, setSelectedTeamFilter] = useState<string>('ALL');
+  const [spocSearchQuery, setSpocSearchQuery] = useState<string>('');
+
+  const scrollToTabs = (tab: ActiveTab) => {
     setActiveTab(tab);
     setTimeout(() => {
       tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -108,6 +158,29 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
     if (!userFlat || userFlat === 'GUEST') return null;
     return sankalpams.find((s) => isFlatMatching(s.flatNo, userFlat)) || null;
   }, [sankalpams, userFlat]);
+
+  const activePoojaDay: PoojaDaySchedule = useMemo(() => {
+    return POOJA_SCHEDULE_DAYS.find((d) => d.dayNumber === selectedPoojaDay) || POOJA_SCHEDULE_DAYS[0];
+  }, [selectedPoojaDay]);
+
+  const filteredTeams = useMemo(() => {
+    return COMMITTEE_TEAMS.map((team) => {
+      if (selectedTeamFilter !== 'ALL' && team.id !== selectedTeamFilter) return null;
+      const query = spocSearchQuery.toLowerCase().trim();
+      const filteredSpocs = team.spocs.filter((spoc) => {
+        if (!query) return true;
+        return (
+          spoc.name.toLowerCase().includes(query) ||
+          spoc.flatNo.toLowerCase().includes(query) ||
+          spoc.role.toLowerCase().includes(query) ||
+          spoc.tower.toLowerCase().includes(query) ||
+          spoc.responsibilities.some((r) => r.toLowerCase().includes(query))
+        );
+      });
+      if (filteredSpocs.length === 0) return null;
+      return { ...team, spocs: filteredSpocs };
+    }).filter(Boolean) as typeof COMMITTEE_TEAMS;
+  }, [selectedTeamFilter, spocSearchQuery]);
 
   // Modals
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
@@ -340,185 +413,105 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
           </div>
         )}
 
-        {/* Festive Top Widescreen Banner Image Card */}
-        <div
-          style={{
-            width: '100%',
-            borderRadius: '20px',
-            overflow: 'hidden',
-            marginBottom: '1.25rem',
-            boxShadow: '0 10px 28px -4px rgba(0, 0, 0, 0.12)',
-            background: '#ffffff',
-            border: '2px solid #fed7aa',
-          }}
-        >
-          <div
-            style={{
-              width: '100%',
-              height: 'clamp(200px, 32vw, 360px)',
-              background: '#fff7ed',
-              overflow: 'hidden',
+        {/* If on Home: Show Mobile-Style Photo Hero Card, Resident Status Cards (Contribution/Gothram), 8 Quick Actions & Add to Home Screen */}
+        {activeTab === 'home' && (
+          <GaneshQuickActions
+            userFlat={userFlat}
+            summary={summary}
+            sankalpams={sankalpams}
+            contributions={contributions}
+            onSelectTab={(tab) => {
+              setActiveTab(tab);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-          >
-            <img
-              src="/ganesh-banner.png"
-              alt="BPS Ganesh Utsav 2026 Celebration"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center 20%',
-                display: 'block',
-              }}
-            />
-          </div>
-
-          {/* Attached Festive Invitation Ribbon & Live Countdown */}
-          <GaneshBannerOverlay />
-        </div>
-
-        {/* Event Title, Details & Google Form Action Header */}
-        <div
-          style={{
-            background: '#ffffff',
-            border: '1px solid #fed7aa',
-            borderRadius: '18px',
-            padding: '1.25rem 1.5rem',
-            marginBottom: '1.5rem',
-            boxShadow: '0 4px 16px -2px rgba(234, 88, 12, 0.06)',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '0.75rem',
+            onOpenContributeModal={() => setIsPayModalOpen(true)}
+            onOpenSponsorModal={() => setIsSponsorModalOpen(true)}
+            onOpenGothramModal={() => {
+              setIsGoogleFormModalOpen(true);
             }}
-          >
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
-                <h1
-                  style={{
-                    margin: 0,
-                    fontSize: 'clamp(1.3rem, 2.8vw, 1.8rem)',
-                    fontWeight: 800,
-                    color: '#0f172a',
-                    letterSpacing: '-0.02em',
-                  }}
-                >
-                  Ganesh Utsav 2026
-                </h1>
-                <span
-                  style={{
-                    background: '#ecfdf5',
-                    color: '#047857',
-                    border: '1px solid #a7f3d0',
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                    padding: '0.12rem 0.55rem',
-                    borderRadius: '9999px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                  }}
-                >
-                  Active
-                </span>
-              </div>
+            onOpenFlatPrompt={() => setIsFlatPromptOpen(true)}
+          />
+        )}
 
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.85rem',
-                  flexWrap: 'nowrap',
-                  whiteSpace: 'nowrap',
-                  color: '#64748b',
-                  fontSize: 'clamp(0.76rem, 2.2vw, 0.84rem)',
-                  fontWeight: 600,
-                  overflowX: 'auto',
-                  scrollbarWidth: 'none',
-                }}
-              >
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
-                  📅 Sep 14 – 19, 2026
-                </span>
-                <span style={{ color: '#cbd5e1', flexShrink: 0 }}>•</span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
-                  📍 Community Hall, Ground Floor
-                </span>
-              </div>
-            </div>
+        {/* Tab 1: Events / Pooja Schedule */}
+        {activeTab === 'pooja' && (
+          <EventList embedded={true} onBackToHome={() => setActiveTab('home')} />
+        )}
 
+        {/* Tab 2: Community Funds */}
+        {activeTab === 'funds' && (
+          <GaneshFundsPage embedded={true} onBackToHome={() => setActiveTab('home')} />
+        )}
+
+        {/* Tab 4: Volunteers & Committee Seva */}
+        {activeTab === 'volunteers' && (
+          <GaneshVolunteerPage embedded={true} onBackToHome={() => setActiveTab('home')} />
+        )}
+
+        {/* Tab 5: Sacred Maha Prasadam Schedule */}
+        {activeTab === 'prasadam' && (
+          <GaneshPrasadamPage embedded={true} onBackToHome={() => setActiveTab('home')} />
+        )}
+
+        {/* Tab 6: Cultural Programmes & Registrations */}
+        {activeTab === 'cultural' && (
+          <GaneshCulturalPage embedded={true} onBackToHome={() => setActiveTab('home')} />
+        )}
+
+        {/* Tab 7: Maha Laddu Live Auction */}
+        {activeTab === 'auction' && (
+          <GaneshAuctionPage embedded={true} onBackToHome={() => setActiveTab('home')} />
+        )}
+
+        {/* Tab 8: Sponsors & Festival Patrons */}
+        {activeTab === 'sponsors' && (
+          <GaneshSponsorsPage embedded={true} onBackToHome={() => setActiveTab('home')} />
+        )}
+
+        {/* Tab 9: Official Announcements & Updates */}
+        {activeTab === 'updates' && (
+          <AnnouncementList embedded={true} onBackToHome={() => setActiveTab('home')} />
+        )}
+
+        {/* If on Classic Financial Ledger / Expenses / SPOCs / Gothram Tabs */}
+        {(activeTab === 'contributions' || activeTab === 'expenses' || activeTab === 'spocs' || activeTab === 'sankalpam') && (
+          <>
+            {/* Top Back Header for Tab Views */}
             <div
+              className="no-print"
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                gap: '0.65rem',
-                width: '100%',
-                maxWidth: '460px',
-                marginTop: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0.35rem 0 0.75rem 0',
               }}
             >
               <button
                 type="button"
-                onClick={() => setIsPayModalOpen(true)}
-                className="btn-festive-primary"
+                onClick={() => setActiveTab('home')}
                 style={{
-                  background: 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
-                  color: '#ffffff',
-                  border: 'none',
-                  padding: '0.65rem 0.75rem',
-                  fontSize: '0.86rem',
+                  background: '#ffffff',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '12px',
+                  padding: '0.45rem 0.95rem',
+                  fontSize: '0.85rem',
                   fontWeight: 700,
-                  borderRadius: '14px',
+                  color: '#0f172a',
+                  cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
                   gap: '0.45rem',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(234, 88, 12, 0.25)',
-                  whiteSpace: 'nowrap',
-                  width: '100%',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                 }}
               >
-                <QrCode size={16} />
-                <span>Contribute Now</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setIsGoogleFormModalOpen(true)}
-                className="btn-festive-secondary"
-                style={{
-                  background: '#fff7ed',
-                  color: '#c2410c',
-                  border: '1.5px solid #fdba74',
-                  padding: '0.65rem 0.75rem',
-                  fontSize: '0.86rem',
-                  fontWeight: 700,
-                  borderRadius: '14px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.45rem',
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(234, 88, 12, 0.08)',
-                  whiteSpace: 'nowrap',
-                  width: '100%',
-                }}
-              >
-                <Sparkles size={16} />
-                <span>Gothram Entry</span>
+                <ArrowLeft size={16} />
+                <span>Back to Festival Home</span>
               </button>
             </div>
-          </div>
-        </div>
 
-        {/* KPI Metrics & Community Progress Summary (Side by Side) */}
-        {summary && (
-          <div className="ganesh-summary-row">
+            {/* KPI Metrics & Community Progress Summary (Side by Side) */}
+            {summary && (
+              <div className="ganesh-summary-row">
             {/* Total Collections */}
             <div
               className="ganesh-metric-card is-clickable"
@@ -613,257 +606,110 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
           </div>
         )}
 
-        {/* Unified Resident Flat Dashboard Card (Contributions & Sankalpam Gothram) */}
-        {userFlat && userFlat !== 'GUEST' && !['ADMN', 'ADMIN'].some((k) => userFlat.toUpperCase().includes(k)) && (
+        {/* =========================================================================
+            INTERACTIVE FESTIVAL MENU CARDS (CONTRIBUTIONS, EXPENSES, POOJA, SPOCS, SANKALPAM)
+           ========================================================================= */}
+        <div className="ganesh-menu-cards-grid no-print">
+          {/* Card 1: Contributions & Sponsors */}
           <div
-            style={{
-              background: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%)',
-              border: '1.5px solid #f97316',
-              borderRadius: '14px',
-              padding: '0.75rem 1rem',
-              marginBottom: '1rem',
-              boxShadow: '0 4px 16px -2px rgba(234, 88, 12, 0.12)',
-            }}
+            className={`ganesh-menu-nav-card card-contributions ${activeTab === 'contributions' ? 'active' : ''}`}
+            onClick={() => scrollToTabs('contributions')}
           >
-            {/* Top Section: Header */}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: '0.5rem',
-                marginBottom: userContributions.length > 0 ? '0.5rem' : '0.35rem',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                <span style={{ fontSize: '1.15rem' }}>🌟</span>
-                <div>
-                  <h3 style={{ margin: 0, color: '#9a3412', fontSize: '0.98rem', fontWeight: 800 }}>
-                    Flat {userFlat.toUpperCase()} • Contributions & Sponsorships
-                  </h3>
-                  <span style={{ fontSize: '0.75rem', color: '#b45309' }}>
-                    {userContributions.length > 0
-                      ? `${userContributions.length} contribution entry recorded for your flat`
-                      : 'No contributions recorded yet for your flat'}
-                  </span>
-                </div>
+            <div className="menu-nav-top">
+              <div className="menu-nav-icon-wrap icon-gold">
+                <HeartHandshake size={20} />
               </div>
+              <span className="menu-nav-badge count-gold">{contributions.length} Records</span>
             </div>
-
-            {/* Contribution Records Grid (if any) or Call-to-Action buttons (if no contributions yet) */}
-            {userContributions.length > 0 ? (
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                  gap: '0.5rem',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                {userContributions.map((item) => (
-                  <div
-                    key={item.id}
-                    style={{
-                      background: '#ffffff',
-                      borderRadius: '10px',
-                      padding: '0.55rem 0.85rem',
-                      border: '1px solid #fed7aa',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontWeight: 700, color: '#1e293b', fontSize: '0.88rem' }}>{item.donorName}</div>
-                      <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
-                        {item.isSponsor ? `🎖️ Sponsor: ${item.sponsorCategory || 'Pooja Sponsor'}` : item.contributionType || 'General Contribution'}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '1.02rem', fontWeight: 800, color: '#ea580c' }}>
-                        ₹{item.amount.toLocaleString('en-IN')}
-                      </div>
-                      {item.verified && (
-                        <span style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700 }}>● Verified</span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div
-                style={{
-                  background: '#ffffff',
-                  borderRadius: '12px',
-                  padding: '0.75rem 1rem',
-                  border: '1px solid #fed7aa',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '0.65rem',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 700, color: '#9a3412', fontSize: '0.88rem' }}>
-                    Join the Grand Utsav Celebration
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.1rem' }}>
-                    Support festival arrangements with voluntary contribution or seva sponsorship
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    onClick={() => setIsPayModalOpen(true)}
-                    className="btn-festive-primary"
-                    style={{
-                      background: '#ea580c',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '0.4rem 0.85rem',
-                      fontSize: '0.78rem',
-                      fontWeight: 700,
-                      borderRadius: '8px',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.35rem',
-                      cursor: 'pointer',
-                      boxShadow: '0 2px 6px rgba(234, 88, 12, 0.2)',
-                    }}
-                  >
-                    <QrCode size={14} /> Contribute via QR Code
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsSponsorModalOpen(true)}
-                    className="btn-festive-secondary"
-                    style={{
-                      background: '#fff7ed',
-                      color: '#c2410c',
-                      border: '1.5px solid #fdba74',
-                      padding: '0.4rem 0.85rem',
-                      fontSize: '0.78rem',
-                      fontWeight: 700,
-                      borderRadius: '8px',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.35rem',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <Sparkles size={14} /> Become a Sponsor
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Divider */}
-            <div style={{ borderTop: '1px dashed #fdba74', margin: '0.5rem 0' }} />
-
-            {/* Embedded Gothram & Sankalpam Section inside the same card */}
-            {mySankalpam ? (
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.2rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                    <span style={{ fontSize: '1rem' }}>🙏</span>
-                    <h4 style={{ margin: 0, color: '#92400e', fontSize: '0.92rem', fontWeight: 800 }}>
-                      Gothram: {mySankalpam.gothram}
-                    </h4>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsGoogleFormModalOpen(true)}
-                    style={{
-                      background: '#ffffff',
-                      border: '1px solid #fdba74',
-                      color: '#c2410c',
-                      borderRadius: '8px',
-                      padding: '0.2rem 0.55rem',
-                      fontSize: '0.74rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.3rem',
-                    }}
-                  >
-                    <Sparkles size={12} /> Edit Gothram (Google Form)
-                  </button>
-                </div>
-                <div style={{ fontSize: '0.74rem', color: '#b45309', marginBottom: '0.3rem' }}>
-                  {mySankalpam.familyMembers?.length || 0} family members registered for daily Sankalpam
-                </div>
-
-                {mySankalpam.familyMembers && mySankalpam.familyMembers.length > 0 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
-                    {mySankalpam.familyMembers.map((m) => (
-                      <span
-                        key={m.id}
-                        style={{
-                          background: '#ffffff',
-                          border: '1px solid #fde68a',
-                          padding: '0.15rem 0.5rem',
-                          borderRadius: '10px',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          color: '#78350f',
-                        }}
-                      >
-                        {m.name} {m.relationship ? `(${m.relationship})` : ''} {m.nakshatram ? `• ${m.nakshatram}` : ''}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '0.75rem',
-                  paddingTop: '0.2rem',
-                }}
-              >
-                <div>
-                  <h4 style={{ margin: 0, color: '#9a3412', fontSize: '0.98rem', fontWeight: 800 }}>
-                    🙏 Flat {userFlat.toUpperCase()} is not yet registered for Sankalpam
-                  </h4>
-                  <p style={{ margin: '0.2rem 0 0 0', color: '#78350f', fontSize: '0.82rem' }}>
-                    Register your Gothram and family members for daily puja chanting & blessings.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsGoogleFormModalOpen(true)}
-                  className="btn-festive-primary"
-                  style={{
-                    background: '#ea580c',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderRadius: '10px',
-                    padding: '0.52rem 1.1rem',
-                    fontWeight: 700,
-                    fontSize: '0.86rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.45rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(234, 88, 12, 0.2)',
-                  }}
-                >
-                  <Sparkles size={16} /> Register Gothram for Flat {userFlat.toUpperCase()}
-                </button>
-              </div>
-            )}
+            <h3 className="menu-nav-title">Contributions &amp; Sponsors</h3>
+            <p className="menu-nav-desc">
+              ₹{summary ? summary.totalCollections.toLocaleString('en-IN') : '0'} collected from{' '}
+              {summary ? summary.totalContributorsCount : 0} Flats
+            </p>
+            <div className="menu-nav-footer">
+              <span>View Donor List &amp; Sponsors</span>
+              <ChevronRight size={14} />
+            </div>
           </div>
-        )}
+
+          {/* Card 2: Expenses & Ledger */}
+          <div
+            className={`ganesh-menu-nav-card card-expenses ${activeTab === 'expenses' ? 'active' : ''}`}
+            onClick={() => scrollToTabs('expenses')}
+          >
+            <div className="menu-nav-top">
+              <div className="menu-nav-icon-wrap icon-rose">
+                <Receipt size={20} />
+              </div>
+              <span className="menu-nav-badge count-rose">{expenses.length} Invoices</span>
+            </div>
+            <h3 className="menu-nav-title">Expenses &amp; Ledger</h3>
+            <p className="menu-nav-desc">
+              ₹{summary ? summary.totalExpenses.toLocaleString('en-IN') : '0'} verified vendor invoices
+            </p>
+            <div className="menu-nav-footer">
+              <span>View Invoices &amp; Bills</span>
+              <ChevronRight size={14} />
+            </div>
+          </div>
+
+          {/* Card 3: Pooja Schedule (14th - 19th Sep) */}
+          <div
+            className="ganesh-menu-nav-card card-pooja"
+            onClick={() => navigate('/events')}
+          >
+            <div className="menu-nav-top">
+              <div className="menu-nav-icon-wrap icon-amber">
+                <Flame size={20} />
+              </div>
+              <span className="menu-nav-badge count-amber">Sep 14–19</span>
+            </div>
+            <h3 className="menu-nav-title">Pooja Schedule</h3>
+            <p className="menu-nav-desc">6 Days • Morning Abhishekam &amp; 7:00 PM Aarti</p>
+            <div className="menu-nav-footer">
+              <span>View Daily Schedule</span>
+              <ChevronRight size={14} />
+            </div>
+          </div>
+
+          {/* Card 4: Volunteer & Committee Teams */}
+          <div
+            className="ganesh-menu-nav-card card-spocs"
+            onClick={() => navigate('/ganesh-volunteers')}
+          >
+            <div className="menu-nav-top">
+              <div className="menu-nav-icon-wrap icon-blue">
+                <Users size={20} />
+              </div>
+              <span className="menu-nav-badge count-blue">Volunteer</span>
+            </div>
+            <h3 className="menu-nav-title">Volunteer Portal</h3>
+            <p className="menu-nav-desc">Join Food, Decor, Cultural, Pooja &amp; Crowd Teams</p>
+            <div className="menu-nav-footer">
+              <span>Sign Up &amp; Be Part of Celebration</span>
+              <ChevronRight size={14} />
+            </div>
+          </div>
+
+          {/* Card 5: Gothram & Sankalpam */}
+          <div
+            className={`ganesh-menu-nav-card card-sankalpam ${activeTab === 'sankalpam' ? 'active' : ''}`}
+            onClick={() => scrollToTabs('sankalpam')}
+          >
+            <div className="menu-nav-top">
+              <div className="menu-nav-icon-wrap icon-teal">
+                <Sparkles size={20} />
+              </div>
+              <span className="menu-nav-badge count-teal">{sankalpams.length} Families</span>
+            </div>
+            <h3 className="menu-nav-title">Gothram &amp; Sankalpam</h3>
+            <p className="menu-nav-desc">Daily Archana Family Names &amp; Pujari Roster</p>
+            <div className="menu-nav-footer">
+              <span>View Registered Families</span>
+              <ChevronRight size={14} />
+            </div>
+          </div>
+        </div>
 
         {/* Feature Tabs Navigation */}
         <div className="ganesh-tabs-container no-print" ref={tabsRef}>
@@ -886,9 +732,39 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
             <span>Expenses &amp; Ledger</span>
             <span className="tab-counter-badge">{expenses.length}</span>
           </button>
+
+          <button
+            type="button"
+            className="ganesh-tab-btn"
+            onClick={() => navigate('/events')}
+          >
+            <Flame size={18} />
+            <span>Pooja Schedule (14th–19th)</span>
+            <span className="tab-counter-badge">6 Days</span>
+          </button>
+
+          <button
+            type="button"
+            className={`ganesh-tab-btn ${activeTab === 'spocs' ? 'active' : ''}`}
+            onClick={() => setActiveTab('spocs')}
+          >
+            <Users size={18} />
+            <span>Teams &amp; SPOCs</span>
+            <span className="tab-counter-badge">12 SPOCs</span>
+          </button>
+
+          <button
+            type="button"
+            className={`ganesh-tab-btn ${activeTab === 'sankalpam' ? 'active' : ''}`}
+            onClick={() => setActiveTab('sankalpam')}
+          >
+            <Sparkles size={18} />
+            <span>Gothram &amp; Sankalpam</span>
+            <span className="tab-counter-badge">{sankalpams.length}</span>
+          </button>
         </div>
 
-        {/* Tab Panels */}
+        {/* Tab Panel 1: Contributions & Sponsors */}
         {activeTab === 'contributions' && (
           <GaneshContributorsList
             contributions={contributions}
@@ -898,6 +774,7 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
           />
         )}
 
+        {/* Tab Panel 2: Expenses & Ledger */}
         {activeTab === 'expenses' && (
           <div className="ganesh-contributors-card">
             <GaneshExpenseTracker
@@ -908,19 +785,152 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
           </div>
         )}
 
-        {/* Sankalpam Gothram Registration / Edit Modal */}
-        <GaneshSankalpamForm
-          sankalpams={sankalpams}
-          contributions={contributions}
-          expenses={expenses}
-          onRefresh={loadData}
-          userFlat={userFlat}
-          activeViewMode={sankalpamViewMode}
-          onViewModeChange={setSankalpamViewMode}
-          isAddModalOpen={isGothramModalOpen}
-          onOpenAddModal={() => setIsGothramModalOpen(true)}
-          onCloseAddModal={() => setIsGothramModalOpen(false)}
-        />
+        {/* Tab Panel 4: Embedded Committee Teams & SPOC Directory */}
+        {activeTab === 'spocs' && (
+          <div className="spoc-directory-section">
+            {/* Toolbar & Filters */}
+            <div className="spoc-filter-toolbar">
+              <div className="spoc-search-box">
+                <Search size={16} color="#94a3b8" />
+                <input
+                  type="text"
+                  className="spoc-search-input"
+                  placeholder="Search SPOC by name, flat (e.g. A-704), or role..."
+                  value={spocSearchQuery}
+                  onChange={(e) => setSpocSearchQuery(e.target.value)}
+                />
+              </div>
+
+              <div className="team-pill-filter-bar">
+                <button
+                  type="button"
+                  className={`team-pill-btn ${selectedTeamFilter === 'ALL' ? 'active' : ''}`}
+                  onClick={() => setSelectedTeamFilter('ALL')}
+                >
+                  All Teams (6)
+                </button>
+                {COMMITTEE_TEAMS.map((team) => (
+                  <button
+                    key={team.id}
+                    type="button"
+                    className={`team-pill-btn ${selectedTeamFilter === team.id ? 'active' : ''}`}
+                    onClick={() => setSelectedTeamFilter(team.id)}
+                  >
+                    {team.name.split('&')[0]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Teams Grid */}
+            <div className="teams-list-wrapper">
+              {filteredTeams.map((team) => (
+                <div key={team.id} className="team-block-card">
+                  <div className="team-block-header">
+                    <div>
+                      <h3 className="team-block-title">
+                        <Flame size={20} color="#ea580c" />
+                        <span>{team.name}</span>
+                      </h3>
+                      <p className="team-block-desc">{team.description}</p>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        background: '#f1f5f9',
+                        padding: '0.25rem 0.65rem',
+                        borderRadius: '9999px',
+                        color: '#475569',
+                      }}
+                    >
+                      {team.spocs.length} Designated SPOCs
+                    </span>
+                  </div>
+
+                  {/* SPOCs inside team */}
+                  <div className="spocs-grid">
+                    {team.spocs.map((spoc) => (
+                      <div key={spoc.id} className="spoc-card">
+                        <div>
+                          <div className="spoc-top-row">
+                            <div>
+                              <h4 className="spoc-name">{spoc.name}</h4>
+                              <div className="spoc-role">{spoc.role}</div>
+                            </div>
+                            <span className="spoc-flat-badge">
+                              {spoc.flatNo} ({spoc.tower})
+                            </span>
+                          </div>
+
+                          <div style={{ marginTop: '0.75rem' }}>
+                            <span
+                              style={{
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                textTransform: 'uppercase',
+                                color: '#94a3b8',
+                                letterSpacing: '0.04em',
+                                display: 'block',
+                                marginBottom: '0.35rem',
+                              }}
+                            >
+                              Key Responsibilities:
+                            </span>
+                            <ul className="spoc-responsibilities-list">
+                              {spoc.responsibilities.map((resp, rIdx) => (
+                                <li key={rIdx} className="spoc-resp-item">
+                                  <span style={{ color: '#ea580c', fontWeight: 800 }}>•</span>
+                                  <span>{resp}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab Panel 5: Gothram & Sankalpam Registration Form & Families */}
+        {activeTab === 'sankalpam' && (
+          <div className="ganesh-contributors-card">
+            <GaneshSankalpamForm
+              sankalpams={sankalpams}
+              contributions={contributions}
+              expenses={expenses}
+              onRefresh={loadData}
+              userFlat={userFlat}
+              activeViewMode={sankalpamViewMode}
+              onViewModeChange={setSankalpamViewMode}
+              isAddModalOpen={isGothramModalOpen}
+              onOpenAddModal={() => setIsGothramModalOpen(true)}
+              onCloseAddModal={() => setIsGothramModalOpen(false)}
+            />
+          </div>
+        )}
+
+        {/* Hidden Gothram Modal trigger if on another tab */}
+        {activeTab !== 'sankalpam' && isGothramModalOpen && (
+          <GaneshSankalpamForm
+            sankalpams={sankalpams}
+            contributions={contributions}
+            expenses={expenses}
+            onRefresh={loadData}
+            userFlat={userFlat}
+            activeViewMode={sankalpamViewMode}
+            onViewModeChange={setSankalpamViewMode}
+            isAddModalOpen={isGothramModalOpen}
+            onOpenAddModal={() => setIsGothramModalOpen(true)}
+            onCloseAddModal={() => setIsGothramModalOpen(false)}
+          />
+        )}
+          </>
+        )}
 
         {/* Contribution / QR Modal */}
         {isPayModalOpen && (
@@ -997,6 +1007,16 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
         isOpen={isSyncModalOpen}
         onClose={() => setIsSyncModalOpen(false)}
         onRefreshData={() => loadData(true)}
+      />
+
+      {/* Floating Bottom Navigation */}
+      <GaneshBottomNav
+        activeTab={activeTab}
+        onSelectTab={(tab) => {
+          setActiveTab(tab);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenContributeModal={() => setIsPayModalOpen(true)}
       />
     </div>
   );

@@ -17,9 +17,12 @@ export default defineConfig({
         name: 'BPS Twin Towers Community PWA',
         short_name: 'BPS Towers',
         description: 'BPS Twin Towers Resident Portal & Community Management System',
+        start_url: '/ganesh-utsav',
+        scope: '/',
         theme_color: '#0f172a',
         background_color: '#0f172a',
         display: 'standalone',
+        display_override: ['standalone', 'window-controls-overlay'],
         orientation: 'portrait-primary',
         icons: [
           {

@@ -1,0 +1,960 @@
+/* ==========================================================================
+   GANESH FESTIVAL MOBILE APP QUICK ACTIONS, TODAY'S SCHEDULE & FESTIVAL FUND
+   ========================================================================== */
+
+.ganesh-sample-hero-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+/* 1. Royal Dark Header */
+.ganesh-app-top-bar {
+  background: linear-gradient(135deg, #09142e 0%, #0f172a 100%);
+  border-radius: 18px 18px 0 0;
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #ffffff;
+  border-bottom: 1px solid rgba(254, 215, 170, 0.2);
+}
+
+.ganesh-app-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.ganesh-app-logo-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(254, 240, 138, 0.15);
+  border: 1px solid rgba(254, 240, 138, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.ganesh-app-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  margin: 0;
+  font-family: 'Cinzel', 'Georgia', serif, system-ui;
+}
+
+.ganesh-app-user-pill {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e0e7ff;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1.5px solid #ffffff;
+  transition: transform 0.15s ease;
+}
+
+.ganesh-app-user-pill:hover {
+  transform: scale(1.05);
+}
+
+/* 2. Photo Hero Card */
+.ganesh-photo-hero-card {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px -8px rgba(15, 23, 42, 0.35), 0 8px 16px -4px rgba(234, 88, 12, 0.2);
+  min-height: 290px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.75rem 1.5rem;
+  color: #ffffff;
+  background: #0f172a;
+}
+
+.ganesh-photo-hero-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  transition: transform 0.6s ease;
+}
+
+.ganesh-photo-hero-card:hover .ganesh-photo-hero-img {
+  transform: scale(1.02);
+}
+
+.ganesh-photo-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(9, 20, 46, 0.4) 0%, rgba(9, 20, 46, 0.75) 60%, #09142e 100%);
+}
+
+.ganesh-photo-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 600px;
+}
+
+.ganesh-photo-subtag {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #fde047;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.ganesh-photo-title {
+  font-family: 'Cinzel', 'Georgia', serif, system-ui;
+  font-size: clamp(1.6rem, 3.5vw, 2.25rem);
+  font-weight: 900;
+  line-height: 1.15;
+  margin: 0;
+  color: #ffffff;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+  letter-spacing: -0.01em;
+}
+
+.ganesh-countdown-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(30, 58, 138, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(254, 240, 138, 0.5);
+  color: #fef08a;
+  padding: 0.45rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  width: fit-content;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  margin-top: 0.35rem;
+}
+
+/* 2. Side-by-Side Resident Status Grid (My Contribution & Gothram) */
+.resident-status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+}
+
+.resident-status-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 0.95rem 1rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+  cursor: default;
+}
+
+.resident-status-card.is-action {
+  background: linear-gradient(135deg, #fffdfa 0%, #fff7ed 100%);
+  border-color: #fed7aa;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.resident-status-card.is-action:hover {
+  border-color: #ea580c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.12);
+}
+
+.resident-status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  z-index: 2;
+}
+
+.resident-status-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.resident-status-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.resident-status-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  width: fit-content;
+  margin-top: 0.15rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.btn-contribute-badge {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.btn-gothram-badge {
+  background: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.resident-status-watermark {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  color: #0f172a;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.resident-status-card:hover .resident-status-watermark {
+  opacity: 0.15;
+  transform: scale(1.08);
+}
+
+.resident-status-card.is-action .resident-status-watermark {
+  color: #ea580c;
+  opacity: 0.1;
+}
+
+.resident-status-card.is-action:hover .resident-status-watermark {
+  opacity: 0.2;
+}
+
+/* 3. Quick Actions Section */
+.ganesh-quick-actions-section {
+  background: #ffffff;
+  border: 1px solid #fed7aa;
+  border-radius: 20px;
+  padding: 1.35rem 1.25rem;
+  box-shadow: 0 4px 16px -2px rgba(234, 88, 12, 0.06);
+}
+
+.quick-actions-heading {
+  font-family: 'Cinzel', 'Georgia', serif, system-ui;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem 0.75rem;
+}
+
+.quick-action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.35rem 0.2rem;
+  border-radius: 16px;
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+}
+
+.quick-action-item:hover {
+  transform: translateY(-4px);
+}
+
+.quick-action-squircle {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.quick-action-item:hover .quick-action-squircle {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Individual Pastel Squircle Themes */
+.squircle-events {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.squircle-prasadam {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.squircle-volunteer {
+  background: #fef08a;
+  color: #854d0e;
+}
+
+.squircle-cultural {
+  background: #ffe4e6;
+  color: #be123c;
+}
+
+.squircle-funds {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.squircle-sponsor {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.squircle-expenses {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.squircle-auction {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.squircle-updates {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.quick-action-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #334155;
+  letter-spacing: -0.01em;
+  transition: color 0.15s ease;
+}
+
+.quick-action-item:hover .quick-action-label {
+  color: #ea580c;
+}
+
+/* ==========================================================================
+   4. TODAY'S SCHEDULE SECTION
+   ========================================================================== */
+.ganesh-today-schedule-section {
+  background: #ffffff;
+  border: 1px solid #fed7aa;
+  border-radius: 20px;
+  padding: 1.35rem 1.25rem;
+  box-shadow: 0 4px 16px -2px rgba(234, 88, 12, 0.06);
+}
+
+.schedule-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.schedule-heading-title {
+  font-family: 'Cinzel', 'Georgia', serif, system-ui;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+.schedule-view-all-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.schedule-view-all-btn:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+
+.schedule-cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.schedule-item-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  cursor: default;
+}
+
+.schedule-item-card:hover {
+  border-color: #cbd5e1;
+}
+
+.schedule-icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.schedule-icon-circle.icon-pooja {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.schedule-icon-circle.icon-cultural {
+  background: #fce7f3;
+  color: #db2777;
+}
+
+.schedule-icon-circle.icon-prasadam {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.schedule-icon-circle.icon-activity {
+  background: #fef08a;
+  color: #854d0e;
+}
+
+.schedule-icon-circle.icon-event {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.schedule-date-subtitle {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ea580c;
+  margin-top: 0.15rem;
+}
+
+.schedule-time-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.schedule-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-cultural {
+  background: #fce7f3;
+  color: #be185d;
+  border: 1px solid #fbcfe8;
+}
+
+.badge-highlight {
+  background: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+}
+
+.schedule-meta-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.meta-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.55rem;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+.meta-performer {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #9f1239;
+}
+
+.meta-duration {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.meta-location {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #334155;
+}
+
+.meta-spoc {
+  background: #fefce8;
+  border-color: #fef08a;
+  color: #854d0e;
+}
+
+.schedule-loading-card,
+.schedule-empty-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.schedule-content-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.schedule-time-tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.schedule-item-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+.schedule-item-desc {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* ==========================================================================
+   5. FESTIVAL FINANCE SECTION & DONUT CHART OVERVIEW
+   ========================================================================== */
+.finance-intro-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.finance-tagline-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Cinzel', 'Georgia', serif, system-ui;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.finance-tagline-desc {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.finance-white-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 1.35rem;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+  border: 1px solid #e2e8f0;
+  cursor: default;
+}
+
+.finance-white-card.with-top-border {
+  border-top: 3.5px solid #ea580c;
+}
+
+.finance-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 1.15rem;
+}
+
+.donut-chart-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+}
+
+.donut-svg-wrap {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.donut-center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.donut-center-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.donut-center-percent {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #0d1b4c;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.1;
+  margin-top: 0.2rem;
+}
+
+.donut-legend-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.donut-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.donut-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.donut-legend-dot.dot-income {
+  background: #0d1b4c;
+}
+
+.donut-legend-dot.dot-expenses {
+  background: #b91c1c;
+}
+
+/* Combined 3 Metrics Strip Inside Overview */
+.overview-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+}
+
+.overview-stat-cell {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 0.75rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.overview-stat-cell.stat-donations {
+  background: #eff6ff;
+  border-color: #dbeafe;
+}
+
+.overview-stat-cell.stat-donations .stat-val {
+  color: #1d4ed8;
+}
+
+.overview-stat-cell.stat-expenses {
+  background: #fef2f2;
+  border-color: #fee2e2;
+}
+
+.overview-stat-cell.stat-expenses .stat-val {
+  color: #b91c1c;
+}
+
+.overview-stat-cell.stat-balance {
+  background: #f0fdf4;
+  border-color: #dcfce7;
+}
+
+.overview-stat-cell.stat-balance .stat-val {
+  color: #15803d;
+}
+
+.stat-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.stat-val {
+  font-size: 0.95rem;
+  font-weight: 900;
+  font-family: 'Inter', sans-serif;
+}
+
+@media (max-width: 480px) {
+  .overview-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .overview-stat-cell {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.65rem 0.85rem;
+    text-align: left;
+  }
+  
+  .donut-chart-container {
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+}
+
+.btn-contribute-gold {
+  width: 100%;
+  background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
+  color: #713f12;
+  border: none;
+  padding: 0.85rem 1.25rem;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(250, 204, 21, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btn-contribute-gold:hover {
+  transform: translateY(-2px);
+  background: #fef08a;
+  box-shadow: 0 6px 18px rgba(250, 204, 21, 0.45);
+}
+
+/* ==========================================================================
+   6. ADD TO HOME SCREEN PWA BANNER
+   ========================================================================== */
+.pwa-add-to-home-card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 16px;
+  padding: 0.85rem 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1.5px solid rgba(56, 189, 248, 0.35);
+  transition: all 0.2s ease;
+}
+
+.pwa-add-to-home-card:hover {
+  border-color: #38bdf8;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(56, 189, 248, 0.25);
+}
+
+.pwa-success-card {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border-radius: 16px;
+  padding: 0.85rem 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  color: #065f46;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15);
+  border: 1.5px solid #a7f3d0;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pwa-install-action-pill {
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+}
+
+.pwa-add-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pwa-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #475569;
+}
+
+.pwa-add-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.pwa-add-subtext {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.pwa-close-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pwa-close-btn:hover {
+  color: #ffffff;
+}
+
+/* Responsive Grid */
+@media (max-width: 640px) {
+  .quick-actions-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.85rem 0.45rem;
+  }
+
+  .quick-action-squircle {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+  }
+
+  .quick-action-label {
+    font-size: 0.72rem;
+  }
+
+  .ganesh-photo-hero-card {
+    min-height: 240px;
+    padding: 1.25rem 1rem;
+  }
+}

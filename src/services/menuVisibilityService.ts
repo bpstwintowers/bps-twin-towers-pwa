@@ -8,6 +8,7 @@ import { supabase } from './supabase/client';
 
 export interface MenuVisibilityConfig {
   dashboard: boolean;
+  'water-initiative'?: boolean;
   events: boolean;
   facilities: boolean;     // Amenities & Bookings (hidden by default for residents)
   complaints: boolean;     // Maintenance & Complaints (hidden by default for residents)
@@ -15,6 +16,8 @@ export interface MenuVisibilityConfig {
   household: boolean;      // My Household (hidden by default for residents)
   donations: boolean;      // My Contributions
   volunteers: boolean;     // Volunteer Ops
+  'pooja-schedule'?: boolean; // Pooja Schedule & SPOC Details
+  surveys?: boolean;       // Resident Surveys & Polls
   announcements: boolean;  // Announcements
   notifications: boolean;  // Notifications
   profile: boolean;        // My Profile
@@ -22,6 +25,7 @@ export interface MenuVisibilityConfig {
 
 export const DEFAULT_MENU_VISIBILITY: MenuVisibilityConfig = {
   dashboard: true,
+  'water-initiative': true,
   events: true,
   facilities: false,    // Hidden for residents as requested
   complaints: false,    // Hidden for residents as requested
@@ -29,6 +33,8 @@ export const DEFAULT_MENU_VISIBILITY: MenuVisibilityConfig = {
   household: false,     // Hidden for residents as requested
   donations: true,
   volunteers: true,
+  'pooja-schedule': true,
+  surveys: true,
   announcements: true,
   notifications: true,
   profile: true,
@@ -43,6 +49,12 @@ export const MENU_ITEM_METADATA: Record<
     description: 'Main resident dashboard and overview',
     path: '/',
     iconName: 'Home',
+  },
+  'water-initiative': {
+    label: 'Water Initiative',
+    description: 'Municipal water connection resident strategy and forum',
+    path: '/water-initiative',
+    iconName: 'Droplets',
   },
   events: {
     label: 'Events & Festivals',
@@ -85,6 +97,18 @@ export const MENU_ITEM_METADATA: Record<
     description: 'Community volunteering opportunities and task assignments',
     path: '/volunteers',
     iconName: 'HeartHandshake',
+  },
+  'pooja-schedule': {
+    label: 'Pooja & SPOC Details',
+    description: '14th to 19th Sep Pooja rituals, daily Maha Aarti, and SPOC directory',
+    path: '/pooja-schedule',
+    iconName: 'Flame',
+  },
+  surveys: {
+    label: 'Resident Surveys',
+    description: 'Society pulse polls, maintenance satisfaction, and feedback',
+    path: '/surveys',
+    iconName: 'Vote',
   },
   announcements: {
     label: 'Announcements',
