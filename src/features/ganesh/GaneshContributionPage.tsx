@@ -53,6 +53,8 @@ import {
 } from '../../services/liveSheetService';
 import { supabase } from '../../services/supabase/client';
 import { resolveUserAccess } from '../../services/supabase/registrationService';
+import { fetchUserRoles } from '../../services/supabase/adminService';
+import { hasAnyAdminRole } from '../../utils/rbac';
 import { HeaderNavbar } from './components/HeaderNavbar';
 import { GaneshPaymentModal } from './components/GaneshPaymentModal';
 import { GaneshExpenseModal } from './components/GaneshExpenseModal';
@@ -111,6 +113,7 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
   const [isRegistered, setIsRegistered] = useState<boolean>(() => {
     return isRegisteredProp !== undefined ? isRegisteredProp : false;
   });
+  const [hasAuthAdminRole, setHasAuthAdminRole] = useState<boolean>(false);
 
   // User Flat Identification State
   const [userFlat, setUserFlat] = useState<string>(() => {
@@ -221,6 +224,14 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
         if (session?.user) {
           setIsRegistered(true);
 
+          try {
+            const roles = await fetchUserRoles();
+            const isAdm = hasAnyAdminRole(roles, session.user.email);
+            setHasAuthAdminRole(isAdm);
+          } catch {
+            setHasAuthAdminRole(false);
+          }
+
           // Attempt to retrieve registered flat details
           const { data: profile } = await supabase
             .from('profiles')
@@ -255,6 +266,7 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
           setIsFlatPromptOpen(false);
         } else {
           setIsRegistered(false);
+          setHasAuthAdminRole(false);
           const storedFlat = localStorage.getItem('bps_ganesh_user_flat');
           if (!storedFlat) {
             setIsFlatPromptOpen(true);
@@ -263,6 +275,7 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
       } catch (err) {
         console.error('Error checking resident auth status:', err);
         setIsRegistered(false);
+        setHasAuthAdminRole(false);
         const storedFlat = localStorage.getItem('bps_ganesh_user_flat');
         if (!storedFlat) {
           setIsFlatPromptOpen(true);
@@ -286,12 +299,12 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
   };
 
   const isAdminUser = useMemo(() => {
-    if (isRegistered) {
+    if (hasAuthAdminRole) {
       return true;
     }
     const clean = (userFlat || '').trim().toUpperCase();
     return clean === 'ADMN' || clean === 'ADMIN' || clean.includes('ADMN') || clean.includes('ADMIN');
-  }, [isRegistered, userFlat]);
+  }, [hasAuthAdminRole, userFlat]);
 
   const progressPercentage = summary
     ? Math.min(100, Math.round((summary.totalCollections / summary.targetBudget) * 100))
@@ -781,6 +794,7 @@ export const GaneshContributionPage: React.FC<Props> = ({ isRegisteredUser: isRe
               expenses={expenses}
               totalCollections={summary?.totalCollections || 0}
               onRefresh={loadData}
+              isAdmin={isAdminUser}
             />
           </div>
         )}

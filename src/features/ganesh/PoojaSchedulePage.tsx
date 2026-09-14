@@ -125,10 +125,10 @@ export const PoojaSchedulePage: React.FC = () => {
             <span className="pooja-hero-badge">
               <Sparkles size={14} /> 14th Sep – 19th Sep 2026 • Grand Utsav
             </span>
-            <h1 className="pooja-hero-title">Pooja Schedule &amp; SPOC Directory</h1>
+            <h1 className="pooja-hero-title">Pooja Schedule &amp; Team Directory</h1>
             <p className="pooja-hero-desc">
               Complete day-by-day ritual timings, daily morning &amp; evening Maha Aarti schedule,
-              special seva details, and dedicated committee SPOCs for Tower A &amp; Tower B.
+              special seva details, and dedicated committee Team for Tower A &amp; Tower B.
             </p>
           </div>
 
@@ -239,8 +239,8 @@ export const PoojaSchedulePage: React.FC = () => {
             onClick={() => setActiveMainTab('teams')}
           >
             <Users size={18} />
-            <span>Committee Teams &amp; SPOC Directory</span>
-            <span className="pooja-sub-counter-badge">12 SPOCs</span>
+            <span>Committee Teams</span>
+            <span className="pooja-sub-counter-badge">12 Leads</span>
           </button>
         </div>
 
@@ -416,7 +416,7 @@ export const PoojaSchedulePage: React.FC = () => {
               <input
                 type="text"
                 className="spoc-search-input"
-                placeholder="Search SPOC by name, flat (e.g. A-704), or role..."
+                placeholder="Search Team by name, flat (e.g. A-704), or role..."
                 value={spocSearchQuery}
                 onChange={(e) => setSpocSearchQuery(e.target.value)}
               />
@@ -465,7 +465,7 @@ export const PoojaSchedulePage: React.FC = () => {
                       color: '#475569',
                     }}
                   >
-                    {team.spocs.length} Designated SPOCs
+                    {team.spocs.length} Team Members
                   </span>
                 </div>
 
@@ -517,7 +517,7 @@ export const PoojaSchedulePage: React.FC = () => {
                           title={`Call ${spoc.name}`}
                         >
                           <Phone size={14} color="#0d9488" />
-                          <span>Call SPOC</span>
+                          <span>Call</span>
                         </a>
                         <a
                           href={`https://wa.me/${spoc.whatsapp}?text=Namaste%20${encodeURIComponent(
@@ -552,7 +552,7 @@ export const PoojaSchedulePage: React.FC = () => {
                 }}
               >
                 <Search size={32} style={{ marginBottom: '0.5rem', opacity: 0.5 }} />
-                <h4 style={{ margin: '0 0 0.25rem 0' }}>No matching SPOCs found</h4>
+                <h4 style={{ margin: '0 0 0.25rem 0' }}>No matching team members found</h4>
                 <p style={{ margin: 0, fontSize: '0.85rem' }}>
                   Try adjusting your search terms or selecting "All Teams".
                 </p>

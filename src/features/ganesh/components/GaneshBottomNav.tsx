@@ -122,7 +122,7 @@ export const GaneshBottomNav: React.FC<Props> = ({
             <span className="ganesh-tab-label">Events</span>
           </button>
 
-          {/* 3. SPOCs */}
+          {/* 3. Team */}
           <button
             type="button"
             className={`ganesh-tab-item ${isVolunteerActive ? 'is-active' : ''}`}
@@ -133,7 +133,7 @@ export const GaneshBottomNav: React.FC<Props> = ({
             <div className="ganesh-tab-icon-wrap">
               <Users size={22} />
             </div>
-            <span className="ganesh-tab-label">SPOCs</span>
+            <span className="ganesh-tab-label">Team</span>
           </button>
 
           {/* 4. My Flat */}

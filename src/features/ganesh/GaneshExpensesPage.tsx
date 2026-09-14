@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   fetchLiveExpenses,
   getCachedExpenses,
 } from '../../services/liveSheetService';
 import type { GaneshExpenseRecord } from '../../types/ganesh';
+import { supabase } from '../../services/supabase/client';
+import { fetchUserRoles } from '../../services/supabase/adminService';
+import { hasAnyAdminRole } from '../../utils/rbac';
 import { HeaderNavbar } from './components/HeaderNavbar';
 import { GaneshExpenseTracker } from './components/GaneshExpenseTracker';
 import { GaneshBottomNav } from './components/GaneshBottomNav';
@@ -12,6 +15,8 @@ import './GaneshExpenseTracker.css';
 export const GaneshExpensesPage: React.FC = () => {
   const [expenses, setExpenses] = useState<GaneshExpenseRecord[]>(() => getCachedExpenses());
   const [isLoading, setIsLoading] = useState(false);
+  const [hasAuthAdminRole, setHasAuthAdminRole] = useState(false);
+  const [userFlat, setUserFlat] = useState(() => localStorage.getItem('bps_ganesh_user_flat') || '');
 
   const loadData = async () => {
     setIsLoading(true);
@@ -27,7 +32,29 @@ export const GaneshExpensesPage: React.FC = () => {
 
   useEffect(() => {
     loadData();
+
+    const checkAdmin = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const roles = await fetchUserRoles();
+          const isAdm = hasAnyAdminRole(roles, session.user.email);
+          setHasAuthAdminRole(isAdm);
+        } else {
+          setHasAuthAdminRole(false);
+        }
+      } catch {
+        setHasAuthAdminRole(false);
+      }
+    };
+    checkAdmin();
   }, []);
+
+  const isAdminUser = useMemo(() => {
+    if (hasAuthAdminRole) return true;
+    const clean = (userFlat || '').trim().toUpperCase();
+    return clean === 'ADMN' || clean === 'ADMIN' || clean.includes('ADMN') || clean.includes('ADMIN');
+  }, [hasAuthAdminRole, userFlat]);
 
   return (
     <div
@@ -41,6 +68,8 @@ export const GaneshExpensesPage: React.FC = () => {
     >
       {/* Home Page Style Header Navbar */}
       <HeaderNavbar
+        isAdmin={isAdminUser}
+        userFlat={userFlat}
         onRefreshData={loadData}
         isLoading={isLoading}
       />
@@ -57,6 +86,7 @@ export const GaneshExpensesPage: React.FC = () => {
           expenses={expenses}
           totalCollections={334608}
           onRefresh={loadData}
+          isAdmin={isAdminUser}
         />
       </main>
 

@@ -250,7 +250,16 @@ export const GaneshQuickActions: React.FC<Props> = ({
       <div className="resident-status-grid">
         {/* Left Card: Contribution Status */}
         {effectiveMyContribution > 0 ? (
-          <div className="resident-status-card">
+          <div
+            className="resident-status-card is-action"
+            onClick={() => {
+              if (onOpenContributeModal) {
+                onOpenContributeModal();
+              }
+            }}
+            style={{ cursor: 'pointer' }}
+            title="Click to view or add more contribution"
+          >
             <div className="resident-status-info">
               <span className="resident-status-label">My Contribution</span>
               <span className="resident-status-val">{formatRupee(effectiveMyContribution)}</span>
@@ -260,7 +269,16 @@ export const GaneshQuickActions: React.FC<Props> = ({
             </div>
           </div>
         ) : (
-          <div className="resident-status-card is-action">
+          <div
+            className="resident-status-card is-action"
+            onClick={() => {
+              if (onOpenContributeModal) {
+                onOpenContributeModal();
+              }
+            }}
+            style={{ cursor: 'pointer' }}
+            title="Click to Contribute"
+          >
             <div className="resident-status-info">
               <span className="resident-status-label">My Contribution</span>
               <span className="resident-status-action-btn btn-contribute-badge">
@@ -276,7 +294,16 @@ export const GaneshQuickActions: React.FC<Props> = ({
 
         {/* Right Card: Gothram / Family Status */}
         {mySankalpamRecord ? (
-          <div className="resident-status-card">
+          <div
+            className="resident-status-card is-action"
+            onClick={() => {
+              if (onOpenGothramModal) {
+                onOpenGothramModal();
+              }
+            }}
+            style={{ cursor: 'pointer' }}
+            title="View or Update Family Gothram"
+          >
             <div className="resident-status-info">
               <span className="resident-status-label">Gothram</span>
               <span className="resident-status-val">
@@ -349,17 +376,17 @@ export const GaneshQuickActions: React.FC<Props> = ({
             <span className="quick-action-label">Prasadam</span>
           </button>
 
-          {/* Action 3: SPOCs */}
+          {/* Action 3: Team */}
           <button
             type="button"
             className="quick-action-item"
             onClick={() => navigate('/ganesh-volunteers')}
-            title="Event Teams & Committee SPOCs Directory"
+            title="Event Teams & Committee Directory"
           >
             <div className="quick-action-squircle squircle-volunteer">
               <Users size={24} />
             </div>
-            <span className="quick-action-label">SPOCs</span>
+            <span className="quick-action-label">Team</span>
           </button>
 
           {/* Action 4: Cultural */}

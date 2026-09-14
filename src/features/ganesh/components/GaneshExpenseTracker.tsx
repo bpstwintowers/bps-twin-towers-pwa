@@ -30,6 +30,9 @@ import {
   deleteGaneshExpense,
   exportGaneshExpensesCSV,
 } from '../../../services/liveSheetService';
+import { supabase } from '../../../services/supabase/client';
+import { fetchUserRoles } from '../../../services/supabase/adminService';
+import { hasAnyAdminRole } from '../../../utils/rbac';
 import '../GaneshExpenseTracker.css';
 
 interface Props {
@@ -74,10 +77,39 @@ export const GaneshExpenseTracker: React.FC<Props> = ({
   // Determine Admin privileges
   const storedFlat = localStorage.getItem('bps_ganesh_user_flat') || '';
   const cleanFlat = storedFlat.trim().toUpperCase();
+  const isAdminFlat =
+    cleanFlat === 'ADMN' ||
+    cleanFlat === 'ADMIN' ||
+    cleanFlat.includes('ADMN') ||
+    cleanFlat.includes('ADMIN');
+
+  const [hasAuthAdminRole, setHasAuthAdminRole] = useState<boolean>(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const checkRole = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const roles = await fetchUserRoles();
+          if (isMounted) {
+            setHasAuthAdminRole(hasAnyAdminRole(roles, session.user.email));
+          }
+        }
+      } catch {
+        // silent
+      }
+    };
+    checkRole();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const effectiveAdmin =
     isAdmin !== undefined
       ? isAdmin
-      : (cleanFlat === 'ADMN' || cleanFlat === 'ADMIN' || cleanFlat.includes('ADMN') || cleanFlat.includes('ADMIN') || true);
+      : (isAdminFlat || hasAuthAdminRole);
 
   // Budget & Calculations based on Google Sheets live data
   const targetBudget = 200000;

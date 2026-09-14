@@ -197,13 +197,12 @@ export const GaneshAuctionPage: React.FC<GaneshAuctionPageProps> = ({ embedded =
             <li>Open to all residents of BPS Twin Towers (Towers A &amp; B).</li>
             <li>
               All proceeds from the auction are directly credited into the{' '}
-              <strong>BPS Ganesh Festival &amp; Temple Maintenance Fund</strong>.
+              <strong>BPS Ganesh Event Fund</strong>.
             </li>
             <li>
-              The highest bidder will receive the blessed 21-kg Laddu, a special silver Ganesha idol,
+              The highest bidder will receive the blessed 21-kg Laddu
               and a ceremonial shawl felicitation by the head priest.
             </li>
-            <li>The winning amount can be paid via UPI / Bank Transfer on the spot.</li>
           </ul>
         </section>
       </main>

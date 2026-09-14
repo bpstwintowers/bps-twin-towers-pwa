@@ -9,6 +9,9 @@ import {
   X as CloseIcon,
   User,
 } from 'lucide-react';
+import { supabase } from '../../../services/supabase/client';
+import { fetchUserRoles } from '../../../services/supabase/adminService';
+import { hasAnyAdminRole } from '../../../utils/rbac';
 import './HeaderNavbar.css';
 
 interface Props {
@@ -27,7 +30,7 @@ interface Props {
 }
 
 export const HeaderNavbar: React.FC<Props> = ({
-  isAdmin = true,
+  isAdmin,
   onSelectPrintView,
   onSelectAdminConsole: _onSelectAdminConsole,
   onSelectAdminSync,
@@ -43,6 +46,28 @@ export const HeaderNavbar: React.FC<Props> = ({
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [storedFlat, setStoredFlat] = useState<string>('');
+  const [hasAuthAdminRole, setHasAuthAdminRole] = useState<boolean>(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const checkRole = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const roles = await fetchUserRoles();
+          if (isMounted) {
+            setHasAuthAdminRole(hasAnyAdminRole(roles, session.user.email));
+          }
+        }
+      } catch {
+        // silent
+      }
+    };
+    checkRole();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const flat = propUserFlat || localStorage.getItem('bps_ganesh_user_flat') || '';
@@ -57,9 +82,14 @@ export const HeaderNavbar: React.FC<Props> = ({
     cleanFlat.includes('ADMN') ||
     cleanFlat.includes('ADMIN');
 
+  const effectiveAdmin =
+    isAdmin !== undefined
+      ? isAdmin
+      : (isAdminFlat || hasAuthAdminRole);
+
   const flatButtonText =
     effectiveFlat && effectiveFlat !== 'GUEST'
-      ? isAdminFlat
+      ? effectiveAdmin
         ? '🛡️ Admin'
         : `Flat ${effectiveFlat.replace(/^FLAT\s*/i, '').toUpperCase()}`
       : 'Select Flat';
@@ -184,7 +214,7 @@ export const HeaderNavbar: React.FC<Props> = ({
           </button>
 
           {/* Admin Menu Dropdown (if admin actions exist) */}
-          {isAdmin && (onOpenExpenseModal || onSelectAdminSync || onSelectPrintView) && (
+          {effectiveAdmin && (onOpenExpenseModal || onSelectAdminSync || onSelectPrintView) && (
             <div style={{ position: 'relative' }}>
               <button
                 type="button"

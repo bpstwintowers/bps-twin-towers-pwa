@@ -33,6 +33,34 @@ interface GaneshPrasadamPageProps {
   onBackToHome?: () => void;
 }
 
+function parseDishItems(mainDish: string): string[] {
+  if (!mainDish) return [];
+  return mainDish
+    .split(/[,;\n•\+]|\s{2,}/)
+    .map((s) => {
+      let cleaned = s.trim();
+      // Remove any header-like prefix like "Traditional 14-Item", "Traditional 14-Item Satvik Feast:", etc.
+      cleaned = cleaned.replace(/^Traditional\s*\d*[- ]*(?:item|items)?(?:\s+satvik)?(?:\s+royal)?(?:\s+feast)?[:\s-]*/i, '').trim();
+      return cleaned;
+    })
+    .filter((s) => s.length > 0 && !/^traditional\s*\d*[- ]*(?:item|items)?$/i.test(s));
+}
+
+function getDishIcon(dish: string, index: number): string {
+  const d = dish.toLowerCase();
+  if (d.includes('rice') || d.includes('bath') || d.includes('pulihora') || d.includes('biryani') || d.includes('pulao') || d.includes('pongal')) return '🍚';
+  if (d.includes('sambar') || d.includes('rasam') || d.includes('dal') || d.includes('gravy') || d.includes('curry')) return '🍛';
+  if (d.includes('vada') || d.includes('wada') || d.includes('appalam') || d.includes('papad') || d.includes('bajji') || d.includes('pakora')) return '🧀';
+  if (d.includes('palya') || d.includes('poriyal') || d.includes('subji') || d.includes('paneer') || d.includes('veg') || d.includes('fry')) return '🥣';
+  if (d.includes('curd') || d.includes('daddojanam') || d.includes('dadojanam') || d.includes('raita') || d.includes('buttermilk')) return '🥛';
+  if (d.includes('sweet') || d.includes('payasam') || d.includes('laddu') || d.includes('halwa') || d.includes('kheer') || d.includes('jamun') || d.includes('jalebi')) return '🍧';
+  if (d.includes('roti') || d.includes('puri') || d.includes('poori') || d.includes('naan') || d.includes('chapati') || d.includes('bonda') || d.includes('idly') || d.includes('idli')) return '🫓';
+  if (d.includes('soup') || d.includes('shorba') || d.includes('kichidi') || d.includes('khichdi')) return '🍲';
+
+  const fallbackIcons = ['🍚', '🍲', '🍛', '🧀', '🥣', '🥛', '🥗', '🥘', '🫓', '🍧'];
+  return fallbackIcons[index % fallbackIcons.length];
+}
+
 function mapLivePrasadamToPrasadamDay(item: LiveMasterPrasadamItem): PrasadamDay {
   const day = item.dayNumber;
   const isGrandFeast = day === 5;
@@ -83,15 +111,15 @@ function mapLivePrasadamToPrasadamDay(item: LiveMasterPrasadamItem): PrasadamDay
 
   return {
     day,
-    date: dateFormatted,
+    date: item.date || dateFormatted,
     weekday,
     categoryTag,
     categoryType,
-    title: item.occasionTitle || `Day ${day} Maha Prasadam`,
+    title: item.occasionTitle || (isGrandFeast ? 'Grand Community Annadanam Feast' : `Day ${day} Maha Prasadam`),
     mealHeader: isGrandFeast ? 'TRADITIONAL 14-ITEM SATVIK ROYAL FEAST' : 'SATVIK PRASADAM MENU',
-    mainDish: item.menuItems || 'Hot Maha Prasadam',
-    accompaniments: item.specialHighlight || '',
-    timing: item.mealType || 'Night Dinner (From 9:00 PM)',
+    mainDish: item.menuItems || (isGrandFeast ? 'Bisibelebath / Tamarind Pulihora, Royal Fragrant Ghee Rice, Traditional Vegetable Sambar & Rasam, Crisp Medu Vada & Appalam, Fresh Vegetable Palya (Poriyal), Satvik Temple Daddojanam (Curd Rice)' : 'Hot Maha Prasadam'),
+    accompaniments: item.specialHighlight || (isGrandFeast ? 'Special Sweet: Warm Payasam & Ghee Laddu' : ''),
+    timing: item.mealType || (isGrandFeast ? 'Grand Community Dinner (7:30 PM to 10:30 PM)' : 'Night Dinner (From 9:00 PM)'),
     timingContext: isGrandFeast ? 'Community Dining Area' : item.specialHighlight || 'Post Evening Aarti',
     location: isGrandFeast ? 'Central Festival Ground Dinner Banquet Pandal' : 'Central Pandal Dining Hall',
     sponsorText: item.sponsorName ? `Sponsor: ${item.sponsorName}` : 'Community Seva',
@@ -173,13 +201,13 @@ const PRASADAM_SCHEDULE_DATA: PrasadamDay[] = [
     categoryType: 'cultural',
     title: 'Grand Community Annadanam Feast',
     mealHeader: 'TRADITIONAL 14-ITEM SATVIK ROYAL FEAST',
-    mainDish: 'Traditional 14-Item Satvik Feast: Bisibelebath, Rice, Sambar, Rasam, Palya, Vada, Payasam, Curd & Appalam',
-    accompaniments: '5th Day Grand Feast for all 1000+ residents',
+    mainDish: 'Bisibelebath / Tamarind Pulihora, Royal Fragrant Ghee Rice, Traditional Vegetable Sambar & Rasam, Crisp Medu Vada & Appalam, Fresh Vegetable Palya (Poriyal), Satvik Temple Daddojanam (Curd Rice)',
+    accompaniments: 'Special Sweet: Warm Payasam & Ghee Laddu',
     timing: 'Grand Community Dinner (7:30 PM to 10:30 PM)',
     timingContext: 'Community Dining Area',
     location: 'Central Festival Ground Dinner Banquet Pandal',
-    sponsorText: 'Sponsor: Committee & Patrons',
-    sponsorStatus: 'Community Seva',
+    sponsorText: 'Sponsor: Mahidhar, Naresh reddy,',
+    sponsorStatus: 'Sponsored',
     isGrandFeast: true,
   },
   {
@@ -335,6 +363,8 @@ export const GaneshPrasadamPage: React.FC<GaneshPrasadamPageProps> = ({ embedded
           {displayedDays.map((item) => {
             // Day 5 Grand Maha Prasadam Feast Golden Card
             if (item.isGrandFeast) {
+              const parsedDishes = parseDishItems(item.mainDish);
+
               return (
                 <div key={item.day} className="grand-annadanam-golden-card">
                   {/* Header Row with DAY 5 Circular Badge */}
@@ -342,14 +372,14 @@ export const GaneshPrasadamPage: React.FC<GaneshPrasadamPageProps> = ({ embedded
                     <div className="card-day-meta-left">
                       <div className="card-day-badge-circle">
                         <span>DAY</span>
-                        <span>5</span>
+                        <span>{item.day}</span>
                       </div>
                       <div className="card-date-subtext">
-                        Sep 18, 2026 • Friday
+                        {item.date} • {item.weekday}
                       </div>
                     </div>
                     <span className="card-category-pill cultural">
-                      Grand Feast
+                      {item.categoryTag}
                     </span>
                   </div>
 
@@ -361,7 +391,7 @@ export const GaneshPrasadamPage: React.FC<GaneshPrasadamPageProps> = ({ embedded
                       <span>🍲</span>
                       <span>{item.timing}</span>
                     </div>
-                    <span className="lunch-navy-pill-btn">Traditional Leaf Seva</span>
+                    <span className="lunch-navy-pill-btn">Traditional 14-Item</span>
                   </div>
 
                   {/* 2-Column 9-Course Thali Section */}
@@ -370,38 +400,31 @@ export const GaneshPrasadamPage: React.FC<GaneshPrasadamPageProps> = ({ embedded
                       <span>{item.mealHeader}</span>
                     </div>
 
-                    <div className="thali-items-2col">
-                      <div className="thali-item-row">
-                        <span>🍚</span>
-                        <span>Bisibelebath / Tamarind Pulihora</span>
+                    {parsedDishes.length > 1 ? (
+                      <div className="thali-items-2col">
+                        {parsedDishes.map((dish, idx) => (
+                          <div key={idx} className="thali-item-row">
+                            <span>{getDishIcon(dish, idx)}</span>
+                            <span>{dish}</span>
+                          </div>
+                        ))}
                       </div>
-                      <div className="thali-item-row">
-                        <span>🍲</span>
-                        <span>Royal Fragrant Ghee Rice</span>
+                    ) : (
+                      <div className="thali-items-2col">
+                        <div className="thali-item-row" style={{ gridColumn: '1 / -1' }}>
+                          <span>🍲</span>
+                          <span>{item.mainDish}</span>
+                        </div>
                       </div>
-                      <div className="thali-item-row">
-                        <span>🍛</span>
-                        <span>Traditional Vegetable Sambar & Rasam</span>
-                      </div>
-                      <div className="thali-item-row">
-                        <span>🧀</span>
-                        <span>Crisp Medu Vada & Appalam</span>
-                      </div>
-                      <div className="thali-item-row">
-                        <span>🥣</span>
-                        <span>Fresh Vegetable Palya (Poriyal)</span>
-                      </div>
-                      <div className="thali-item-row">
-                        <span>🥛</span>
-                        <span>Satvik Temple Daddojanam (Curd Rice)</span>
-                      </div>
-                    </div>
+                    )}
 
                     {/* Special Sweet Box */}
-                    <div className="thali-special-sweet-box">
-                      <span>🍧</span>
-                      <span>Special Sweet: Warm Payasam & Ghee Laddu</span>
-                    </div>
+                    {item.accompaniments && (
+                      <div className="thali-special-sweet-box">
+                        <span>🍧</span>
+                        <span>{item.accompaniments}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Timing & Context */}

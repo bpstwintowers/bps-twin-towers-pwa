@@ -451,7 +451,7 @@ export const ResidentDashboard: React.FC = () => {
               navigate('/pooja-schedule');
             }}
           >
-            <span>View Schedule &amp; SPOCs</span>
+            <span>View Schedule &amp; Team</span>
             <ArrowRight size={15} />
           </button>
         </div>

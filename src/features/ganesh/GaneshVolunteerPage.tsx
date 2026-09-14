@@ -328,7 +328,7 @@ export const GaneshVolunteerPage: React.FC<GaneshVolunteerPageProps> = ({ embedd
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {team.spocs.length} SPOCs
+                    {team.spocs.length} Leads
                   </span>
                 </div>
 
