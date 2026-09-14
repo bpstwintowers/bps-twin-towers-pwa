@@ -48,14 +48,15 @@ function parseDishItems(mainDish: string): string[] {
 
 function getDishIcon(dish: string, index: number): string {
   const d = dish.toLowerCase();
-  if (d.includes('rice') || d.includes('bath') || d.includes('pulihora') || d.includes('biryani') || d.includes('pulao') || d.includes('pongal')) return '🍚';
-  if (d.includes('sambar') || d.includes('rasam') || d.includes('dal') || d.includes('gravy') || d.includes('curry')) return '🍛';
-  if (d.includes('vada') || d.includes('wada') || d.includes('appalam') || d.includes('papad') || d.includes('bajji') || d.includes('pakora')) return '🧀';
-  if (d.includes('palya') || d.includes('poriyal') || d.includes('subji') || d.includes('paneer') || d.includes('veg') || d.includes('fry')) return '🥣';
-  if (d.includes('curd') || d.includes('daddojanam') || d.includes('dadojanam') || d.includes('raita') || d.includes('buttermilk')) return '🥛';
-  if (d.includes('sweet') || d.includes('payasam') || d.includes('laddu') || d.includes('halwa') || d.includes('kheer') || d.includes('jamun') || d.includes('jalebi')) return '🍧';
+  if (d.includes('pulihora') || d.includes('tamarind')) return '🍚';
+  if (d.includes('ghee rice') || d.includes('biryani') || d.includes('pulao') || d.includes('bath') || d.includes('rice')) return '🍲';
+  if (d.includes('salan') || d.includes('mirchi') || d.includes('curry') || d.includes('gravy') || d.includes('sambar')) return '🍛';
+  if (d.includes('paneer') || d.includes('makhani') || d.includes('palya') || d.includes('subji') || d.includes('poriyal')) return '🧀';
+  if (d.includes('rasam') || d.includes('soup') || d.includes('shorba')) return '🥣';
+  if (d.includes('daddojanam') || d.includes('dadojanam') || d.includes('curd') || d.includes('raita') || d.includes('buttermilk')) return '🥛';
+  if (d.includes('sweet') || d.includes('jamun') || d.includes('payasam') || d.includes('laddu') || d.includes('halwa') || d.includes('kheer') || d.includes('jalebi')) return '🍧';
+  if (d.includes('vada') || d.includes('wada') || d.includes('appalam') || d.includes('papad') || d.includes('bajji') || d.includes('pakora')) return '🍘';
   if (d.includes('roti') || d.includes('puri') || d.includes('poori') || d.includes('naan') || d.includes('chapati') || d.includes('bonda') || d.includes('idly') || d.includes('idli')) return '🫓';
-  if (d.includes('soup') || d.includes('shorba') || d.includes('kichidi') || d.includes('khichdi')) return '🍲';
 
   const fallbackIcons = ['🍚', '🍲', '🍛', '🧀', '🥣', '🥛', '🥗', '🥘', '🫓', '🍧'];
   return fallbackIcons[index % fallbackIcons.length];
@@ -109,21 +110,31 @@ function mapLivePrasadamToPrasadamDay(item: LiveMasterPrasadamItem): PrasadamDay
       break;
   }
 
+  const rawDishes = item.menuItems || '';
+  const parsedDishes = parseDishItems(rawDishes);
+  const courseCount = parsedDishes.length > 0 ? `${parsedDishes.length}-COURSE` : '9-COURSE';
+
   return {
     day,
     date: item.date || dateFormatted,
     weekday,
     categoryTag,
     categoryType,
-    title: item.occasionTitle || (isGrandFeast ? 'Grand Community Annadanam Feast' : `Day ${day} Maha Prasadam`),
-    mealHeader: isGrandFeast ? 'TRADITIONAL 14-ITEM SATVIK ROYAL FEAST' : 'SATVIK PRASADAM MENU',
-    mainDish: item.menuItems || (isGrandFeast ? 'Bisibelebath / Tamarind Pulihora, Royal Fragrant Ghee Rice, Traditional Vegetable Sambar & Rasam, Crisp Medu Vada & Appalam, Fresh Vegetable Palya (Poriyal), Satvik Temple Daddojanam (Curd Rice)' : 'Hot Maha Prasadam'),
-    accompaniments: item.specialHighlight || (isGrandFeast ? 'Special Sweet: Warm Payasam & Ghee Laddu' : ''),
-    timing: item.mealType || (isGrandFeast ? 'Grand Community Dinner (7:30 PM to 10:30 PM)' : 'Night Dinner (From 9:00 PM)'),
-    timingContext: isGrandFeast ? 'Community Dining Area' : item.specialHighlight || 'Post Evening Aarti',
-    location: isGrandFeast ? 'Central Festival Ground Dinner Banquet Pandal' : 'Central Pandal Dining Hall',
-    sponsorText: item.sponsorName ? `Sponsor: ${item.sponsorName}` : 'Community Seva',
-    sponsorStatus: item.sponsorName ? 'Sponsored' : 'Community Seva',
+    title: item.occasionTitle || (isGrandFeast ? 'Grand Community Maha Prasadam Feast' : `Day ${day} Maha Prasadam`),
+    mealHeader: isGrandFeast ? `TRADITIONAL ${courseCount} SATVIK ROYAL MEAL` : 'SATVIK PRASADAM MENU',
+    mainDish: item.menuItems || (isGrandFeast ? 'Pulihora (Tamarind Rice), Royal Fragrant Ghee Rice, Hyderabadi Mirchi Salan, Paneer Makhani (No Onion), Traditional Tomato Rasam, Satvik Daddojanam' : 'Hot Maha Prasadam'),
+    accompaniments: item.specialHighlight?.replace(/^Special Sweet:\s*/i, '') || (isGrandFeast ? 'Authentic Warm Gulaab Jamun (2 Pcs)' : ''),
+    timing: item.mealType || (isGrandFeast ? 'Grand Feast Lunch (12:30 PM – 4:00 PM)' : 'Night Dinner (From 9:00 PM)'),
+    timingContext: isGrandFeast ? 'Lunch Banquet Pandal' : (item.specialHighlight || 'Post Evening Aarti'),
+    location: isGrandFeast ? 'Central Festival Ground Lunch Banquet Pandal' : 'Central Pandal Dining Hall',
+    sponsorText: item.sponsorName
+      ? (item.sponsorName.toLowerCase().startsWith('sponsor') || item.sponsorName.toLowerCase().startsWith('grand community')
+          ? item.sponsorName
+          : `Grand Community: ${item.sponsorName}`)
+      : (isGrandFeast ? 'Grand Community: BPS Management & All Resident Donors' : 'Community Seva'),
+    sponsorStatus: item.sponsorName
+      ? (item.sponsorName.toLowerCase().includes('seva') ? 'COMMUNITY SEVA' : 'Sponsored')
+      : (isGrandFeast ? 'COMMUNITY SEVA' : 'Community Seva'),
     isGrandFeast,
   };
 }
@@ -199,15 +210,15 @@ const PRASADAM_SCHEDULE_DATA: PrasadamDay[] = [
     weekday: 'Friday',
     categoryTag: 'Grand Feast',
     categoryType: 'cultural',
-    title: 'Grand Community Annadanam Feast',
-    mealHeader: 'TRADITIONAL 14-ITEM SATVIK ROYAL FEAST',
-    mainDish: 'Bisibelebath / Tamarind Pulihora, Royal Fragrant Ghee Rice, Traditional Vegetable Sambar & Rasam, Crisp Medu Vada & Appalam, Fresh Vegetable Palya (Poriyal), Satvik Temple Daddojanam (Curd Rice)',
-    accompaniments: 'Special Sweet: Warm Payasam & Ghee Laddu',
-    timing: 'Grand Community Dinner (7:30 PM to 10:30 PM)',
-    timingContext: 'Community Dining Area',
-    location: 'Central Festival Ground Dinner Banquet Pandal',
-    sponsorText: 'Sponsor: Mahidhar, Naresh reddy,',
-    sponsorStatus: 'Sponsored',
+    title: 'Grand Community Maha Prasadam Feast',
+    mealHeader: 'TRADITIONAL 9-COURSE SATVIK ROYAL MEAL',
+    mainDish: 'Pulihora (Tamarind Rice), Royal Fragrant Ghee Rice, Hyderabadi Mirchi Salan, Paneer Makhani (No Onion), Traditional Tomato Rasam, Satvik Daddojanam',
+    accompaniments: 'Authentic Warm Gulaab Jamun (2 Pcs)',
+    timing: 'Grand Feast Lunch (12:30 PM – 4:00 PM)',
+    timingContext: 'Lunch Banquet Pandal',
+    location: 'Central Festival Ground Lunch Banquet Pandal',
+    sponsorText: 'Grand Community: BPS Management & All Resident Donors',
+    sponsorStatus: 'COMMUNITY SEVA',
     isGrandFeast: true,
   },
   {
@@ -360,65 +371,148 @@ export const GaneshPrasadamPage: React.FC<GaneshPrasadamPageProps> = ({ embedded
 
         {/* Daily Schedule Cards */}
         <div className="prasadam-cards-list">
-          {displayedDays.map((item) => (
-            <div key={item.day} className="prasadam-schedule-card">
-              {/* Header Row */}
-              <div className="card-top-header-row">
-                <div className="card-day-meta-left">
-                  <div className="card-day-badge-circle">
-                    <span>DAY</span>
-                    <span>{item.day}</span>
+          {displayedDays.map((item) => {
+            // Day 5 Grand Maha Prasadam Feast Golden Card (Exact mockup format)
+            if (item.day === 5 || item.isGrandFeast) {
+              const parsedDishes = parseDishItems(item.mainDish);
+              const courseCount = parsedDishes.length > 0 ? parsedDishes.length : 9;
+
+              return (
+                <div key={item.day} className="grand-annadanam-golden-card">
+                  {/* Header Row */}
+                  <div className="card-top-header-row" style={{ marginBottom: '0.75rem' }}>
+                    <div className="card-day-meta-left">
+                      <div className="card-day-badge-circle">
+                        <span>DAY</span>
+                        <span>{item.day}</span>
+                      </div>
+                      <div className="card-date-subtext">
+                        {item.date} • {item.weekday}
+                      </div>
+                    </div>
+                    <span className="grand-feast-tag">GRAND FEAST</span>
                   </div>
-                  <div className="card-date-subtext">
-                    {item.date} • {item.weekday}
+
+                  {/* Main Title */}
+                  <h3 className="grand-feast-main-title">{item.title}</h3>
+
+                  {/* Dark Navy Lunch / Dinner Banner */}
+                  <div className="grand-lunch-navy-banner">
+                    <div className="lunch-navy-left">
+                      <span>🍲</span>
+                      <span>{item.timing}</span>
+                    </div>
+                  </div>
+
+                  {/* 2-Column Thali Menu Section */}
+                  <div className="thali-menu-grid-section">
+                    <div className="thali-section-header">
+                      <span>{item.mealHeader || `TRADITIONAL ${courseCount}-COURSE SATVIK ROYAL MEAL`}</span>
+                    </div>
+
+                    {parsedDishes.length > 1 ? (
+                      <div className="thali-items-2col">
+                        {parsedDishes.map((dish, idx) => (
+                          <div key={idx} className="thali-item-row">
+                            <span>{getDishIcon(dish, idx)}</span>
+                            <span>{dish}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="thali-items-2col">
+                        <div className="thali-item-row" style={{ gridColumn: '1 / -1' }}>
+                          <span>🍲</span>
+                          <span>{item.mainDish}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Sweet Box */}
+                    {item.accompaniments && (
+                      <div className="thali-special-sweet-box">
+                        <span>🍧</span>
+                        <span>
+                          {item.accompaniments.replace(/^Special Sweet:\s*/i, '')}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sponsor / Seva Bottom Row */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.65rem', borderTop: '1px solid #f1f5f9', fontSize: '0.78rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#475569', fontWeight: 600 }}>
+                      <span>🤝</span>
+                      <span>{item.sponsorText}</span>
+                    </div>
+                    <span style={{ background: '#f0fdf4', color: '#15803d', fontWeight: 800, fontSize: '0.72rem', padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
+                      {item.sponsorStatus}
+                    </span>
                   </div>
                 </div>
-                <span className={`card-category-pill ${item.categoryType}`}>
-                  {item.categoryTag}
-                </span>
-              </div>
+              );
+            }
 
-              {/* Event Title */}
-              <h3 className="card-event-title">{item.title}</h3>
-
-              {/* Satvik Menu Box */}
-              <div className="card-prasadam-menu-box">
-                <div className="menu-dish-icon-box">
-                  {item.day === 1 && <span>🍲</span>}
-                  {item.day === 2 && <span>🌾</span>}
-                  {item.day === 3 && <span>🔥</span>}
-                  {item.day === 4 && <span>🍱</span>}
-                  {item.day === 5 && <span>🍛</span>}
-                  {item.day === 6 && <span>🪔</span>}
+            // Standard Day Cards (Days 1, 2, 3, 4, 6)
+            return (
+              <div key={item.day} className="prasadam-schedule-card">
+                {/* Header Row */}
+                <div className="card-top-header-row">
+                  <div className="card-day-meta-left">
+                    <div className="card-day-badge-circle">
+                      <span>DAY</span>
+                      <span>{item.day}</span>
+                    </div>
+                    <div className="card-date-subtext">
+                      {item.date} • {item.weekday}
+                    </div>
+                  </div>
+                  <span className={`card-category-pill ${item.categoryType}`}>
+                    {item.categoryTag}
+                  </span>
                 </div>
-                <div className="menu-dish-content-wrap">
-                  <div className="menu-label-tag">{item.mealHeader}</div>
-                  <div className="menu-main-title">{item.mainDish}</div>
-                  {item.accompaniments && (
-                    <div className="menu-sub-accompaniment">{item.accompaniments}</div>
-                  )}
+
+                {/* Event Title */}
+                <h3 className="card-event-title">{item.title}</h3>
+
+                {/* Satvik Menu Box */}
+                <div className="card-prasadam-menu-box">
+                  <div className="menu-dish-icon-box">
+                    {item.day === 1 && <span>🍲</span>}
+                    {item.day === 2 && <span>🌾</span>}
+                    {item.day === 3 && <span>🔥</span>}
+                    {item.day === 4 && <span>🍱</span>}
+                    {item.day === 6 && <span>🪔</span>}
+                  </div>
+                  <div className="menu-dish-content-wrap">
+                    <div className="menu-label-tag">{item.mealHeader}</div>
+                    <div className="menu-main-title">{item.mainDish}</div>
+                    {item.accompaniments && (
+                      <div className="menu-sub-accompaniment">{item.accompaniments}</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Timing & Context */}
+                <div className="card-timing-context-row">
+                  <div className="timing-left-item">
+                    <Clock size={14} color="#ea580c" />
+                    <span>{item.timing}</span>
+                  </div>
+                  <span className="context-right-item">{item.timingContext}</span>
+                </div>
+
+                {/* Sponsor Footer */}
+                <div className="card-sponsor-bottom-row">
+                  <div className="sponsor-bottom-left">
+                    <span>🤝</span>
+                    <span>{item.sponsorText}</span>
+                  </div>
+                  <span className="sponsor-status-tag">{item.sponsorStatus}</span>
                 </div>
               </div>
-
-              {/* Timing & Context */}
-              <div className="card-timing-context-row">
-                <div className="timing-left-item">
-                  <Clock size={14} color="#ea580c" />
-                  <span>{item.timing}</span>
-                </div>
-                <span className="context-right-item">{item.timingContext}</span>
-              </div>
-
-              {/* Sponsor Footer */}
-              <div className="card-sponsor-bottom-row">
-                <div className="sponsor-bottom-left">
-                  <span>🤝</span>
-                  <span>{item.sponsorText}</span>
-                </div>
-                <span className="sponsor-status-tag">{item.sponsorStatus}</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

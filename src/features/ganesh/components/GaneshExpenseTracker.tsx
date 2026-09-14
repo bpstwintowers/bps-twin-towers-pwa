@@ -111,14 +111,14 @@ export const GaneshExpenseTracker: React.FC<Props> = ({
       ? isAdmin
       : (isAdminFlat || hasAuthAdminRole);
 
-  // Budget & Calculations based on Google Sheets live data
-  const targetBudget = 200000;
+  // Dynamic Budget & Fund Received from live Google Sheet
+  const fundReceived = totalCollections && totalCollections > 0 ? totalCollections : 334608;
   const totalSpent = useMemo(() => {
     return expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
   }, [expenses]);
 
-  const utilizationPercent = Math.min(100, Math.round((totalSpent / (targetBudget || 1)) * 100));
-  const availableAmount = Math.max(0, targetBudget - totalSpent);
+  const utilizationPercent = Math.min(100, Math.round((totalSpent / (fundReceived || 1)) * 100));
+  const availableAmount = Math.max(0, fundReceived - totalSpent);
 
   // Category-wise Breakdown from Google Sheets expenses
   const activeCategoryTotals = useMemo(() => {
@@ -306,7 +306,7 @@ export const GaneshExpenseTracker: React.FC<Props> = ({
 
         <div className="expenses-amount-row">
           <span className="expenses-big-val">₹{totalSpent.toLocaleString('en-IN')}</span>
-          <span className="expenses-budget-val">/ ₹{targetBudget.toLocaleString('en-IN')} Budget</span>
+          <span className="expenses-budget-val">/ ₹{fundReceived.toLocaleString('en-IN')} Fund Received</span>
         </div>
 
         {/* Progress Track */}
@@ -319,7 +319,7 @@ export const GaneshExpenseTracker: React.FC<Props> = ({
 
         <div className="expenses-util-stats">
           <span className="util-used-text">{utilizationPercent}% Utilized</span>
-          <span className="util-avail-text">₹{availableAmount.toLocaleString('en-IN')} Available</span>
+          <span className="util-avail-text">₹{availableAmount.toLocaleString('en-IN')} Balance</span>
         </div>
 
         <div className="expenses-hero-bottom-row">

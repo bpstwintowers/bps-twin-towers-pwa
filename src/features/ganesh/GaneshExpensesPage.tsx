@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   fetchLiveExpenses,
+  fetchLiveContributions,
   getCachedExpenses,
+  getCachedContributions,
 } from '../../services/liveSheetService';
 import type { GaneshExpenseRecord } from '../../types/ganesh';
 import { supabase } from '../../services/supabase/client';
@@ -14,6 +16,10 @@ import './GaneshExpenseTracker.css';
 
 export const GaneshExpensesPage: React.FC = () => {
   const [expenses, setExpenses] = useState<GaneshExpenseRecord[]>(() => getCachedExpenses());
+  const [totalCollections, setTotalCollections] = useState<number>(() => {
+    const cached = getCachedContributions();
+    return cached.reduce((sum, c) => sum + (c.amount || 0), 0) || 334608;
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [hasAuthAdminRole, setHasAuthAdminRole] = useState(false);
   const [userFlat, setUserFlat] = useState(() => localStorage.getItem('bps_ganesh_user_flat') || '');
@@ -21,8 +27,15 @@ export const GaneshExpensesPage: React.FC = () => {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const list = await fetchLiveExpenses();
-      setExpenses(list);
+      const [expList, contList] = await Promise.all([
+        fetchLiveExpenses(),
+        fetchLiveContributions(),
+      ]);
+      setExpenses(expList);
+      if (contList && contList.length > 0) {
+        const sum = contList.reduce((acc, c) => acc + (c.amount || 0), 0);
+        setTotalCollections(sum);
+      }
     } catch (err) {
       console.error('Error fetching expenses:', err);
     } finally {
@@ -84,7 +97,7 @@ export const GaneshExpensesPage: React.FC = () => {
       >
         <GaneshExpenseTracker
           expenses={expenses}
-          totalCollections={334608}
+          totalCollections={totalCollections}
           onRefresh={loadData}
           isAdmin={isAdminUser}
         />
