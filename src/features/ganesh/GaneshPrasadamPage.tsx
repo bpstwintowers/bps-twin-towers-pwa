@@ -360,154 +360,65 @@ export const GaneshPrasadamPage: React.FC<GaneshPrasadamPageProps> = ({ embedded
 
         {/* Daily Schedule Cards */}
         <div className="prasadam-cards-list">
-          {displayedDays.map((item) => {
-            // Day 5 Grand Maha Prasadam Feast Golden Card
-            if (item.isGrandFeast) {
-              const parsedDishes = parseDishItems(item.mainDish);
-
-              return (
-                <div key={item.day} className="grand-annadanam-golden-card">
-                  {/* Header Row with DAY 5 Circular Badge */}
-                  <div className="card-top-header-row" style={{ marginBottom: '0.75rem' }}>
-                    <div className="card-day-meta-left">
-                      <div className="card-day-badge-circle">
-                        <span>DAY</span>
-                        <span>{item.day}</span>
-                      </div>
-                      <div className="card-date-subtext">
-                        {item.date} • {item.weekday}
-                      </div>
-                    </div>
-                    <span className="card-category-pill cultural">
-                      {item.categoryTag}
-                    </span>
+          {displayedDays.map((item) => (
+            <div key={item.day} className="prasadam-schedule-card">
+              {/* Header Row */}
+              <div className="card-top-header-row">
+                <div className="card-day-meta-left">
+                  <div className="card-day-badge-circle">
+                    <span>DAY</span>
+                    <span>{item.day}</span>
                   </div>
-
-                  <h3 className="grand-feast-main-title">{item.title}</h3>
-
-                  {/* Navy Blue Dinner Banner */}
-                  <div className="grand-lunch-navy-banner">
-                    <div className="lunch-navy-left">
-                      <span>🍲</span>
-                      <span>{item.timing}</span>
-                    </div>
-                    <span className="lunch-navy-pill-btn">Traditional 14-Item</span>
-                  </div>
-
-                  {/* 2-Column 9-Course Thali Section */}
-                  <div className="thali-menu-grid-section">
-                    <div className="thali-section-header">
-                      <span>{item.mealHeader}</span>
-                    </div>
-
-                    {parsedDishes.length > 1 ? (
-                      <div className="thali-items-2col">
-                        {parsedDishes.map((dish, idx) => (
-                          <div key={idx} className="thali-item-row">
-                            <span>{getDishIcon(dish, idx)}</span>
-                            <span>{dish}</span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="thali-items-2col">
-                        <div className="thali-item-row" style={{ gridColumn: '1 / -1' }}>
-                          <span>🍲</span>
-                          <span>{item.mainDish}</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Special Sweet Box */}
-                    {item.accompaniments && (
-                      <div className="thali-special-sweet-box">
-                        <span>🍧</span>
-                        <span>{item.accompaniments}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Timing & Context */}
-                  <div className="card-timing-context-row">
-                    <div className="timing-left-item">
-                      <Clock size={14} color="#ea580c" />
-                      <span>{item.timing}</span>
-                    </div>
-                    <span className="context-right-item">{item.timingContext}</span>
-                  </div>
-
-                  {/* Sponsor Bottom */}
-                  <div className="card-sponsor-bottom-row" style={{ borderTop: 'none', paddingTop: '0.2rem' }}>
-                    <div className="sponsor-bottom-left">
-                      <span>🤝</span>
-                      <span>{item.sponsorText}</span>
-                    </div>
-                    <span className="sponsor-status-tag" style={{ background: '#ecfdf5', color: '#047857' }}>
-                      {item.sponsorStatus}
-                    </span>
+                  <div className="card-date-subtext">
+                    {item.date} • {item.weekday}
                   </div>
                 </div>
-              );
-            }
+                <span className={`card-category-pill ${item.categoryType}`}>
+                  {item.categoryTag}
+                </span>
+              </div>
 
-            // Standard Day Cards (Days 1, 2, 3, 4, 6)
-            return (
-              <div key={item.day} className="prasadam-schedule-card">
-                {/* Header Row */}
-                <div className="card-top-header-row">
-                  <div className="card-day-meta-left">
-                    <div className="card-day-badge-circle">
-                      <span>DAY</span>
-                      <span>{item.day}</span>
-                    </div>
-                    <div className="card-date-subtext">
-                      {item.date} • {item.weekday}
-                    </div>
-                  </div>
-                  <span className={`card-category-pill ${item.categoryType}`}>
-                    {item.categoryTag}
-                  </span>
+              {/* Event Title */}
+              <h3 className="card-event-title">{item.title}</h3>
+
+              {/* Satvik Menu Box */}
+              <div className="card-prasadam-menu-box">
+                <div className="menu-dish-icon-box">
+                  {item.day === 1 && <span>🍲</span>}
+                  {item.day === 2 && <span>🌾</span>}
+                  {item.day === 3 && <span>🔥</span>}
+                  {item.day === 4 && <span>🍱</span>}
+                  {item.day === 5 && <span>🍛</span>}
+                  {item.day === 6 && <span>🪔</span>}
                 </div>
-
-                {/* Event Title */}
-                <h3 className="card-event-title">{item.title}</h3>
-
-                {/* Satvik Menu Box */}
-                <div className="card-prasadam-menu-box">
-                  <div className="menu-dish-icon-box">
-                    {item.day === 1 && <span>🍲</span>}
-                    {item.day === 2 && <span>🌾</span>}
-                    {item.day === 3 && <span>🔥</span>}
-                    {item.day === 4 && <span>🍱</span>}
-                    {item.day === 6 && <span>🪔</span>}
-                  </div>
-                  <div className="menu-dish-content-wrap">
-                    <div className="menu-label-tag">{item.mealHeader}</div>
-                    <div className="menu-main-title">{item.mainDish}</div>
+                <div className="menu-dish-content-wrap">
+                  <div className="menu-label-tag">{item.mealHeader}</div>
+                  <div className="menu-main-title">{item.mainDish}</div>
+                  {item.accompaniments && (
                     <div className="menu-sub-accompaniment">{item.accompaniments}</div>
-                  </div>
-                </div>
-
-                {/* Timing & Context */}
-                <div className="card-timing-context-row">
-                  <div className="timing-left-item">
-                    <Clock size={14} color="#ea580c" />
-                    <span>{item.timing}</span>
-                  </div>
-                  <span className="context-right-item">{item.timingContext}</span>
-                </div>
-
-                {/* Sponsor Footer */}
-                <div className="card-sponsor-bottom-row">
-                  <div className="sponsor-bottom-left">
-                    <span>🤝</span>
-                    <span>{item.sponsorText}</span>
-                  </div>
-                  <span className="sponsor-status-tag">{item.sponsorStatus}</span>
+                  )}
                 </div>
               </div>
-            );
-          })}
+
+              {/* Timing & Context */}
+              <div className="card-timing-context-row">
+                <div className="timing-left-item">
+                  <Clock size={14} color="#ea580c" />
+                  <span>{item.timing}</span>
+                </div>
+                <span className="context-right-item">{item.timingContext}</span>
+              </div>
+
+              {/* Sponsor Footer */}
+              <div className="card-sponsor-bottom-row">
+                <div className="sponsor-bottom-left">
+                  <span>🤝</span>
+                  <span>{item.sponsorText}</span>
+                </div>
+                <span className="sponsor-status-tag">{item.sponsorStatus}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
