@@ -34,6 +34,7 @@ export function setGothramSheetUrl(url: string): void {
 }
 
 export const MASTER_PORTAL_STORAGE_KEY = 'bps_ganesh_master_portal_url';
+export const MASTER_PORTAL_SPREADSHEET_ID = '19wJOLle-co42OSM083JZWSrD_IIAOy6wUmoWsRVeM1M';
 export const DEFAULT_MASTER_PORTAL_SPREADSHEET_URL =
   'https://docs.google.com/spreadsheets/d/19wJOLle-co42OSM083JZWSrD_IIAOy6wUmoWsRVeM1M/edit?usp=sharing';
 
@@ -1012,11 +1013,10 @@ export function exportGaneshSankalpamCSV(sankalpams: GaneshSankalpamRecord[]): s
 // ============================================================================
 // 6. BPS GANESH UTSAV 2026 - MASTER PORTAL LIVE GOOGLE SHEET SYNC
 // ============================================================================
-export const MASTER_PORTAL_SPREADSHEET_ID = '19wJOLle-co42OSM083JZWSrD_IIAOy6wUmoWsRVeM1M';
 export const MASTER_PORTAL_URL = 'https://docs.google.com/spreadsheets/d/19wJOLle-co42OSM083JZWSrD_IIAOy6wUmoWsRVeM1M/edit?usp=sharing';
 
 export function getMasterSheetCsvUrl(tabName: 'Events' | 'Event Team' | 'Cultural' | 'Prasadam' | 'Expenses'): string {
-  return `https://docs.google.com/spreadsheets/d/${MASTER_PORTAL_SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
+  return `https://docs.google.com/spreadsheets/d/${MASTER_PORTAL_SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}&_cb=${Date.now()}`;
 }
 
 export interface LiveMasterEventItem {
@@ -1097,7 +1097,10 @@ export function getEventDateMeta(dayNum: number): {
  */
 export async function fetchLiveMasterEvents(): Promise<LiveMasterEventItem[]> {
   try {
-    const res = await fetch(getMasterSheetCsvUrl('Events'));
+    const res = await fetch(getMasterSheetCsvUrl('Events'), {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', Pragma: 'no-cache' },
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const csvText = await res.text();
     const rows = parseCSV(csvText);
@@ -1149,7 +1152,7 @@ export async function fetchLiveMasterEvents(): Promise<LiveMasterEventItem[]> {
         const meta = getEventDateMeta(dayNum);
 
         items.push({
-          id: `live-event-d${dayNum}-${rIdx}`,
+          id: `live-event-${rIdx}`,
           dayNumber: dayNum,
           dateStr,
           dayLabel: meta.dayLabel,
@@ -1167,6 +1170,7 @@ export async function fetchLiveMasterEvents(): Promise<LiveMasterEventItem[]> {
         });
       }
     }
+
     return items;
   } catch (err) {
     console.warn('Could not fetch live Master Events from Google Sheets, using fallback:', err);
@@ -1179,7 +1183,10 @@ export async function fetchLiveMasterEvents(): Promise<LiveMasterEventItem[]> {
  */
 export async function fetchLiveMasterPrasadam(): Promise<LiveMasterPrasadamItem[]> {
   try {
-    const res = await fetch(getMasterSheetCsvUrl('Prasadam'));
+    const res = await fetch(getMasterSheetCsvUrl('Prasadam'), {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', Pragma: 'no-cache' },
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const csvText = await res.text();
     const rows = parseCSV(csvText);
@@ -1224,7 +1231,10 @@ export interface LiveMasterTeamGroup {
  */
 export async function fetchLiveMasterTeams(): Promise<LiveMasterTeamGroup[]> {
   try {
-    const res = await fetch(getMasterSheetCsvUrl('Event Team'));
+    const res = await fetch(getMasterSheetCsvUrl('Event Team'), {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', Pragma: 'no-cache' },
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const csvText = await res.text();
     const rows = parseCSV(csvText);
@@ -1278,9 +1288,43 @@ export async function fetchLiveMasterTeams(): Promise<LiveMasterTeamGroup[]> {
 
     return Object.values(teamMap);
   } catch (err) {
-    console.warn('Could not fetch live Event Team from Google Sheets:', err);
+    console.warn('Could not fetch live Event Teams from Google Sheets:', err);
     return [];
   }
+}
+
+export function stripPhoneNumbers(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/\(?\+?91[\s-]?\d{5}[\s-]?\d{5}\)?/gi, '')
+    .replace(/\(?\+?91[\s-]?\d{10}\)?/gi, '')
+    .replace(/\(?\b\d{10}\b\)?/g, '')
+    .replace(/\(\s*\+?\d{5,}\s*[\s-]?\s*\d+\s*\)/g, '')
+    .replace(/\b\d{5}[\s-]\d{5}\b/g, '')
+    .replace(/\(\s*\)/g, '')
+    .replace(/\[\s*\]/g, '')
+    .replace(/\s*-\s*$/g, '')
+    .replace(/\s*,\s*$/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export function getCulturalActKey(act: {
+  date?: string;
+  performanceTitle?: string;
+  performers?: string;
+  description?: string;
+  durationMins?: string;
+  flatNo?: string;
+  id?: string;
+}): string {
+  const d = (act.date || '').trim().toLowerCase();
+  const t = stripPhoneNumbers(act.performanceTitle || '').trim().toLowerCase();
+  const p = stripPhoneNumbers(act.performers || '').trim().toLowerCase();
+  const desc = stripPhoneNumbers(act.description || '').trim().toLowerCase();
+  const dur = (act.durationMins || '').trim().toLowerCase();
+  const f = (act.flatNo || '').trim().toUpperCase().replace(/[\s-]/g, '');
+  return `${d}::${t}::${p}::${desc}::${dur}::${f}`;
 }
 
 /**
@@ -1288,7 +1332,13 @@ export async function fetchLiveMasterTeams(): Promise<LiveMasterTeamGroup[]> {
  */
 export async function fetchLiveMasterCultural(): Promise<LiveMasterCulturalItem[]> {
   try {
-    const res = await fetch(getMasterSheetCsvUrl('Cultural'));
+    const res = await fetch(getMasterSheetCsvUrl('Cultural'), {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        Pragma: 'no-cache',
+      },
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const csvText = await res.text();
     const rows = parseCSV(csvText);
@@ -1317,7 +1367,7 @@ export async function fetchLiveMasterCultural(): Promise<LiveMasterCulturalItem[
       if (startParsing) {
         const date = (row[0] || '').trim();
         const timeSlot = (row[1] || '').trim();
-        const performanceTitle = (row[2] || '').trim();
+        const performanceTitle = stripPhoneNumbers((row[2] || '').trim());
 
         if (
           !performanceTitle ||
@@ -1329,13 +1379,13 @@ export async function fetchLiveMasterCultural(): Promise<LiveMasterCulturalItem[
 
         const rawDuration = (row[3] || '').trim();
         const durationMins = rawDuration ? `${rawDuration} Mins` : undefined;
-        const performers = (row[4] || '').trim();
+        const performers = stripPhoneNumbers((row[4] || '').trim());
         const flatNo = (row[5] || '').trim();
         const actCategory = (row[6] || '').trim();
-        const description = (row[7] || '').trim();
+        const description = stripPhoneNumbers((row[7] || '').trim());
 
         items.push({
-          id: `live-cultural-${i}`,
+          id: `live-cultural-${i}-${date}-${(description || performanceTitle).slice(0, 10).replace(/[\s-]/g, '')}`,
           date,
           timeSlot,
           durationMins,
@@ -1347,10 +1397,193 @@ export async function fetchLiveMasterCultural(): Promise<LiveMasterCulturalItem[
         });
       }
     }
-    return items;
+
+    // Merge added items, apply overrides, and filter deleted items
+    const deletedIds = new Set(getDeletedCulturalIds());
+    const deletedKeys = new Set(getDeletedCulturalKeys());
+    const overrides = getCulturalOverrides();
+    const addedItems = getAddedCulturalItems();
+
+    const mergedItems = [...addedItems, ...items]
+      .filter((it) => !deletedIds.has(it.id) && !deletedKeys.has(getCulturalActKey(it)))
+      .map((it) => {
+        if (overrides[it.id]) {
+          return { ...it, ...overrides[it.id], performers: stripPhoneNumbers(overrides[it.id].performers ?? it.performers) };
+        }
+        return it;
+      });
+
+    return mergedItems;
   } catch (err) {
     console.warn('Could not fetch live Cultural from Google Sheets:', err);
+    const addedItems = getAddedCulturalItems();
+    return addedItems;
+  }
+}
+
+export const CULTURAL_OVERRIDES_STORAGE_KEY = 'bps_cultural_custom_overrides';
+export const CULTURAL_DELETED_STORAGE_KEY = 'bps_cultural_deleted_ids';
+export const CULTURAL_DELETED_KEYS_STORAGE_KEY = 'bps_cultural_deleted_keys';
+export const CULTURAL_ADDED_STORAGE_KEY = 'bps_cultural_added_items';
+
+export function getCulturalOverrides(): Record<string, Partial<LiveMasterCulturalItem>> {
+  try {
+    return JSON.parse(localStorage.getItem(CULTURAL_OVERRIDES_STORAGE_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
+
+export function getDeletedCulturalIds(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(CULTURAL_DELETED_STORAGE_KEY) || '[]');
+  } catch {
     return [];
+  }
+}
+
+export function getDeletedCulturalKeys(): string[] {
+  try {
+    const raw: string[] = JSON.parse(localStorage.getItem(CULTURAL_DELETED_KEYS_STORAGE_KEY) || '[]');
+    // Only accept specific 6-part keys (containing at least 4 colons `::`) so old broad keys don't hide multiple distinct acts
+    return raw.filter((k) => typeof k === 'string' && (k.match(/::/g) || []).length >= 4);
+  } catch {
+    return [];
+  }
+}
+
+export function resetCulturalScheduleOverrides(): void {
+  localStorage.removeItem(CULTURAL_OVERRIDES_STORAGE_KEY);
+  localStorage.removeItem(CULTURAL_DELETED_STORAGE_KEY);
+  localStorage.removeItem(CULTURAL_DELETED_KEYS_STORAGE_KEY);
+  localStorage.removeItem(CULTURAL_ADDED_STORAGE_KEY);
+}
+
+export function getAddedCulturalItems(): LiveMasterCulturalItem[] {
+  try {
+    return JSON.parse(localStorage.getItem(CULTURAL_ADDED_STORAGE_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+export function addCustomCulturalAct(act: Omit<LiveMasterCulturalItem, 'id'>): LiveMasterCulturalItem {
+  const newAct: LiveMasterCulturalItem = {
+    ...act,
+    id: `custom-act-${Date.now()}`,
+  };
+  const added = getAddedCulturalItems();
+  const updated = [newAct, ...added];
+  localStorage.setItem(CULTURAL_ADDED_STORAGE_KEY, JSON.stringify(updated));
+
+  // Sync to webhook if configured
+  const webhookUrl = getCulturalAppsScriptUrl();
+  if (webhookUrl) {
+    try {
+      fetch(webhookUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'addCulturalAct',
+          ...newAct,
+        }),
+      }).catch((e) => console.warn('Add act webhook error:', e));
+    } catch (e) {
+      console.warn('Add act webhook exception:', e);
+    }
+  }
+
+  return newAct;
+}
+
+export function updateCustomCulturalAct(id: string, updates: Partial<LiveMasterCulturalItem>): void {
+  const added = getAddedCulturalItems();
+  const addedIndex = added.findIndex((a) => a.id === id);
+  if (addedIndex !== -1) {
+    added[addedIndex] = { ...added[addedIndex], ...updates };
+    localStorage.setItem(CULTURAL_ADDED_STORAGE_KEY, JSON.stringify(added));
+    return;
+  }
+
+  const overrides = getCulturalOverrides();
+  overrides[id] = { ...(overrides[id] || {}), ...updates };
+  localStorage.setItem(CULTURAL_OVERRIDES_STORAGE_KEY, JSON.stringify(overrides));
+
+  // Sync to webhook if configured
+  const webhookUrl = getCulturalAppsScriptUrl();
+  if (webhookUrl) {
+    try {
+      fetch(webhookUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'updateCulturalAct',
+          id,
+          ...updates,
+        }),
+      }).catch((e) => console.warn('Update act webhook error:', e));
+    } catch (e) {
+      console.warn('Update act webhook exception:', e);
+    }
+  }
+}
+
+export function deleteCustomCulturalAct(
+  actOrId:
+    | string
+    | {
+        id: string;
+        date?: string;
+        performanceTitle?: string;
+        performers?: string;
+        description?: string;
+        durationMins?: string;
+        flatNo?: string;
+      }
+): void {
+  const id = typeof actOrId === 'string' ? actOrId : actOrId.id;
+  const key = typeof actOrId === 'string' ? '' : getCulturalActKey(actOrId);
+
+  const added = getAddedCulturalItems();
+  const filteredAdded = added.filter((a) => a.id !== id && (key ? getCulturalActKey(a) !== key : true));
+  localStorage.setItem(CULTURAL_ADDED_STORAGE_KEY, JSON.stringify(filteredAdded));
+
+  const deleted = getDeletedCulturalIds();
+  if (!deleted.includes(id)) {
+    deleted.push(id);
+    localStorage.setItem(CULTURAL_DELETED_STORAGE_KEY, JSON.stringify(deleted));
+  }
+
+  if (key) {
+    const deletedKeys = getDeletedCulturalKeys();
+    if (!deletedKeys.includes(key)) {
+      deletedKeys.push(key);
+      localStorage.setItem(CULTURAL_DELETED_KEYS_STORAGE_KEY, JSON.stringify(deletedKeys));
+    }
+  }
+
+  // Sync delete to Apps Script Webhook if configured
+  const webhookUrl = getCulturalAppsScriptUrl();
+  if (webhookUrl) {
+    try {
+      fetch(webhookUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'deleteCulturalAct',
+          id,
+          key,
+          performanceTitle: typeof actOrId === 'object' ? actOrId.performanceTitle : undefined,
+          date: typeof actOrId === 'object' ? actOrId.date : undefined,
+          performers: typeof actOrId === 'object' ? actOrId.performers : undefined,
+        }),
+      }).catch((e) => console.warn('Delete webhook error:', e));
+    } catch (e) {
+      console.warn('Delete webhook exception:', e);
+    }
   }
 }
 
