@@ -221,7 +221,7 @@ export const GaneshQuickActions: React.FC<Props> = ({
       {/* 1. Photo Hero Card with Golden Glow & Countdown */}
       <div className="ganesh-photo-hero-card">
         <img
-          src="/ganesh-banner.png"
+          src="/ganesh-banner.png?v=20260915_2"
           alt="Ganesh Festival 2026 Celebration at BPS Twin Towers"
           className="ganesh-photo-hero-img"
         />
