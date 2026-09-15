@@ -32,6 +32,7 @@ import {
   getCachedContributions,
   getCachedGothram,
   fetchTodayCombinedSchedule,
+  getFestivalDayMeta,
 } from '../../../services/liveSheetService';
 import type { TodayCombinedScheduleItem } from '../../../services/liveSheetService';
 import './GaneshQuickActions.css';
@@ -73,7 +74,7 @@ export const GaneshQuickActions: React.FC<Props> = ({
 
   // Live Today's Schedule from Master Events & Cultural Sheets
   const [todaySchedule, setTodaySchedule] = useState<TodayCombinedScheduleItem[]>([]);
-  const [todayDateLabel, setTodayDateLabel] = useState<string>('Day 1 • Mon, 14th Sep');
+  const [todayDateLabel, setTodayDateLabel] = useState<string>(() => getFestivalDayMeta(new Date()).dayLabel);
   const [isLoadingSchedule, setIsLoadingSchedule] = useState<boolean>(true);
 
   useEffect(() => {
@@ -232,17 +233,6 @@ export const GaneshQuickActions: React.FC<Props> = ({
             <span>OUR COMMUNITY • OUR CELEBRATION</span>
           </div>
           <h1 className="ganesh-photo-title">Ganesh Festival 2026</h1>
-          <p
-            style={{
-              fontSize: '0.84rem',
-              color: '#f8fafc',
-              margin: '0.2rem 0 0 0',
-              lineHeight: 1.45,
-              textShadow: '0 1px 4px rgba(0, 0, 0, 0.7)',
-            }}
-          >
-            Join the entire BPS Twin Towers family for the auspicious <strong>Ganesh Sthapana</strong>, evening <strong>Aarti</strong>, cultural performances by children, and community <strong>Mahaprasad dinner</strong>.
-          </p>
         </div>
       </div>
 

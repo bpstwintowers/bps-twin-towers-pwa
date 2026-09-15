@@ -69,14 +69,14 @@
 /* 2. Photo Hero Card */
 .ganesh-photo-hero-card {
   position: relative;
-  border-radius: 24px;
+  border-radius: 22px;
   overflow: hidden;
-  box-shadow: 0 16px 40px -10px rgba(15, 23, 42, 0.4), 0 8px 20px -4px rgba(234, 88, 12, 0.25);
-  min-height: 320px;
+  box-shadow: 0 14px 34px -8px rgba(15, 23, 42, 0.35), 0 8px 16px -4px rgba(234, 88, 12, 0.2);
+  min-height: clamp(340px, 32vw, 420px);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 2rem 1.6rem 1.75rem 1.6rem;
+  padding: 1.75rem 1.5rem;
   color: #ffffff;
   background: #0f172a;
 }
@@ -88,12 +88,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 18%;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  object-position: center 42%;
+  transition: transform 0.6s ease;
 }
 
 .ganesh-photo-hero-card:hover .ganesh-photo-hero-img {
-  transform: scale(1.03);
+  transform: scale(1.02);
 }
 
 .ganesh-photo-hero-overlay {
@@ -102,7 +102,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(180deg, rgba(9, 20, 46, 0.4) 0%, rgba(9, 20, 46, 0.75) 60%, #09142e 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(9, 20, 46, 0.08) 35%, rgba(9, 20, 46, 0.65) 80%, #09142e 100%);
 }
 
 .ganesh-photo-hero-content {
@@ -800,7 +800,7 @@
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
-  
+
   .overview-stat-cell {
     flex-direction: row;
     justify-content: space-between;
@@ -808,7 +808,7 @@
     padding: 0.65rem 0.85rem;
     text-align: left;
   }
-  
+
   .donut-chart-container {
     flex-direction: column;
     gap: 0.85rem;
@@ -954,7 +954,11 @@
   }
 
   .ganesh-photo-hero-card {
-    min-height: 240px;
+    min-height: 270px;
     padding: 1.25rem 1rem;
+  }
+
+  .ganesh-photo-hero-img {
+    object-position: center 36%;
   }
 }

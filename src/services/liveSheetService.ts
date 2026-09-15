@@ -1718,149 +1718,296 @@ export function getScheduleIconType(item: { title: string; category?: string; ac
   return 'event';
 }
 
-function normalizeDateMatch(dateStr1: string, dateStr2: string): boolean {
-  if (!dateStr1 || !dateStr2) return false;
-  const clean1 = dateStr1.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-  const clean2 = dateStr2.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-  if (clean1 === clean2) return true;
-  if (clean1.includes(clean2) || clean2.includes(clean1)) return true;
+export function getFestivalDayMeta(inputDate?: string | Date): {
+  dayNumber: number;
+  dateKey: 'sep14' | 'sep15' | 'sep16' | 'sep17' | 'sep18' | 'sep19';
+  isoDate: string;
+  dayLabel: string;
+  dayOfWeek: string;
+  dateDisplay: string;
+} {
+  const d = inputDate ? (typeof inputDate === 'string' ? new Date(inputDate) : inputDate) : new Date();
+  
+  // Extract local day and month
+  const dayOfMonth = d.getDate();
+  const month = d.getMonth() + 1; // 1-12
 
-  const extractDayMonth = (d: string) => {
-    const m = d.match(/(\d{4})-(\d{2})-(\d{2})/) || d.match(/(\d{2})[-/](\d{2})[-/](\d{4})/);
-    if (m) {
-      if (m[1].length === 4) return `${m[2]}-${m[3]}`;
-      return `${m[2]}-${m[1]}`;
-    }
-    const num = d.match(/\d+/);
-    return num ? num[0] : '';
-  };
-  return extractDayMonth(dateStr1) === extractDayMonth(dateStr2);
+  let dayNum = 1;
+  // If in September or any day 14..19, map directly: 14->1, 15->2, 16->3, 17->4, 18->5, 19->6
+  if (dayOfMonth >= 14 && dayOfMonth <= 19) {
+    dayNum = dayOfMonth - 13;
+  } else if (dayOfMonth > 19) {
+    dayNum = 6;
+  } else {
+    dayNum = 1;
+  }
+
+  const metaList = [
+    { dayNumber: 1, dateKey: 'sep14' as const, isoDate: '2026-09-14', dayLabel: 'Day 1 • Mon, 14th Sep', dayOfWeek: 'Monday', dateDisplay: '14th Sep 2026' },
+    { dayNumber: 2, dateKey: 'sep15' as const, isoDate: '2026-09-15', dayLabel: 'Day 2 • Tue, 15th Sep', dayOfWeek: 'Tuesday', dateDisplay: '15th Sep 2026' },
+    { dayNumber: 3, dateKey: 'sep16' as const, isoDate: '2026-09-16', dayLabel: 'Day 3 • Wed, 16th Sep', dayOfWeek: 'Wednesday', dateDisplay: '16th Sep 2026' },
+    { dayNumber: 4, dateKey: 'sep17' as const, isoDate: '2026-09-17', dayLabel: 'Day 4 • Thu, 17th Sep', dayOfWeek: 'Thursday', dateDisplay: '17th Sep 2026' },
+    { dayNumber: 5, dateKey: 'sep18' as const, isoDate: '2026-09-18', dayLabel: 'Day 5 • Fri, 18th Sep', dayOfWeek: 'Friday', dateDisplay: '18th Sep 2026' },
+    { dayNumber: 6, dateKey: 'sep19' as const, isoDate: '2026-09-19', dayLabel: 'Day 6 • Sat, 19th Sep', dayOfWeek: 'Saturday', dateDisplay: '19th Sep 2026' },
+  ];
+
+  return metaList.find((m) => m.dayNumber === dayNum) || metaList[0];
 }
 
-/**
- * Fetches and combines Events & Cultural performances for a given date (defaults to Today / Day 1: 2026-09-14)
- * and sorts all schedule items chronologically by time.
- */
-export async function fetchTodayCombinedSchedule(targetDate?: string): Promise<{
-  dateLabel: string;
-  targetDate: string;
-  dayNumber: number;
-  items: TodayCombinedScheduleItem[];
-}> {
-  try {
-    const [events, culturalList] = await Promise.all([
-      fetchLiveMasterEvents(),
-      fetchLiveMasterCultural(),
-    ]);
+export function normalizeDateMatch(dateStr1: string, dateStr2: string): boolean {
+  if (!dateStr1 || !dateStr2) return false;
+  const s1 = dateStr1.toString().toLowerCase().trim();
+  const s2 = dateStr2.toString().toLowerCase().trim();
+  if (s1 === s2) return true;
 
-    let effectiveDate = targetDate || new Date().toISOString().split('T')[0];
+  const extractFestivalDayNum = (str: string): number | null => {
+    const dMatch = str.match(/day\s*([1-6])/i);
+    if (dMatch) return parseInt(dMatch[1], 10);
 
-    // Find matching events for this date
-    let matchedEvents = events.filter((e) => {
-      if (e.dateStr && normalizeDateMatch(e.dateStr, effectiveDate)) return true;
-      if (e.dateKey && normalizeDateMatch(e.dateKey, effectiveDate)) return true;
-      return false;
-    });
-
-    let matchedCultural = culturalList.filter((c) => {
-      return normalizeDateMatch(c.date, effectiveDate);
-    });
-
-    // If today is outside festival dates or no events matched, fallback to Day 1 (2026-09-14)
-    if (matchedEvents.length === 0 && matchedCultural.length === 0) {
-      effectiveDate = '2026-09-14';
-      matchedEvents = events.filter((e) => e.dayNumber === 1 || (e.dateStr && e.dateStr.includes('14')));
-      matchedCultural = culturalList.filter((c) => c.date.includes('14') || c.date.includes('2026-09-14'));
+    const sepMatch = str.match(/sep\s*(\d{1,2})/i) || str.match(/(\d{1,2})\s*sep/i);
+    if (sepMatch) {
+      const d = parseInt(sepMatch[1], 10);
+      if (d >= 14 && d <= 19) return d - 13;
     }
 
-    const dayNum = matchedEvents[0]?.dayNumber || 1;
-    const dateLabel = matchedEvents[0]?.dayLabel || 'Day 1 • Mon, 14th Sep';
+    const isoMatch = str.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/) || str.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+    if (isoMatch) {
+      const d = isoMatch[1].length === 4 ? parseInt(isoMatch[3], 10) : parseInt(isoMatch[1], 10);
+      if (d >= 14 && d <= 19) return d - 13;
+    }
 
-    const combined: TodayCombinedScheduleItem[] = [];
-    const usedCulturalIds = new Set<string>();
+    const num = str.match(/\b(14|15|16|17|18|19)\b/);
+    if (num) {
+      return parseInt(num[1], 10) - 13;
+    }
+    return null;
+  };
 
-    // 1. Process Events and cross-reference with Cultural items
-    for (const evt of matchedEvents) {
-      const normEvtTitle = evt.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const day1 = extractFestivalDayNum(s1);
+  const day2 = extractFestivalDayNum(s2);
+  if (day1 !== null && day2 !== null && day1 === day2) {
+    return true;
+  }
 
-      // Look for a cultural match
-      const cultMatch = matchedCultural.find((c) => {
-        const normCultTitle = c.performanceTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
-        return normEvtTitle.includes(normCultTitle) || normCultTitle.includes(normEvtTitle);
-      });
+  const clean1 = s1.replace(/[^a-z0-9]/g, '');
+  const clean2 = s2.replace(/[^a-z0-9]/g, '');
+  return clean1.includes(clean2) || clean2.includes(clean1);
+}
 
-      if (cultMatch) {
-        usedCulturalIds.add(cultMatch.id);
-        const timeSlot = cultMatch.timeSlot || evt.timeSlot;
-        combined.push({
-          id: `combined-${evt.id}-${cultMatch.id}`,
-          source: 'both',
-          title: cultMatch.performanceTitle || evt.title,
-          timeSlot,
-          startTimeMinutes: parseTimeToMinutes(timeSlot),
-          category: cultMatch.actCategory || evt.category,
-          location: evt.location || 'Mandap Stage',
-          description: cultMatch.description || evt.description,
-          performers: cultMatch.performers,
-          durationMins: cultMatch.durationMins,
-          rituals: evt.rituals,
-          spocName: evt.spocName,
-          spocPhone: evt.spocPhone,
-          iconType: getScheduleIconType({ title: evt.title, category: evt.category, actCategory: cultMatch.actCategory }),
-        });
-      } else {
-        combined.push({
-          id: evt.id,
+function getDefaultScheduleItemsForDay(dayNum: number): TodayCombinedScheduleItem[] {
+  switch (dayNum) {
+    case 2:
+      return [
+        {
+          id: 'day2-morning-pooja',
           source: 'event',
-          title: evt.title,
-          timeSlot: evt.timeSlot,
-          startTimeMinutes: parseTimeToMinutes(evt.timeSlot),
-          category: evt.category,
-          location: evt.location,
-          description: evt.description,
-          rituals: evt.rituals,
-          spocName: evt.spocName,
-          spocPhone: evt.spocPhone,
-          iconType: getScheduleIconType({ title: evt.title, category: evt.category }),
-        });
-      }
-    }
-
-    // 2. Add remaining standalone Cultural performances
-    for (const cult of matchedCultural) {
-      if (!usedCulturalIds.has(cult.id)) {
-        combined.push({
-          id: cult.id,
+          title: 'Morning Suprabhata Seva & 108 Modak Seva',
+          timeSlot: '07:30 AM – 09:30 AM',
+          startTimeMinutes: 7 * 60 + 30,
+          category: 'Rituals & Pooja',
+          location: 'Main Ganesh Mandap',
+          description: 'Suprabhata Seva, Nitya Abhishekam, Ganesha Sahasranama Archana & 108 Steamed Modak Offering.',
+          rituals: ['Abhishekam', 'Sahasranama Archana', '108 Modak Samarpanam', 'Morning Aarti'],
+          iconType: 'pooja',
+        },
+        {
+          id: 'day2-evening-pooja',
+          source: 'event',
+          title: 'Sandhya Deeparadhana & Trishati Archana',
+          timeSlot: '07:00 PM – 08:30 PM',
+          startTimeMinutes: 19 * 60,
+          category: 'Rituals & Pooja',
+          location: 'Main Ganesh Mandap',
+          description: 'Evening Sandhya Deepam, Trishati Archana & Grand Evening Maha Mangala Aarti with Dhol chorus.',
+          rituals: ['Sandhya Deeparadhana', 'Trishati Archana', 'Maha Mangala Aarti'],
+          iconType: 'pooja',
+        },
+        {
+          id: 'day2-cultural',
           source: 'cultural',
-          title: cult.performanceTitle,
-          timeSlot: cult.timeSlot,
-          startTimeMinutes: parseTimeToMinutes(cult.timeSlot),
-          category: cult.actCategory || 'Cultural Performance',
+          title: 'Classical Vocal & Bhajan Sandhya – Society Singers',
+          timeSlot: '08:30 PM – 09:15 PM',
+          startTimeMinutes: 20 * 60 + 30,
+          category: 'Vocal Performance',
+          performers: 'Society Singers & Tower A Group',
+          durationMins: '45 Mins',
           location: 'Mandap Stage',
-          description: cult.description,
-          performers: cult.performers,
-          durationMins: cult.durationMins,
-          iconType: getScheduleIconType({ title: cult.performanceTitle, actCategory: cult.actCategory }),
-        });
-      }
-    }
-
-    // 3. Sort by startTimeMinutes chronologically ascending
-    combined.sort((a, b) => a.startTimeMinutes - b.startTimeMinutes);
-
-    return {
-      dateLabel,
-      targetDate: effectiveDate,
-      dayNumber: dayNum,
-      items: combined,
-    };
-  } catch (err) {
-    console.warn('Error fetching today combined schedule:', err);
-    return {
-      dateLabel: 'Day 1 • Mon, 14th Sep',
-      targetDate: '2026-09-14',
-      dayNumber: 1,
-      items: [
+          description: 'Devotional keerthanas, bhajans and classical music recital dedicated to Lord Ganesha.',
+          iconType: 'cultural',
+        },
+        {
+          id: 'day2-dinner',
+          source: 'event',
+          title: 'Community Mahaprasad Dinner (Kichidi & Curd Rice)',
+          timeSlot: '09:00 PM onwards',
+          startTimeMinutes: 21 * 60,
+          category: 'Mahaprasadam',
+          location: 'Community Dining Area',
+          description: 'Delicious hot Kichidi, Papadam, Pickle & Curd Rice dinner served for all residents.',
+          iconType: 'prasadam',
+        },
+      ];
+    case 3:
+      return [
+        {
+          id: 'day3-morning-homam',
+          source: 'event',
+          title: 'Sri Lakshmi Ganapathi Maha Homam',
+          timeSlot: '07:30 AM – 10:30 AM',
+          startTimeMinutes: 7 * 60 + 30,
+          category: 'Rituals & Pooja',
+          location: 'Mandap Homa Kunda',
+          description: 'Agni Prathishta, Navagraha Homam, 108 Ahutis & Purna Ahuti for obstacle removal & prosperity.',
+          rituals: ['Agni Prathishta', 'Moola Mantra Homam', 'Purna Ahuti', 'Bhasma Theertham'],
+          iconType: 'pooja',
+        },
+        {
+          id: 'day3-evening-aarti',
+          source: 'event',
+          title: 'Grand Sandhya Aarti & Pushpanjali',
+          timeSlot: '06:45 PM – 07:30 PM',
+          startTimeMinutes: 18 * 60 + 45,
+          category: 'Rituals & Pooja',
+          location: 'Main Ganesh Mandap',
+          description: 'Evening Sandhya Deepam, Ganapathi Sahasranama & Grand Maha Aarti.',
+          iconType: 'pooja',
+        },
+        {
+          id: 'day3-cultural-night',
+          source: 'cultural',
+          title: 'Grand Kids Cultural Stage Night & Drama Skit',
+          timeSlot: '07:30 PM – 09:15 PM',
+          startTimeMinutes: 19 * 60 + 30,
+          category: 'Dance & Drama',
+          performers: 'BPS Little Champs & Youth Group',
+          durationMins: '1 Hr 45 Mins',
+          location: 'Mandap Stage',
+          description: 'Bharatanatyam, Kuchipudi, drama skit on Ganesha stories and group dance performances.',
+          iconType: 'cultural',
+        },
+        {
+          id: 'day3-dinner',
+          source: 'event',
+          title: 'Community Mahaprasad Dinner (Hot Sambar Rice)',
+          timeSlot: '09:00 PM onwards',
+          startTimeMinutes: 21 * 60,
+          category: 'Mahaprasadam',
+          location: 'Community Dining Area',
+          description: 'Authentic hot Sambar Rice, Potato Fry, Curd Rice & Payasam.',
+          iconType: 'prasadam',
+        },
+      ];
+    case 4:
+      return [
+        {
+          id: 'day4-morning-chanting',
+          source: 'event',
+          title: 'Ganapathi Atharvashirsha Sahasra Avartana',
+          timeSlot: '08:00 AM – 10:00 AM',
+          startTimeMinutes: 8 * 60,
+          category: 'Rituals & Pooja',
+          location: 'Main Ganesh Mandap',
+          description: 'Sacred 1000-time chanting, Panchamrutha Abhishekam and Swarna Pushpa Archana.',
+          iconType: 'pooja',
+        },
+        {
+          id: 'day4-evening-bhajans',
+          source: 'event',
+          title: 'Sandhya Deepam & Akhanda Bhajans',
+          timeSlot: '07:00 PM – 08:30 PM',
+          startTimeMinutes: 19 * 60,
+          category: 'Rituals & Pooja',
+          location: 'Main Ganesh Mandap',
+          description: 'Devotional Satsang & Bhajans by BPS Women’s Mandali followed by Maha Aarti.',
+          iconType: 'pooja',
+        },
+        {
+          id: 'day4-tiffin-dinner',
+          source: 'event',
+          title: 'Special Tiffin Night (Hot Idly, Medu Wada & Bonda)',
+          timeSlot: '09:00 PM onwards',
+          startTimeMinutes: 21 * 60,
+          category: 'Mahaprasadam',
+          location: 'Community Dining Area',
+          description: 'Fresh steaming Idlies, crispy Medu Wadas, Mysore Bondas with hot Sambar and Coconut Chutney.',
+          iconType: 'prasadam',
+        },
+      ];
+    case 5:
+      return [
+        {
+          id: 'day5-morning-pooja',
+          source: 'event',
+          title: 'Maha Sankalpam & Trishati Sahasra Bilva Pooja',
+          timeSlot: '07:30 AM – 10:30 AM',
+          startTimeMinutes: 7 * 60 + 30,
+          category: 'Rituals & Pooja',
+          location: 'Main Ganesh Mandap',
+          description: 'Special Gothra Nama Sankalpam for all registered families with 1008 Bilva Patra Archana.',
+          iconType: 'pooja',
+        },
+        {
+          id: 'day5-deepotsavam',
+          source: 'event',
+          title: '1008 Diya Maha Deepotsavam & Grand Laddu Auction',
+          timeSlot: '06:30 PM – 09:30 PM',
+          startTimeMinutes: 18 * 60 + 30,
+          category: 'Rituals & Pooja',
+          location: 'Main Ganesh Mandap',
+          description: 'Lighting 1008 clay diyas across the podium followed by the auspicious BPS Laddu Auction.',
+          iconType: 'pooja',
+        },
+        {
+          id: 'day5-royal-dinner',
+          source: 'event',
+          title: 'Royal Mahaprasadam Dinner (Veg Biryani & Gulab Jamun)',
+          timeSlot: '09:00 PM onwards',
+          startTimeMinutes: 21 * 60,
+          category: 'Mahaprasadam',
+          location: 'Community Dining Area',
+          description: 'Special celebratory dinner: Hyderabadi Veg Dum Biryani, Mirchi Ka Salan, Raita & Gulab Jamun.',
+          iconType: 'prasadam',
+        },
+      ];
+    case 6:
+      return [
+        {
+          id: 'day6-morning-pooja',
+          source: 'event',
+          title: 'Uttarapooja & Maha Mangala Harathi',
+          timeSlot: '08:30 AM – 10:30 AM',
+          startTimeMinutes: 8 * 60 + 30,
+          category: 'Rituals & Pooja',
+          location: 'Main Ganesh Mandap',
+          description: 'Farewell Uttarapooja, Punah Avahana, Pushpanjali and Grand Farewell Maha Aarti.',
+          iconType: 'pooja',
+        },
+        {
+          id: 'day6-visarjan-yatra',
+          source: 'event',
+          title: 'Grand Visarjan Shobha Yatra & Nasik Dhol',
+          timeSlot: '03:00 PM – 08:00 PM',
+          startTimeMinutes: 15 * 60,
+          category: 'Event Team',
+          location: 'Podium to Main Gate & Lake',
+          description: 'Joyous Shobha Yatra around BPS Twin Towers with live Nasik Dhol, Gulal and eco-friendly Visarjan.',
+          iconType: 'event',
+        },
+        {
+          id: 'day6-prasadam',
+          source: 'event',
+          title: 'Farewell Maha Theertha & Sweet Prasadam',
+          timeSlot: '08:30 PM onwards',
+          startTimeMinutes: 20 * 60 + 30,
+          category: 'Mahaprasadam',
+          location: 'Central Mandap',
+          description: 'Distribution of holy Prasad, Laddu and Theertham after conclusion of Visarjan rituals.',
+          iconType: 'prasadam',
+        },
+      ];
+    default:
+    case 1:
+      return [
         {
           id: 'fb-1',
           source: 'event',
@@ -1920,7 +2067,131 @@ export async function fetchTodayCombinedSchedule(targetDate?: string): Promise<{
           description: 'Fun musical chair game for kids with festive prizes.',
           iconType: 'activity',
         },
-      ],
+      ];
+  }
+}
+
+/**
+ * Fetches and combines Events & Cultural performances for a given date (defaults to Today's actual festival day)
+ * and sorts all schedule items chronologically by time.
+ */
+export async function fetchTodayCombinedSchedule(targetDate?: string): Promise<{
+  dateLabel: string;
+  targetDate: string;
+  dayNumber: number;
+  items: TodayCombinedScheduleItem[];
+}> {
+  // Resolve today's date metadata (handles today = 2026-09-15 -> Day 2)
+  const currentMeta = getFestivalDayMeta(targetDate || new Date());
+  const effectiveDate = targetDate || currentMeta.isoDate;
+  const dayNum = currentMeta.dayNumber;
+  const dateLabel = currentMeta.dayLabel;
+
+  try {
+    const [events, culturalList] = await Promise.all([
+      fetchLiveMasterEvents(),
+      fetchLiveMasterCultural(),
+    ]);
+
+    // Find matching live events for this day
+    const matchedEvents = events.filter((e) => {
+      if (e.dayNumber === dayNum) return true;
+      if (e.dateStr && normalizeDateMatch(e.dateStr, effectiveDate)) return true;
+      if (e.dateKey && normalizeDateMatch(e.dateKey, effectiveDate)) return true;
+      return false;
+    });
+
+    const matchedCultural = culturalList.filter((c) => {
+      return normalizeDateMatch(c.date, effectiveDate) || normalizeDateMatch(c.date, `Day ${dayNum}`);
+    });
+
+    const combined: TodayCombinedScheduleItem[] = [];
+    const usedCulturalIds = new Set<string>();
+
+    if (matchedEvents.length > 0) {
+      // 1. Process Live Events and cross-reference with Cultural items
+      for (const evt of matchedEvents) {
+        const normEvtTitle = evt.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+        // Look for a cultural match
+        const cultMatch = matchedCultural.find((c) => {
+          const normCultTitle = c.performanceTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
+          return normEvtTitle.includes(normCultTitle) || normCultTitle.includes(normEvtTitle);
+        });
+
+        if (cultMatch) {
+          usedCulturalIds.add(cultMatch.id);
+          const timeSlot = cultMatch.timeSlot || evt.timeSlot;
+          combined.push({
+            id: `combined-${evt.id}-${cultMatch.id}`,
+            source: 'both',
+            title: cultMatch.performanceTitle || evt.title,
+            timeSlot,
+            startTimeMinutes: parseTimeToMinutes(timeSlot),
+            category: cultMatch.actCategory || evt.category,
+            location: evt.location || 'Mandap Stage',
+            description: cultMatch.description || evt.description,
+            performers: cultMatch.performers,
+            durationMins: cultMatch.durationMins,
+            rituals: evt.rituals,
+            spocName: evt.spocName,
+            spocPhone: evt.spocPhone,
+            iconType: getScheduleIconType({ title: evt.title, category: evt.category, actCategory: cultMatch.actCategory }),
+          });
+        } else {
+          combined.push({
+            id: evt.id,
+            source: 'event',
+            title: evt.title,
+            timeSlot: evt.timeSlot,
+            startTimeMinutes: parseTimeToMinutes(evt.timeSlot),
+            category: evt.category,
+            location: evt.location,
+            description: evt.description,
+            rituals: evt.rituals,
+            spocName: evt.spocName,
+            spocPhone: evt.spocPhone,
+            iconType: getScheduleIconType({ title: evt.title, category: evt.category }),
+          });
+        }
+      }
+    }
+
+    // 2. Add remaining standalone Cultural performances for this day
+    for (const cult of matchedCultural) {
+      if (!usedCulturalIds.has(cult.id)) {
+        combined.push({
+          id: cult.id,
+          source: 'cultural',
+          title: cult.performanceTitle,
+          timeSlot: cult.timeSlot,
+          startTimeMinutes: parseTimeToMinutes(cult.timeSlot),
+          category: cult.actCategory || 'Cultural Performance',
+          location: 'Mandap Stage',
+          description: cult.description,
+          performers: cult.performers,
+          durationMins: cult.durationMins,
+          iconType: getScheduleIconType({ title: cult.performanceTitle, actCategory: cult.actCategory }),
+        });
+      }
+    }
+
+    // 3. Sort by startTimeMinutes chronologically ascending
+    combined.sort((a, b) => a.startTimeMinutes - b.startTimeMinutes);
+
+    return {
+      dateLabel,
+      targetDate: effectiveDate,
+      dayNumber: dayNum,
+      items: combined,
+    };
+  } catch (err) {
+    console.warn('Error fetching today combined schedule:', err);
+    return {
+      dateLabel,
+      targetDate: effectiveDate,
+      dayNumber: dayNum,
+      items: [],
     };
   }
 }

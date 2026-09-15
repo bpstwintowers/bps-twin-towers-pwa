@@ -25,24 +25,6 @@ export const GaneshBannerOverlay: React.FC<Props> = ({
             flexWrap: 'wrap',
           }}
         >
-          {/* Invitation Text */}
-          <p
-            style={{
-              margin: 0,
-              fontSize: 'clamp(0.78rem, 1.15vw, 0.88rem)',
-              lineHeight: 1.45,
-              color: '#f8fafc',
-              fontWeight: 500,
-              flex: '1 1 260px',
-            }}
-          >
-            Join the entire BPS Twin Towers family for the auspicious{' '}
-            <strong style={{ color: '#fef08a' }}>Ganesh Sthapana</strong>, evening{' '}
-            <strong style={{ color: '#fed7aa' }}>Aarti</strong>, cultural performances by{' '}
-            <strong style={{ color: '#fed7aa' }}>children</strong>, and community{' '}
-            <strong style={{ color: '#fef08a' }}>Mahaprasad dinner</strong>.
-          </p>
-
           {/* Action Links (Side by Side) */}
           <div
             style={{

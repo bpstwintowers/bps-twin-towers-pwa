@@ -28,6 +28,7 @@ import {
   type PoojaDaySchedule,
   type CommitteeTeam,
 } from './poojaScheduleData';
+import { getFestivalDayMeta } from '../../services/liveSheetService';
 import { GaneshBottomNav } from './components/GaneshBottomNav';
 import { HeaderNavbar } from './components/HeaderNavbar';
 import './PoojaSchedule.css';
@@ -38,8 +39,8 @@ export const PoojaSchedulePage: React.FC = () => {
   // Active view tabs: 'schedule' (14th - 19th Sep) vs 'teams' (Teams & SPOCs)
   const [activeMainTab, setActiveMainTab] = useState<'schedule' | 'teams'>('schedule');
 
-  // Active Selected Day (1 to 6)
-  const [selectedDayNumber, setSelectedDayNumber] = useState<number>(1);
+  // Active Selected Day (1 to 6) - dynamically defaults to Today's date (e.g. Day 2 on 15th Sep)
+  const [selectedDayNumber, setSelectedDayNumber] = useState<number>(() => getFestivalDayMeta(new Date()).dayNumber);
 
   // Teams & SPOC Filters
   const [selectedTeamFilter, setSelectedTeamFilter] = useState<string>('ALL');
