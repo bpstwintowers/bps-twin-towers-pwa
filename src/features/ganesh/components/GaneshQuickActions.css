@@ -69,14 +69,14 @@
 /* 2. Photo Hero Card */
 .ganesh-photo-hero-card {
   position: relative;
-  border-radius: 22px;
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 14px 34px -8px rgba(15, 23, 42, 0.35), 0 8px 16px -4px rgba(234, 88, 12, 0.2);
-  min-height: 290px;
+  box-shadow: 0 16px 40px -10px rgba(15, 23, 42, 0.4), 0 8px 20px -4px rgba(234, 88, 12, 0.25);
+  min-height: 320px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 1.75rem 1.5rem;
+  padding: 2rem 1.6rem 1.75rem 1.6rem;
   color: #ffffff;
   background: #0f172a;
 }
@@ -88,12 +88,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 30%;
-  transition: transform 0.6s ease;
+  object-position: center 18%;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .ganesh-photo-hero-card:hover .ganesh-photo-hero-img {
-  transform: scale(1.02);
+  transform: scale(1.03);
 }
 
 .ganesh-photo-hero-overlay {
