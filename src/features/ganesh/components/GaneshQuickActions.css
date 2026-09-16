@@ -795,6 +795,49 @@
   font-family: 'Inter', sans-serif;
 }
 
+.overview-stat-cell.is-clickable {
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.overview-stat-cell.is-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+}
+
+.overview-stat-cell.stat-donations.is-clickable:hover {
+  border-color: #3b82f6;
+  background: #e0f2fe;
+}
+
+.overview-stat-cell.stat-expenses.is-clickable:hover {
+  border-color: #ef4444;
+  background: #fee2e2;
+}
+
+.overview-stat-cell.stat-balance.is-clickable:hover {
+  border-color: #22c55e;
+  background: #dcfce7;
+}
+
+.overview-stat-cell.is-clickable:active {
+  transform: translateY(0);
+}
+
+.donut-legend-item.is-clickable {
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.donut-legend-item.is-clickable:hover {
+  background: #f1f5f9;
+  color: #ea580c;
+}
+
 @media (max-width: 480px) {
   .overview-stats-grid {
     grid-template-columns: 1fr;

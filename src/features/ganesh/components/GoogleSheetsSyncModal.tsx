@@ -63,12 +63,69 @@ function doPost(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var data = JSON.parse(e.postData.contents);
     
-    // 1. Handle Expenses Appending (action === 'saveExpense')
-    if (data.action === 'saveExpense' || data.category || data.amount) {
+    // 1. Handle Expenses (saveExpense / updateExpense / deleteExpense)
+    if (data.action === 'saveExpense' || data.action === 'updateExpense' || data.action === 'deleteExpense' || data.category || data.amount) {
       var expSheet = ss.getSheetByName('Expenses') || ss.insertSheet('Expenses');
       var lastRow = expSheet.getLastRow();
-      var nextSlNo = lastRow > 0 ? lastRow : 1;
       
+      // Look for existing row by invoice number or matching title+paidTo
+      var targetRow = -1;
+      if (lastRow > 1 && (data.originalInvoiceNo || data.invoiceNo || data.title)) {
+        var values = expSheet.getRange(1, 1, lastRow, 10).getValues();
+        var searchInv = (data.originalInvoiceNo || data.invoiceNo || '').toString().trim().toLowerCase();
+        var searchTitle = (data.title || '').toString().trim().toLowerCase();
+        var searchPaidTo = (data.paidTo || '').toString().trim().toLowerCase();
+        
+        for (var r = 1; r < values.length; r++) {
+          var rowInv = (values[r][8] || '').toString().trim().toLowerCase(); // Col 9 (Invoice)
+          var rowTitle = (values[r][1] || '').toString().trim().toLowerCase(); // Col 2 (Title)
+          var rowPaidTo = (values[r][4] || '').toString().trim().toLowerCase(); // Col 5 (PaidTo)
+          
+          if (searchInv && rowInv && rowInv === searchInv) {
+            targetRow = r + 1;
+            break;
+          } else if (searchTitle && rowTitle === searchTitle && (!searchPaidTo || rowPaidTo === searchPaidTo)) {
+            targetRow = r + 1;
+            break;
+          }
+        }
+      }
+      
+      // Delete Action
+      if (data.action === 'deleteExpense') {
+        if (targetRow !== -1) {
+          expSheet.deleteRow(targetRow);
+          return ContentService.createTextOutput(
+            JSON.stringify({ status: 'success', message: 'Expense row deleted successfully' })
+          ).setMimeType(ContentService.MimeType.JSON);
+        }
+        return ContentService.createTextOutput(
+          JSON.stringify({ status: 'not_found', message: 'Expense row not found to delete' })
+        ).setMimeType(ContentService.MimeType.JSON);
+      }
+      
+      // Update Existing Row in place
+      if (targetRow !== -1 && (data.action === 'updateExpense' || data.originalInvoiceNo)) {
+        expSheet.getRange(targetRow, 1, 1, 10).setValues([[
+          targetRow - 1,
+          data.title || '',
+          data.category || 'Other Festival Expenses',
+          data.amount || 0,
+          data.paidTo || '',
+          data.paymentMode || 'UPI',
+          data.expenseDate || new Date().toISOString().split('T')[0],
+          data.status || 'Paid',
+          data.invoiceNo || ('INV-' + new Date().getTime()),
+          data.notes || ''
+        ]]);
+        
+        return ContentService.createTextOutput(
+          JSON.stringify({ status: 'success', message: 'Expense record updated successfully', row: targetRow })
+        ).setMimeType(ContentService.MimeType.JSON);
+      }
+      
+      // Otherwise: Append New Row
+      var nextSlNo = lastRow > 0 ? lastRow : 1;
       expSheet.appendRow([
         nextSlNo,
         data.title || '',

@@ -44,6 +44,7 @@ export const GaneshExpensesPage: React.FC = () => {
   };
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     loadData();
 
     const checkAdmin = async () => {

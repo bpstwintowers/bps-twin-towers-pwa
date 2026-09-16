@@ -15,6 +15,7 @@ import {
   Droplets,
   Vote,
   Flame,
+  Star,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -108,6 +109,13 @@ export const NAVIGATION_ITEMS: NavItemConfig[] = [
     label: 'Resident Surveys',
     path: '/surveys',
     icon: Vote,
+    section: 'general',
+  },
+  {
+    id: 'builder-feedback',
+    label: 'Builder Reviews',
+    path: '/builder-feedback',
+    icon: Star,
     section: 'general',
   },
   {
@@ -216,5 +224,13 @@ export const NAVIGATION_ITEMS: NavItemConfig[] = [
     icon: Shield,
     section: 'management',
     requiredRoles: ['admin', 'security', 'gate'],
+  },
+  {
+    id: 'admin-builder-reviews',
+    label: 'Builder Reviews Admin',
+    path: '/admin/builder-reviews',
+    icon: Star,
+    section: 'management',
+    requiredRoles: ['admin', 'super_admin', 'society admin', 'communication', 'pr'],
   },
 ];

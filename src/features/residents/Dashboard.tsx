@@ -15,6 +15,8 @@ import {
   ThumbsUp,
   Vote,
   Flame,
+  Star,
+  Building,
 } from 'lucide-react';
 import './Dashboard.css';
 
@@ -270,6 +272,100 @@ export const ResidentDashboard: React.FC = () => {
             }}
           >
             <span>Explore & Post Strategy</span>
+            <ArrowRight size={15} />
+          </button>
+        </div>
+      </section>
+
+      {/* Builder Feedback & Google Review Banner */}
+      <section
+        className="dashboard-water-spotlight animate-fade-in"
+        style={{
+          background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+          borderRadius: 'var(--radius-xl, 16px)',
+          padding: '1.4rem 1.5rem',
+          color: '#ffffff',
+          boxShadow: '0 8px 24px -4px rgba(0, 0, 0, 0.25)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1.25rem',
+          flexWrap: 'wrap',
+          cursor: 'pointer',
+          marginTop: '1.25rem',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+        }}
+        onClick={() => navigate('/builder-feedback')}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', maxWidth: '640px' }}>
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              background: 'rgba(245, 158, 11, 0.2)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#f59e0b',
+              flexShrink: 0,
+            }}
+          >
+            <Star size={24} className="fill-amber-400 text-amber-400" />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <span
+                style={{
+                  background: 'rgba(59, 130, 246, 0.2)',
+                  border: '1px solid rgba(96, 165, 250, 0.4)',
+                  color: '#93c5fd',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  padding: '0.15rem 0.55rem',
+                  borderRadius: '9999px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                Google Review Sync
+              </span>
+              <span style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>BPS Developers Feedback</span>
+            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
+              Rate Your Living Experience & Builder Handover
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
+              Submit your ratings for construction quality, finishing & amenities. Generate a 1080p Google Review image card and post directly to Google!
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button
+            type="button"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+              color: '#ffffff',
+              border: 'none',
+              padding: '0.65rem 1.15rem',
+              borderRadius: '10px',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)',
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate('/builder-feedback');
+            }}
+          >
+            <span>Write Review & Get Card</span>
             <ArrowRight size={15} />
           </button>
         </div>

@@ -59,11 +59,6 @@ export const GaneshFundsPage: React.FC<GaneshFundsPageProps> = ({ embedded = fal
 
   const handleTabSwitch = (tab: 'sponsors' | 'contributions') => {
     setActiveViewTab(tab);
-    setTimeout(() => {
-      if (tabSectionRef.current) {
-        tabSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 60);
   };
 
   // Voluntary Contributions State
@@ -92,6 +87,7 @@ export const GaneshFundsPage: React.FC<GaneshFundsPageProps> = ({ embedded = fal
   };
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     loadData();
   }, []);
 

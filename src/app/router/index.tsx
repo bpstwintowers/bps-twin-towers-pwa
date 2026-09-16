@@ -1,7 +1,19 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ProtectedRoute } from '../guards/ProtectedRoute';
 import { AdminRoute } from '../guards/AdminRoute';
+
+const ScrollToTop: React.FC = () => {
+  const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.body.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [pathname]);
+
+  return null;
+};
 
 import { AppLayout } from '../../components/layout/AppLayout';
 import { SearchProvider } from '../../context/SearchContext';
@@ -104,10 +116,16 @@ const ComplaintForm = lazy(() =>
 const ComplaintDetails = lazy(() =>
   import('../../features/complaints/ComplaintDetails').then((m) => ({ default: m.ComplaintDetails }))
 );
+const BuilderFeedbackForm = lazy(() =>
+  import('../../features/builderFeedback/BuilderFeedbackForm').then((m) => ({ default: m.BuilderFeedbackForm }))
+);
 
 // Lazy loaded admin routes
 const AdminPermissions = lazy(() =>
   import('../../features/admin/AdminPermissions').then((m) => ({ default: m.AdminPermissions }))
+);
+const AdminReviewHub = lazy(() =>
+  import('../../features/builderFeedback/AdminReviewHub').then((m) => ({ default: m.AdminReviewHub }))
 );
 const AdminEvents = lazy(() =>
   import('../../features/admin/AdminEvents').then((m) => ({ default: m.AdminEvents }))
@@ -248,6 +266,7 @@ const WaterPortalRoute: React.FC = () => {
 export const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <SearchProvider>
         <Suspense fallback={<PageLoader />}>
           <Routes>
@@ -289,6 +308,8 @@ export const AppRouter: React.FC = () => {
               <Route path="/notifications" element={<NotificationCenter />} />
               <Route path="/announcements" element={<AnnouncementList />} />
               <Route path="/surveys" element={<ResidentSurveys />} />
+              <Route path="/builder-feedback" element={<BuilderFeedbackForm />} />
+              <Route path="/builder-reviews" element={<BuilderFeedbackForm />} />
               <Route path="/settings/notifications" element={<NotificationPreferences />} />
               <Route path="/my-visitors" element={<VisitorManagement />} />
               <Route path="/security" element={<SecurityConsole />} />
@@ -338,6 +359,11 @@ export const AppRouter: React.FC = () => {
 
               <Route element={<AdminRoute requiredRoles={['admin', 'security', 'gate']} />}>
                 <Route path="/visitors-manage" element={<AdminVisitors />} />
+              </Route>
+
+              <Route element={<AdminRoute requiredRoles={['admin', 'super_admin', 'society admin', 'communication', 'pr']} />}>
+                <Route path="/admin/builder-reviews" element={<AdminReviewHub />} />
+                <Route path="/builder-reviews-manage" element={<AdminReviewHub />} />
               </Route>
 
               {/* Backwards-compatible legacy admin paths redirects */}

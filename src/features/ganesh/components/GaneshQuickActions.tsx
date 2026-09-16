@@ -396,7 +396,10 @@ export const GaneshQuickActions: React.FC<Props> = ({
           <button
             type="button"
             className="quick-action-item"
-            onClick={() => navigate('/ganesh-funds')}
+            onClick={() => {
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+              navigate('/ganesh-funds');
+            }}
             title="Festival Collections & Budget Audit"
           >
             <div className="quick-action-squircle squircle-funds">
@@ -409,7 +412,10 @@ export const GaneshQuickActions: React.FC<Props> = ({
           <button
             type="button"
             className="quick-action-item"
-            onClick={() => navigate('/ganesh-expenses')}
+            onClick={() => {
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+              navigate('/ganesh-expenses');
+            }}
             title="Festival Expenditures & Invoices"
           >
             <div className="quick-action-squircle squircle-expenses">
@@ -573,11 +579,29 @@ export const GaneshQuickActions: React.FC<Props> = ({
           </div>
 
           <div className="donut-legend-wrap">
-            <div className="donut-legend-item">
+            <div
+              className="donut-legend-item is-clickable"
+              onClick={() => {
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                navigate('/ganesh-funds');
+              }}
+              role="button"
+              tabIndex={0}
+              title="Click to view Donations & Community Fund"
+            >
               <div className="donut-legend-dot dot-income" />
               <span>Income</span>
             </div>
-            <div className="donut-legend-item">
+            <div
+              className="donut-legend-item is-clickable"
+              onClick={() => {
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                navigate('/ganesh-expenses');
+              }}
+              role="button"
+              tabIndex={0}
+              title="Click to view Expenses & Ledger"
+            >
               <div className="donut-legend-dot dot-expenses" />
               <span>Expenses</span>
             </div>
@@ -586,15 +610,42 @@ export const GaneshQuickActions: React.FC<Props> = ({
 
         {/* Combined 3 Metrics Strip Inside Overview */}
         <div className="overview-stats-grid">
-          <div className="overview-stat-cell stat-donations">
+          <div
+            className="overview-stat-cell stat-donations is-clickable"
+            onClick={() => {
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+              navigate('/ganesh-funds');
+            }}
+            role="button"
+            tabIndex={0}
+            title="Click to view Donations & Community Fund"
+          >
             <span className="stat-label">Total Donations</span>
             <span className="stat-val">{formatRupee(totalDonations)}</span>
           </div>
-          <div className="overview-stat-cell stat-expenses">
+          <div
+            className="overview-stat-cell stat-expenses is-clickable"
+            onClick={() => {
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+              navigate('/ganesh-expenses');
+            }}
+            role="button"
+            tabIndex={0}
+            title="Click to view Expenses & Ledger"
+          >
             <span className="stat-label">Total Expenses</span>
             <span className="stat-val">{formatRupee(totalExpenses)}</span>
           </div>
-          <div className="overview-stat-cell stat-balance">
+          <div
+            className="overview-stat-cell stat-balance is-clickable"
+            onClick={() => {
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+              navigate('/ganesh-funds');
+            }}
+            role="button"
+            tabIndex={0}
+            title="Click to view Financial Overview & Balance"
+          >
             <span className="stat-label">Current Balance</span>
             <span className="stat-val">{formatRupee(currentBalance)}</span>
           </div>

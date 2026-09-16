@@ -761,7 +761,7 @@ export function addGaneshExpense(expense: Omit<GaneshExpenseRecord, 'id'> | Omit
   const updated = [newRec, ...current];
   localStorage.setItem(EXPENSES_STORAGE_KEY, JSON.stringify(updated));
 
-  syncExpenseToGoogleSheet(newRec);
+  syncExpenseToGoogleSheet(newRec, false);
 
   return newRec;
 }
@@ -769,30 +769,39 @@ export function addGaneshExpense(expense: Omit<GaneshExpenseRecord, 'id'> | Omit
 export function updateGaneshExpense(id: string, updatedFields: Partial<GaneshExpenseRecord>): GaneshExpenseRecord | null {
   const current = getGaneshExpenses();
   let updatedRec: GaneshExpenseRecord | null = null;
+  let originalInvoiceNo: string | undefined;
+
   const updated = current.map((e) => {
     if (e.id === id) {
+      originalInvoiceNo = e.invoiceNo;
       updatedRec = { ...e, ...updatedFields };
       return updatedRec;
     }
     return e;
   });
+
   localStorage.setItem(EXPENSES_STORAGE_KEY, JSON.stringify(updated));
 
   if (updatedRec) {
-    syncExpenseToGoogleSheet(updatedRec);
+    syncExpenseToGoogleSheet(updatedRec, true, originalInvoiceNo);
   }
 
   return updatedRec;
 }
 
-export async function syncExpenseToGoogleSheet(expense: GaneshExpenseRecord): Promise<void> {
+export async function syncExpenseToGoogleSheet(
+  expense: GaneshExpenseRecord,
+  isUpdate: boolean = false,
+  originalInvoiceNo?: string
+): Promise<void> {
   const webhookUrl = getExpensesAppsScriptUrl();
   if (!webhookUrl) return;
 
   try {
     const payload = {
-      action: 'saveExpense',
+      action: isUpdate ? 'updateExpense' : 'saveExpense',
       invoiceNo: expense.invoiceNo || `INV-${Date.now()}`,
+      originalInvoiceNo: originalInvoiceNo || expense.invoiceNo,
       title: expense.title,
       category: expense.category,
       amount: expense.amount,
@@ -817,8 +826,37 @@ export async function syncExpenseToGoogleSheet(expense: GaneshExpenseRecord): Pr
 
 export function deleteGaneshExpense(id: string): void {
   const current = getGaneshExpenses();
+  const toDelete = current.find((e) => e.id === id);
   const updated = current.filter((e) => e.id !== id);
   localStorage.setItem(EXPENSES_STORAGE_KEY, JSON.stringify(updated));
+
+  if (toDelete) {
+    syncDeleteExpenseToGoogleSheet(toDelete);
+  }
+}
+
+export async function syncDeleteExpenseToGoogleSheet(expense: GaneshExpenseRecord): Promise<void> {
+  const webhookUrl = getExpensesAppsScriptUrl();
+  if (!webhookUrl) return;
+
+  try {
+    const payload = {
+      action: 'deleteExpense',
+      invoiceNo: expense.invoiceNo || '',
+      title: expense.title,
+      amount: expense.amount,
+      paidTo: expense.paidTo || '',
+    };
+
+    await fetch(webhookUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+    });
+  } catch (err) {
+    console.warn('Could not sync expense deletion to webhook:', err);
+  }
 }
 
 export function addGaneshContribution(contribution: Omit<GaneshContributionRecord, 'id' | 'createdAt' | 'tower'>): GaneshContributionRecord {
