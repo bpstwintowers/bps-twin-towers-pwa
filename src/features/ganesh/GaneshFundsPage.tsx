@@ -59,6 +59,9 @@ export const GaneshFundsPage: React.FC<GaneshFundsPageProps> = ({ embedded = fal
 
   const handleTabSwitch = (tab: 'sponsors' | 'contributions') => {
     setActiveViewTab(tab);
+    setTimeout(() => {
+      tabSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
   };
 
   // Voluntary Contributions State
@@ -147,92 +150,96 @@ export const GaneshFundsPage: React.FC<GaneshFundsPageProps> = ({ embedded = fal
     return blocks;
   }, [contributions]);
 
-  // Sponsorship Elements List dynamically matched with live Google Sheets entries
-  const sponsorElements: SponsorElement[] = useMemo(() => {
-    const list: SponsorElement[] = [];
+  // Extract live sponsors from Google Sheet or fallback to verified records
+  const sponsorsList = useMemo(() => {
+    const liveSponsors = contributions.filter((c) => c.isSponsor);
+    if (liveSponsors.length > 0) return liveSponsors;
 
-    // 1. Find live sponsors from Google Sheet
-    const findSponsor = (keyword: RegExp) => {
-      return contributions.find(
-        (c) =>
-          keyword.test(c.donorName) ||
-          (c.sponsorCategory && keyword.test(c.sponsorCategory)) ||
-          (c.notes && keyword.test(c.notes))
-      );
-    };
-
-    const pujariSponsor = findSponsor(/pujari|priest/i);
-    const idolSponsor = findSponsor(/idol|vigraha/i);
-    const poojaItemSponsor = findSponsor(/pooja item|samagri/i);
-    const ladduSponsor = findSponsor(/laddu/i);
-    const prasadamSponsor = findSponsor(/mahaprasadam|prasadam/i);
-    const flowerSponsor = findSponsor(/flower|pushpa|decor/i);
-    const soundSponsor = findSponsor(/sound|mic|audio/i);
-
-    // 1. Pujari Sponsor & Daily Prasadam
-    list.push({
-      id: 'pujari-sponsor',
-      name: 'Pujari Sponsor & Daily Prasadam',
-      amount: pujariSponsor?.amount || 64000,
-      badgeAmount: `₹${(pujariSponsor?.amount || 64000).toLocaleString('en-IN')}`,
-      description: 'Daily Priest Seva & Morning/Evening Prasadam for all 6 days',
-      isSponsored: true,
-      sponsorName: pujariSponsor ? pujariSponsor.donorName : 'Chandra Shekhar V',
-      sponsorFlat: pujariSponsor ? pujariSponsor.flatNo : 'B1609',
-    });
-
-    // 2. Idol Sponsor
-    list.push({
-      id: 'idol-sponsor',
-      name: 'Idol Sponsor',
-      amount: idolSponsor?.amount || 22500,
-      badgeAmount: `₹${(idolSponsor?.amount || 22500).toLocaleString('en-IN')}`,
-      description: 'Sacred Lord Ganesh Vigraha (Idol) & Mandap Sthapana sponsorship',
-      isSponsored: true,
-      sponsorName: idolSponsor ? idolSponsor.donorName : 'Sanjay Banerjee',
-      sponsorFlat: idolSponsor ? idolSponsor.flatNo : 'A1711',
-    });
-
-    // 3. Pooja Item Sponsor
-    list.push({
-      id: 'pooja-item-sponsor',
-      name: 'Pooja Item Sponsor',
-      amount: poojaItemSponsor?.amount || 15001,
-      badgeAmount: `₹${(poojaItemSponsor?.amount || 15001).toLocaleString('en-IN')}`,
-      description: 'Vedic Homam, Puja Samagri, 21 Patra, Kalasha & Abhishekam items',
-      isSponsored: true,
-      sponsorName: poojaItemSponsor ? poojaItemSponsor.donorName : 'Nagoju Praveen',
-      sponsorFlat: poojaItemSponsor ? poojaItemSponsor.flatNo : 'B606',
-    });
-
-    // 4. Mahaprasadam Sponsor
-    list.push({
-      id: 'mahaprasadam-sponsor',
-      name: 'Mahaprasadam Sponsor',
-      amount: prasadamSponsor?.amount || 5116,
-      badgeAmount: `₹${(prasadamSponsor?.amount || 5116).toLocaleString('en-IN')}`,
-      description: 'Grand Community Mahaprasad Feast meal for 150+ residents',
-      isSponsored: true,
-      sponsorName: prasadamSponsor ? prasadamSponsor.donorName : 'Mahidhar',
-      sponsorFlat: prasadamSponsor ? prasadamSponsor.flatNo : 'A1701',
-    });
-
-    // 5. Laddu Sponsor
-    list.push({
-      id: 'laddu-sponsor',
-      name: 'Laddu Sponsor',
-      amount: ladduSponsor?.amount || 0,
-      badgeAmount: ladduSponsor?.amount ? `₹${ladduSponsor.amount.toLocaleString('en-IN')}` : '₹0',
-      description: 'Sacred 21-Kg Maha Laddu for community auction & blessing',
-      isSponsored: true,
-      sponsorName: ladduSponsor ? ladduSponsor.donorName : 'Siddharth Giri',
-      sponsorFlat: ladduSponsor ? ladduSponsor.flatNo : 'B1206',
-    });
-
-    return list;
+    // Fallback verified sponsors
+    return [
+      {
+        id: 'sp-1',
+        slNo: 1,
+        donorName: 'Chandra Shekhar V',
+        flatNo: 'B1609',
+        tower: 'B' as const,
+        amount: 64000,
+        contributionType: 'Pujari Dakshina' as const,
+        isSponsor: true,
+        sponsorCategory: 'Pujari Sponsor & Daily Prasadam',
+        paymentMode: 'UPI' as const,
+        notes: 'Daily Priest Seva & Morning/Evening Prasadam for all 6 days',
+        verified: true,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'sp-2',
+        slNo: 2,
+        donorName: 'Sanjay Banerjee',
+        flatNo: 'A1711',
+        tower: 'A' as const,
+        amount: 22500,
+        contributionType: 'Other' as const,
+        isSponsor: true,
+        sponsorCategory: 'Idol Sponsor',
+        paymentMode: 'UPI' as const,
+        notes: 'Sacred Lord Ganesh Vigraha (Idol) & Mandap Sthapana sponsorship',
+        verified: true,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'sp-3',
+        slNo: 3,
+        donorName: 'Siddharth Giri',
+        flatNo: 'B1206',
+        tower: 'B' as const,
+        amount: 0,
+        contributionType: 'Laddu Auction' as const,
+        isSponsor: true,
+        sponsorCategory: 'Laddu Sponsor',
+        paymentMode: 'UPI' as const,
+        notes: 'Sacred 21-Kg Maha Laddu for community auction & blessing',
+        verified: true,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'sp-4',
+        slNo: 4,
+        donorName: 'Nagoju Praveen',
+        flatNo: 'B606',
+        tower: 'B' as const,
+        amount: 15001,
+        contributionType: 'Pooja Item' as const,
+        isSponsor: true,
+        sponsorCategory: 'Pooja Item Sponsor',
+        paymentMode: 'UPI' as const,
+        notes: 'Vedic Homam, Puja Samagri, 21 Patra, Kalasha & Abhishekam items',
+        verified: true,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'sp-5',
+        slNo: 5,
+        donorName: 'Mahidhar',
+        flatNo: 'A1701',
+        tower: 'A' as const,
+        amount: 5116,
+        contributionType: 'Mahaprasadam' as const,
+        isSponsor: true,
+        sponsorCategory: 'Mahaprasadam Sponsor',
+        paymentMode: 'UPI' as const,
+        notes: 'Grand Community Mahaprasad Feast meal for 150+ residents',
+        verified: true,
+        createdAt: new Date().toISOString(),
+      },
+    ];
   }, [contributions]);
 
-  // Resident Voluntary Contributions (Excluding the 5 special sponsors)
+  const totalSponsorAmount = useMemo(() => {
+    return sponsorsList.reduce((sum, c) => sum + (c.amount || 0), 0);
+  }, [sponsorsList]);
+
+  // Resident Voluntary Contributions (Excluding sponsors)
   const voluntaryContributions = useMemo(() => {
     return contributions.filter((c) => !c.isSponsor);
   }, [contributions]);
@@ -271,9 +278,35 @@ export const GaneshFundsPage: React.FC<GaneshFundsPageProps> = ({ embedded = fal
     return list;
   }, [voluntaryContributions, voluntaryFilter, voluntarySearch]);
 
-  const handleSponsorClick = (element: SponsorElement) => {
-    setSelectedSponsorElement({ name: element.name, amount: element.amount });
+  const handleSponsorClick = (item: { name: string; amount: number }) => {
+    setSelectedSponsorElement({ name: item.name, amount: item.amount });
     setIsPayModalOpen(true);
+  };
+
+  const getSponsorDescription = (sponsor: GaneshContributionRecord) => {
+    if (sponsor.notes && sponsor.notes.trim()) return sponsor.notes;
+    const cat = (sponsor.sponsorCategory || sponsor.contributionType || '').toLowerCase();
+    const name = sponsor.donorName.toLowerCase();
+
+    if (cat.includes('pujari') || cat.includes('priest') || name.includes('chandra shekhar')) {
+      return 'Daily Priest Seva & Morning/Evening Prasadam for all 6 days';
+    }
+    if (cat.includes('idol') || name.includes('sanjay')) {
+      return 'Sacred Lord Ganesh Vigraha (Idol) & Mandap Sthapana sponsorship';
+    }
+    if (cat.includes('pooja') || cat.includes('samagri') || name.includes('nagoju')) {
+      return 'Vedic Homam, Puja Samagri, 21 Patra, Kalasha & Abhishekam items';
+    }
+    if (cat.includes('mahaprasadam') || cat.includes('prasadam') || name.includes('mahidhar')) {
+      return 'Grand Community Mahaprasad Feast meal for 150+ residents';
+    }
+    if (cat.includes('laddu') || name.includes('siddharth')) {
+      return 'Sacred 21-Kg Maha Laddu for community auction & blessing';
+    }
+    if (cat.includes('flower') || cat.includes('decor')) {
+      return 'Daily flower garlands & mandap floral alankaram';
+    }
+    return 'Special Festive Seva Contribution & Divine Patronage';
   };
 
   const formatRupee = (val: number) => `₹${val.toLocaleString('en-IN')}`;
@@ -333,7 +366,7 @@ export const GaneshFundsPage: React.FC<GaneshFundsPageProps> = ({ embedded = fal
             >
               <Sparkles size={15} />
               <span>Sponsors</span>
-              <span className="fund-nav-tab-badge">5</span>
+              <span className="fund-nav-tab-badge">{sponsorsList.length}</span>
             </button>
 
             <button
@@ -411,62 +444,82 @@ export const GaneshFundsPage: React.FC<GaneshFundsPageProps> = ({ embedded = fal
 
         {/* 5. Special Sponsors & Seva Patrons Section (Visible when activeViewTab === 'sponsors') */}
         {activeViewTab === 'sponsors' && (
-          <section ref={tabSectionRef} className="fund-sponsor-section" aria-label="Sponsor an Element">
+          <section ref={tabSectionRef} className="fund-sponsor-section" aria-label="Special Sponsors & Seva Patrons">
             <div className="fund-sponsor-heading-box">
-              <h2 className="fund-section-title">Special Sponsors &amp; Seva Patrons</h2>
-              <p className="fund-sponsor-subtitle">
-                Total Sponsored: <strong>₹1,06,617</strong> (5 Sponsors) • Synced from Google Sheets
-              </p>
+              <div className="fund-sponsor-title-header">
+                <div>
+                  <h2 className="fund-section-title" style={{ margin: 0 }}>Special Sponsors &amp; Seva Patrons</h2>
+                  <p className="fund-sponsor-subtitle" style={{ marginTop: '0.2rem' }}>
+                    Total Sponsored: <strong>{formatRupee(totalSponsorAmount)}</strong> ({sponsorsList.length} Sponsors) • Synced from Google Sheets
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className="fund-voluntary-contribute-btn sponsor-add-btn"
+                  onClick={() => {
+                    setSelectedSponsorElement({ name: 'Special Festive Seva Sponsorship', amount: 5001 });
+                    setIsPayModalOpen(true);
+                  }}
+                >
+                  + Sponsor Seva
+                </button>
+              </div>
             </div>
 
+            {/* List of Verified Live Sponsors */}
             <div className="fund-sponsor-cards-grid">
-              {sponsorElements.map((element) => {
-                if (element.isSponsored) {
-                  // Sponsored State Card with Amount & Status
-                  return (
-                    <div key={element.id} className="sponsor-element-card is-sponsored">
-                      <div className="sponsor-card-gold-stripe" />
+              {sponsorsList.map((sponsor) => {
+                const isTowerA = sponsor.flatNo.toUpperCase().startsWith('A');
+                const isTowerB = sponsor.flatNo.toUpperCase().startsWith('B');
+                const sponsorTitle =
+                  sponsor.sponsorCategory ||
+                  (sponsor.contributionType && sponsor.contributionType !== 'General Contribution'
+                    ? `${sponsor.contributionType} Sponsor`
+                    : 'Special Seva Sponsor');
 
-                      <div className="sponsor-card-top-row">
-                        <span className="sponsor-element-name">{element.name}</span>
-                        <div className="sponsor-badges-group">
-                          <span className="sponsor-badge-amount">{element.badgeAmount}</span>
-                          <span className="sponsor-badge-sponsored">
-                            <Check size={13} strokeWidth={2.5} />
-                            <span>Sponsored</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      <p className="sponsor-element-desc">{element.description}</p>
-
-                      <div className="sponsor-acknowledgment">
-                        Generously sponsored by <strong>{element.sponsorName}</strong> {element.sponsorFlat ? `(${element.sponsorFlat})` : ''}
-                      </div>
-                    </div>
-                  );
-                }
-
-                // Available for Sponsorship Card
                 return (
-                  <div key={element.id} className="sponsor-element-card is-available">
-                    {/* Top Golden Accent Stripe */}
+                  <div key={sponsor.id} className="sponsor-element-card is-sponsored">
                     <div className="sponsor-card-gold-stripe" />
 
                     <div className="sponsor-card-top-row">
-                      <span className="sponsor-element-name">{element.name}</span>
-                      <span className="sponsor-badge-amount">{element.badgeAmount}</span>
+                      <div className="sponsor-card-title-wrap">
+                        <span className="sponsor-element-icon">🌟</span>
+                        <span className="sponsor-element-name">{sponsorTitle}</span>
+                      </div>
+
+                      <div className="sponsor-badges-group">
+                        <span className="sponsor-badge-amount">
+                          {sponsor.amount > 0 ? formatRupee(sponsor.amount) : 'Sacred Seva'}
+                        </span>
+                        <span className="sponsor-badge-sponsored">
+                          <Check size={13} strokeWidth={2.5} />
+                          <span>Sponsored</span>
+                        </span>
+                      </div>
                     </div>
 
-                    <p className="sponsor-element-desc">{element.description}</p>
+                    <p className="sponsor-element-desc">{getSponsorDescription(sponsor)}</p>
 
-                    <button
-                      type="button"
-                      className="sponsor-this-btn"
-                      onClick={() => handleSponsorClick(element)}
-                    >
-                      Sponsor This
-                    </button>
+                    <div className="sponsor-acknowledgment">
+                      <div className="sponsor-ack-left">
+                        <span className="sponsor-ack-label">Generously Sponsored by</span>
+                        <div className="sponsor-ack-donor-row">
+                          <strong className="sponsor-donor-name">{sponsor.donorName}</strong>
+                          {sponsor.flatNo && (
+                            <span
+                              className={`sponsor-flat-pill ${
+                                isTowerA ? 'badge-tower-a' : isTowerB ? 'badge-tower-b' : 'badge-other'
+                              }`}
+                            >
+                              {sponsor.flatNo}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <span className="sponsor-mode-pill">{sponsor.paymentMode || 'UPI'}</span>
+                    </div>
                   </div>
                 );
               })}

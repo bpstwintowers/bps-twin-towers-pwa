@@ -259,10 +259,17 @@ export async function submitRegistration(payload: RegistrationPayload): Promise<
   // Ensure user profile exists to satisfy foreign key constraint
   await ensureProfileExists(user);
 
-  // Frontend duplicate check
-  const isDuplicate = await checkDuplicateRegistration(payload.flat_id, payload.requested_membership_type);
-  if (isDuplicate) {
-    throw new Error('You already have a pending or approved registration for this flat and membership type.');
+  // Idempotency: If user already submitted a pending/correction request for this flat, return that ID
+  const { data: existingPending } = await supabase
+    .from('registration_requests')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('flat_id', payload.flat_id)
+    .in('status', ['Pending', 'Correction Required'])
+    .limit(1);
+
+  if (existingPending && existingPending.length > 0) {
+    return { id: existingPending[0].id };
   }
 
   // Check active membership

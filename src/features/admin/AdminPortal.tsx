@@ -23,6 +23,16 @@ import {
   ShieldX,
   Layers,
   Sliders,
+  Eye,
+  FileText,
+  Mail,
+  Phone,
+  Calendar,
+  User,
+  Paperclip,
+  ExternalLink,
+  Download,
+  ShieldCheck,
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import {
@@ -37,6 +47,8 @@ import {
   updateAdminResidentParking,
   fetchAllAvailableRoles,
   fetchAllUsersForPermissionDropdown,
+  generateRegistrationEmail,
+  sendRegistrationNotification,
   type AdminRegistrationItem,
   type AdminResidentItem,
   type AdminFlatItem,
@@ -123,8 +135,9 @@ export const AdminPortal: React.FC = () => {
 
   // Registration Action Modals
   const [selectedRequest, setSelectedRequest] = useState<AdminRegistrationItem | null>(null);
-  const [modalType, setModalType] = useState<'approve' | 'reject' | 'correction' | null>(null);
+  const [modalType, setModalType] = useState<'view' | 'approve' | 'reject' | 'correction' | null>(null);
   const [modalInput, setModalInput] = useState('');
+  const [sendEmailEnabled, setSendEmailEnabled] = useState(true);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -333,10 +346,19 @@ export const AdminPortal: React.FC = () => {
   // Context-aware dynamic statistics for active tabs
   const dynamicStats = useMemo(() => {
     // 1. Registrations Tab Stats
-    const regPending = stats?.pendingCount ?? registrations.filter(r => r.status === 'PENDING').length;
-    const regCorrection = stats?.correctionCount ?? registrations.filter(r => r.status === 'CORRECTION_REQUIRED').length;
-    const regApproved = stats?.approvedCount ?? registrations.filter(r => r.status === 'APPROVED').length;
-    const regRejected = stats?.rejectedCount ?? registrations.filter(r => r.status === 'REJECTED').length;
+    const isStatus = (status: string | null | undefined, target: string) => {
+      const s = (status || '').toLowerCase().trim();
+      if (target === 'pending') return s.includes('pending');
+      if (target === 'correction') return s.includes('correction');
+      if (target === 'approved') return s.includes('approved');
+      if (target === 'rejected') return s.includes('rejected');
+      return false;
+    };
+
+    const regPending = stats?.pendingCount ?? registrations.filter(r => isStatus(r.status, 'pending')).length;
+    const regCorrection = stats?.correctionCount ?? registrations.filter(r => isStatus(r.status, 'correction')).length;
+    const regApproved = stats?.approvedCount ?? registrations.filter(r => isStatus(r.status, 'approved')).length;
+    const regRejected = stats?.rejectedCount ?? registrations.filter(r => isStatus(r.status, 'rejected')).length;
 
     // 2. Residents Tab Stats
     const resTotal = residents.length;
@@ -423,6 +445,13 @@ export const AdminPortal: React.FC = () => {
   };
 
   // Modal Triggers for Registrations
+  const handleOpenView = (req: AdminRegistrationItem) => {
+    setSelectedRequest(req);
+    setModalType('view');
+    setModalInput('');
+    setActionError(null);
+  };
+
   const handleOpenApprove = (req: AdminRegistrationItem) => {
     setSelectedRequest(req);
     setModalType('approve');
@@ -451,25 +480,34 @@ export const AdminPortal: React.FC = () => {
   };
 
   const handleConfirmAction = async () => {
-    if (!selectedRequest || !modalType) return;
+    if (!selectedRequest || !modalType || modalType === 'view') return;
     setActionLoading(true);
     setActionError(null);
     setActionSuccess(null);
 
     try {
+      const emailInfo = generateRegistrationEmail(modalType, selectedRequest, modalInput.trim());
+
       if (modalType === 'approve') {
         await approveRegistrationRequest(selectedRequest.id);
-        setActionSuccess(`Approved registration for flat ${selectedRequest.flat_number}.`);
+        await sendRegistrationNotification(selectedRequest.user_id, 'APPROVED', selectedRequest.flat_number || '');
+        setActionSuccess(`Approved registration for Flat ${selectedRequest.flat_number}. Notification sent.`);
       } else if (modalType === 'reject') {
         const reason = modalInput.trim() || 'Application rejected by administration.';
         await rejectRegistrationRequest(selectedRequest.id, reason);
-        setActionSuccess(`Rejected registration for flat ${selectedRequest.flat_number}.`);
+        await sendRegistrationNotification(selectedRequest.user_id, 'REJECTED', selectedRequest.flat_number || '', reason);
+        setActionSuccess(`Rejected registration for Flat ${selectedRequest.flat_number}. Notification sent.`);
       } else if (modalType === 'correction') {
         if (!modalInput.trim()) {
           throw new Error('Please specify what the resident needs to correct.');
         }
         await requestRegistrationCorrection(selectedRequest.id, modalInput.trim());
-        setActionSuccess(`Correction request sent for flat ${selectedRequest.flat_number}.`);
+        await sendRegistrationNotification(selectedRequest.user_id, 'CORRECTION', selectedRequest.flat_number || '', modalInput.trim());
+        setActionSuccess(`Correction request sent for Flat ${selectedRequest.flat_number}. Notification sent.`);
+      }
+
+      if (sendEmailEnabled && emailInfo && emailInfo.to) {
+        window.open(emailInfo.gmailUrl, '_blank');
       }
 
       handleCloseModal();
@@ -925,7 +963,12 @@ export const AdminPortal: React.FC = () => {
                   </tr>
                 ) : (
                   filteredRegistrations.map((req) => (
-                    <tr key={req.id}>
+                    <tr
+                      key={req.id}
+                      onClick={() => handleOpenView(req)}
+                      style={{ cursor: 'pointer' }}
+                      title="Click to view full application details form"
+                    >
                       <td>
                         <span className="flat-badge">
                           Flat {req.flat_number || 'Unit'} ({req.block_name || 'Tower A'})
@@ -963,8 +1006,33 @@ export const AdminPortal: React.FC = () => {
                         )}
                       </td>
                       <td style={{ textAlign: 'right' }}>
-                        <div className="table-actions">
-                          {req.status === 'PENDING' || req.status === 'CORRECTION_REQUIRED' ? (
+                        <div className="table-actions" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            className="btn-action-view"
+                            onClick={() => handleOpenView(req)}
+                            title="View Full Application Form & Details"
+                            style={{
+                              padding: '0.4rem 0.75rem',
+                              borderRadius: '9999px',
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              border: '1px solid #cbd5e1',
+                              background: '#f8fafc',
+                              color: '#334155',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              transition: 'all 0.15s ease',
+                            }}
+                          >
+                            <Eye size={13} />
+                            <span>View Form</span>
+                          </button>
+
+                          {(req.status?.toLowerCase().includes('pending') ||
+                          req.status?.toLowerCase().includes('correction')) ? (
                             <>
                               <button
                                 type="button"
@@ -1542,90 +1610,670 @@ export const AdminPortal: React.FC = () => {
         </div>
       )}
 
-      {/* 4. REGISTRATION APPROVE / REJECT / CORRECTION MODALS */}
+      {/* 4. REGISTRATION APPLICATION VIEW / APPROVE / REJECT / CORRECTION MODALS */}
       {modalType && selectedRequest && (
-        <div className="modal-overlay">
-          <div className="modal-content animate-fade-in">
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div
+            className="modal-content animate-fade-in"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: modalType === 'view' ? '680px' : '520px', width: '92%' }}
+          >
             <div className="modal-header">
-              <h3>
-                {modalType === 'approve' && 'Approve Registration'}
-                {modalType === 'reject' && 'Reject Registration'}
-                {modalType === 'correction' && 'Request Application Correction'}
-              </h3>
-              <button onClick={handleCloseModal} style={{ color: 'var(--text-muted)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                {modalType === 'view' && <FileText size={20} style={{ color: 'var(--accent-primary, #6366f1)' }} />}
+                <h3 style={{ margin: 0 }}>
+                  {modalType === 'view' && 'Registration Application Form'}
+                  {modalType === 'approve' && 'Approve Registration'}
+                  {modalType === 'reject' && 'Reject Registration'}
+                  {modalType === 'correction' && 'Request Application Correction'}
+                </h3>
+              </div>
+              <button onClick={handleCloseModal} style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}>
                 <X size={18} />
               </button>
             </div>
 
-            <div className="modal-body">
-              <div style={{ marginBottom: '1rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                Applicant: <strong>{selectedRequest.applicant_name}</strong> for Flat{' '}
-                <strong>{selectedRequest.flat_number}</strong> ({selectedRequest.requested_membership_type})
-              </div>
+            <div className="modal-body" style={{ maxHeight: '72vh', overflowY: 'auto' }}>
+              {/* VIEW FULL APPLICATION FORM */}
+              {modalType === 'view' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {/* Top Applicant Highlight Card */}
+                  <div
+                    style={{
+                      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '12px',
+                      padding: '1rem 1.25rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '1rem',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                      <div
+                        style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                          color: '#ffffff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '1.2rem',
+                          fontWeight: 700,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {selectedRequest.applicant_name ? selectedRequest.applicant_name.charAt(0).toUpperCase() : 'U'}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '1.05rem', color: '#0f172a' }}>
+                          {selectedRequest.applicant_name}
+                        </div>
+                        <div style={{ fontSize: '0.82rem', color: '#64748b' }}>
+                          Application ID: <code style={{ fontSize: '0.78rem' }}>{selectedRequest.id.slice(0, 8)}</code>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <StatusBadge status={selectedRequest.status} />
+                    </div>
+                  </div>
 
-              {modalType === 'approve' && (
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  Approving this request will create an active household membership in flat{' '}
-                  <strong>{selectedRequest.flat_number}</strong> and grant the user resident access.
-                </p>
+                  {/* Form Details Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem' }}>
+                    <div style={{ padding: '0.75rem 1rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                        Flat & Block
+                      </div>
+                      <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <Building size={15} style={{ color: '#6366f1' }} />
+                        Flat {selectedRequest.flat_number || 'Unit'} ({selectedRequest.block_name || 'Tower A'})
+                      </div>
+                    </div>
+
+                    <div style={{ padding: '0.75rem 1rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                        Membership Category
+                      </div>
+                      <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#0f172a' }}>
+                        {selectedRequest.requested_membership_type || 'Resident'}
+                        {selectedRequest.relationship && selectedRequest.relationship.toLowerCase() !== 'self' ? ` (${selectedRequest.relationship})` : ''}
+                      </div>
+                    </div>
+
+                    <div style={{ padding: '0.75rem 1rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                        Email Address
+                      </div>
+                      <div style={{ fontWeight: 600, fontSize: '0.88rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.4rem', wordBreak: 'break-all' }}>
+                        <Mail size={14} style={{ color: '#64748b', flexShrink: 0 }} />
+                        {selectedRequest.applicant_email || 'Not provided'}
+                      </div>
+                    </div>
+
+                    <div style={{ padding: '0.75rem 1rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                        Mobile Contact
+                      </div>
+                      <div style={{ fontWeight: 600, fontSize: '0.88rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <Phone size={14} style={{ color: '#64748b' }} />
+                        {selectedRequest.mobile || 'Not provided'}
+                      </div>
+                    </div>
+
+                    <div style={{ padding: '0.75rem 1rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                        Resident Since
+                      </div>
+                      <div style={{ fontWeight: 600, fontSize: '0.88rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <Calendar size={14} style={{ color: '#64748b' }} />
+                        {selectedRequest.resident_since ? new Date(selectedRequest.resident_since).toLocaleDateString() : 'Current'}
+                      </div>
+                    </div>
+
+                    <div style={{ padding: '0.75rem 1rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+                        Parking / Vehicle Details
+                      </div>
+                      <div style={{ fontWeight: 600, fontSize: '0.88rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <Car size={14} style={{ color: '#64748b' }} />
+                        {selectedRequest.parking_details || 'None assigned'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Uploaded Documents & Attachments Section */}
+                  <div
+                    style={{
+                      background: '#ffffff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '12px',
+                      padding: '1rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.75rem',
+                    }}
+                  >
+                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      <Paperclip size={16} style={{ color: '#6366f1' }} />
+                      <span>Uploaded Attachments & Documents</span>
+                    </div>
+
+                    {selectedRequest.rental_agreement_url || selectedRequest.parking_document_url ? (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.75rem' }}>
+                        {selectedRequest.rental_agreement_url && (
+                          <div
+                            style={{
+                              padding: '0.85rem',
+                              background: '#f0fdf4',
+                              border: '1px solid #bbf7d0',
+                              borderRadius: '10px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: '0.5rem',
+                            }}
+                          >
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#166534' }}>
+                                Rental / Lease Agreement
+                              </div>
+                              <div style={{ fontSize: '0.74rem', color: '#15803d' }}>
+                                Signed tenancy contract
+                              </div>
+                            </div>
+                            <a
+                              href={selectedRequest.rental_agreement_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.4rem 0.75rem',
+                                background: '#16a34a',
+                                color: '#ffffff',
+                                borderRadius: '9999px',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                textDecoration: 'none',
+                                boxShadow: '0 2px 4px rgba(22, 163, 74, 0.25)',
+                              }}
+                            >
+                              <ExternalLink size={13} />
+                              <span>View File</span>
+                            </a>
+                          </div>
+                        )}
+
+                        {selectedRequest.parking_document_url && (
+                          <div
+                            style={{
+                              padding: '0.85rem',
+                              background: '#eff6ff',
+                              border: '1px solid #bfdbfe',
+                              borderRadius: '10px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: '0.5rem',
+                            }}
+                          >
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#1e40af' }}>
+                                Parking Allocation Letter
+                              </div>
+                              <div style={{ fontSize: '0.74rem', color: '#1d4ed8' }}>
+                                Parking slot ownership proof
+                              </div>
+                            </div>
+                            <a
+                              href={selectedRequest.parking_document_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.4rem 0.75rem',
+                                background: '#2563eb',
+                                color: '#ffffff',
+                                borderRadius: '9999px',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                textDecoration: 'none',
+                                boxShadow: '0 2px 4px rgba(37, 99, 235, 0.25)',
+                              }}
+                            >
+                              <ExternalLink size={13} />
+                              <span>View File</span>
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          padding: '0.85rem',
+                          background: '#f8fafc',
+                          border: '1px dashed #cbd5e1',
+                          borderRadius: '8px',
+                          fontSize: '0.82rem',
+                          color: '#64748b',
+                          textAlign: 'center',
+                        }}
+                      >
+                        No document files attached with this registration.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Family Members Section (if provided) */}
+                  {(() => {
+                    let fams: any[] = [];
+                    if (Array.isArray(selectedRequest.family_members)) {
+                      fams = selectedRequest.family_members;
+                    } else if (typeof selectedRequest.family_members === 'string') {
+                      try { fams = JSON.parse(selectedRequest.family_members); } catch {}
+                    }
+                    if (!fams || fams.length === 0) return null;
+
+                    return (
+                      <div
+                        style={{
+                          background: '#ffffff',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '12px',
+                          padding: '1rem',
+                        }}
+                      >
+                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.75rem' }}>
+                          <Users size={16} style={{ color: '#059669' }} />
+                          <span>Household Family Members ({fams.length})</span>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.65rem' }}>
+                          {fams.map((fm: any, idx: number) => (
+                            <div
+                              key={idx}
+                              style={{
+                                padding: '0.65rem 0.85rem',
+                                background: '#f8fafc',
+                                border: '1px solid #e2e8f0',
+                                borderRadius: '8px',
+                                fontSize: '0.82rem',
+                              }}
+                            >
+                              <div style={{ fontWeight: 700, color: '#0f172a' }}>{fm.name || 'Member'}</div>
+                              <div style={{ color: '#64748b' }}>
+                                {fm.relation || 'Family'} {fm.dob ? `• DOB: ${fm.dob}` : ''}
+                              </div>
+                              {fm.mobile && <div style={{ color: '#64748b' }}>📞 {fm.mobile}</div>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Registered Vehicles Section (if provided) */}
+                  {(() => {
+                    let vehi: any[] = [];
+                    if (Array.isArray(selectedRequest.vehicles)) {
+                      vehi = selectedRequest.vehicles;
+                    } else if (typeof selectedRequest.vehicles === 'string') {
+                      try { vehi = JSON.parse(selectedRequest.vehicles); } catch {}
+                    }
+                    if (!vehi || vehi.length === 0) return null;
+
+                    return (
+                      <div
+                        style={{
+                          background: '#ffffff',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '12px',
+                          padding: '1rem',
+                        }}
+                      >
+                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.75rem' }}>
+                          <Car size={16} style={{ color: '#2563eb' }} />
+                          <span>Registered Vehicles ({vehi.length})</span>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.65rem' }}>
+                          {vehi.map((v: any, idx: number) => (
+                            <div
+                              key={idx}
+                              style={{
+                                padding: '0.65rem 0.85rem',
+                                background: '#f8fafc',
+                                border: '1px solid #e2e8f0',
+                                borderRadius: '8px',
+                                fontSize: '0.82rem',
+                              }}
+                            >
+                              <div style={{ fontWeight: 700, color: '#0f172a' }}>
+                                {v.registrationNumber || v.regNumber || 'Vehicle'} ({v.vehicleType || v.type || '4W'})
+                              </div>
+                              <div style={{ color: '#64748b' }}>
+                                {v.makeModel || 'Model'} {v.colour ? `• ${v.colour}` : ''}
+                              </div>
+                              {v.slotNumber && <div style={{ color: '#2563eb', fontWeight: 600 }}>Slot: {v.slotNumber}</div>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Tenant Details Section (if rented) */}
+                  {(selectedRequest.tenant_name || selectedRequest.tenant_email) && (
+                    <div
+                      style={{
+                        background: '#faf5ff',
+                        border: '1px solid #e9d5ff',
+                        borderRadius: '12px',
+                        padding: '1rem',
+                      }}
+                    >
+                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#6b21a8', display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.5rem' }}>
+                        <Key size={16} />
+                        <span>Tenant Information</span>
+                      </div>
+                      <div style={{ fontSize: '0.84rem', color: '#581c87', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        <div><strong>Name:</strong> {selectedRequest.tenant_name}</div>
+                        {selectedRequest.tenant_email && <div><strong>Email:</strong> {selectedRequest.tenant_email}</div>}
+                        {selectedRequest.tenant_mobile && <div><strong>Mobile:</strong> {selectedRequest.tenant_mobile}</div>}
+                        {(selectedRequest.lease_start_date || selectedRequest.lease_end_date) && (
+                          <div>
+                            <strong>Lease Term:</strong> {selectedRequest.lease_start_date || 'N/A'} to {selectedRequest.lease_end_date || 'N/A'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Applicant Notes / Remarks */}
+                  {(selectedRequest.remarks || selectedRequest.rejection_reason || selectedRequest.correction_message) && (
+                    <div style={{ padding: '0.85rem 1rem', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', fontSize: '0.85rem' }}>
+                      {selectedRequest.remarks && (
+                        <div style={{ marginBottom: (selectedRequest.rejection_reason || selectedRequest.correction_message) ? '0.5rem' : 0 }}>
+                          <strong style={{ color: '#92400e' }}>Applicant Note:</strong> {selectedRequest.remarks}
+                        </div>
+                      )}
+                      {selectedRequest.correction_message && (
+                        <div style={{ color: '#b45309', marginBottom: selectedRequest.rejection_reason ? '0.5rem' : 0 }}>
+                          <strong>Correction Instructions:</strong> {selectedRequest.correction_message}
+                        </div>
+                      )}
+                      {selectedRequest.rejection_reason && (
+                        <div style={{ color: '#b91c1c' }}>
+                          <strong>Rejection Reason:</strong> {selectedRequest.rejection_reason}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', textAlign: 'right' }}>
+                    Application Submitted: {selectedRequest.created_at ? new Date(selectedRequest.created_at).toLocaleString() : 'N/A'}
+                  </div>
+                </div>
               )}
 
+              {/* APPROVE ACTION STEP */}
+              {modalType === 'approve' && (
+                <div>
+                  <div style={{ marginBottom: '1rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                    Applicant: <strong>{selectedRequest.applicant_name}</strong> for Flat{' '}
+                    <strong>{selectedRequest.flat_number}</strong> ({selectedRequest.requested_membership_type})
+                  </div>
+                  <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    Approving this request will immediately activate household access in Flat{' '}
+                    <strong>{selectedRequest.flat_number}</strong> ({selectedRequest.block_name || 'Tower A'}) and notify the applicant.
+                  </p>
+                </div>
+              )}
+
+              {/* REJECT ACTION STEP */}
               {modalType === 'reject' && (
                 <div>
+                  <div style={{ marginBottom: '1rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                    Applicant: <strong>{selectedRequest.applicant_name}</strong> for Flat{' '}
+                    <strong>{selectedRequest.flat_number}</strong>
+                  </div>
                   <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', fontWeight: 600 }}>
                     Rejection Reason (Optional)
                   </label>
                   <textarea
                     rows={3}
                     className="admin-search-input"
-                    style={{ width: '100%' }}
-                    placeholder="Enter the reason for rejection..."
+                    style={{ width: '100%', padding: '0.65rem' }}
+                    placeholder="Enter the reason for rejection (e.g. Unverified identity proof)..."
                     value={modalInput}
                     onChange={(e) => setModalInput(e.target.value)}
                   />
                 </div>
               )}
 
+              {/* CORRECTION ACTION STEP */}
               {modalType === 'correction' && (
                 <div>
+                  <div style={{ marginBottom: '1rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                    Applicant: <strong>{selectedRequest.applicant_name}</strong> for Flat{' '}
+                    <strong>{selectedRequest.flat_number}</strong>
+                  </div>
                   <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', fontWeight: 600 }}>
                     Correction Instructions (Required)
                   </label>
                   <textarea
                     rows={3}
                     className="admin-search-input"
-                    style={{ width: '100%' }}
-                    placeholder="e.g. Please update your phone number or provide ownership proof..."
+                    style={{ width: '100%', padding: '0.65rem' }}
+                    placeholder="e.g. Please update your flat number or upload proof of ownership..."
                     value={modalInput}
                     onChange={(e) => setModalInput(e.target.value)}
                   />
                 </div>
               )}
+
+              {/* Email Notification Preview for Approve, Reject, and Correction */}
+              {modalType !== 'view' && selectedRequest.applicant_email && (
+                <div
+                  style={{
+                    marginTop: '1.25rem',
+                    padding: '0.85rem 1rem',
+                    background: 'linear-gradient(135deg, #f8faff 0%, #f1f5f9 100%)',
+                    border: '1px solid #e0e7ff',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.65rem',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.45rem', fontSize: '0.8rem', color: '#1e293b' }}>
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '6px',
+                          background: '#e0e7ff',
+                          color: '#4f46e5',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Mail size={13} />
+                      </div>
+                      <span style={{ color: '#64748b', fontWeight: 500 }}>From:</span>
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          color: '#065f46',
+                          background: '#d1fae5',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          border: '1px solid #a7f3d0',
+                          fontSize: '0.78rem',
+                          fontFamily: 'monospace',
+                        }}
+                        title="Official Society Email Account"
+                      >
+                        bpstwintowers.society@gmail.com
+                      </span>
+                      <span style={{ color: '#94a3b8' }}>➔</span>
+                      <span style={{ color: '#64748b', fontWeight: 500 }}>To:</span>
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          color: '#1e1b4b',
+                          background: '#ffffff',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          border: '1px solid #e2e8f0',
+                          fontSize: '0.78rem',
+                          fontFamily: 'monospace',
+                        }}
+                      >
+                        {selectedRequest.applicant_email}
+                      </span>
+                    </div>
+
+                    {(() => {
+                      const emailData = generateRegistrationEmail(modalType as any, selectedRequest, modalInput.trim());
+                      return (
+                        <a
+                          href={emailData.gmailUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            color: '#4f46e5',
+                            background: '#ffffff',
+                            border: '1px solid #c7d2fe',
+                            padding: '4px 10px',
+                            borderRadius: '8px',
+                            textDecoration: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                            transition: 'all 0.15s ease',
+                          }}
+                          title="Preview draft in Gmail Web compose"
+                        >
+                          <ExternalLink size={12} />
+                          <span>Preview in Gmail</span>
+                        </a>
+                      );
+                    })()}
+                  </div>
+
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.55rem',
+                      fontSize: '0.8rem',
+                      color: '#475569',
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      paddingTop: '0.45rem',
+                      borderTop: '1px dashed #e2e8f0',
+                      margin: 0,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={sendEmailEnabled}
+                      onChange={(e) => setSendEmailEnabled(e.target.checked)}
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        minWidth: '16px',
+                        minHeight: '16px',
+                        maxWidth: '16px',
+                        maxHeight: '16px',
+                        accentColor: '#4f46e5',
+                        cursor: 'pointer',
+                        margin: 0,
+                        padding: 0,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span style={{ fontWeight: 500, lineHeight: 1.3 }}>
+                      Open prefilled Gmail draft upon confirmation
+                    </span>
+                  </label>
+                </div>
+              )}
             </div>
 
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn-modal-cancel"
-                onClick={handleCloseModal}
-                disabled={actionLoading}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className={
-                  modalType === 'approve'
-                    ? 'btn-approve'
-                    : modalType === 'reject'
-                    ? 'btn-reject'
-                    : 'btn-correction'
-                }
-                onClick={handleConfirmAction}
-                disabled={actionLoading}
-              >
-                {actionLoading ? 'Processing...' : modalType === 'approve' ? 'Confirm Approval' : 'Submit'}
-              </button>
+            <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+              {modalType === 'view' ? (
+                <>
+                  <button
+                    type="button"
+                    className="btn-modal-cancel"
+                    onClick={handleCloseModal}
+                  >
+                    Close Form
+                  </button>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button
+                      type="button"
+                      className="btn-action-correct"
+                      onClick={() => handleOpenCorrection(selectedRequest)}
+                    >
+                      Request Correction
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-action-reject"
+                      onClick={() => handleOpenReject(selectedRequest)}
+                    >
+                      Reject
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-action-approve"
+                      onClick={() => handleOpenApprove(selectedRequest)}
+                    >
+                      Approve Application
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="btn-modal-cancel"
+                    onClick={handleCloseModal}
+                    disabled={actionLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className={
+                      modalType === 'approve'
+                        ? 'btn-approve'
+                        : modalType === 'reject'
+                        ? 'btn-reject'
+                        : 'btn-correction'
+                    }
+                    onClick={handleConfirmAction}
+                    disabled={actionLoading}
+                  >
+                    {actionLoading ? 'Processing...' : modalType === 'approve' ? 'Confirm Approval' : 'Submit'}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

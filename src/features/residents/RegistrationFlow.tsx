@@ -234,15 +234,19 @@ export const RegistrationFlow: React.FC = () => {
         if (isProcessing) return;
         const pendingPayloadStr = sessionStorage.getItem('pending_registration_payload');
         if (!pendingPayloadStr) return;
+        // Synchronously remove immediately to prevent race conditions from onAuthStateChange
+        sessionStorage.removeItem('pending_registration_payload');
+        isProcessing = true;
 
         try {
           const user = activeUser || (await supabase.auth.getUser()).data.user;
-          if (!user) return;
+          if (!user) {
+            isProcessing = false;
+            return;
+          }
 
-          isProcessing = true;
           setIsProcessingOAuthReturn(true);
           const payload = JSON.parse(pendingPayloadStr);
-          sessionStorage.removeItem('pending_registration_payload');
 
           const enteredEmail = (payload.email || '').trim().toLowerCase();
           const authedEmail = (user.email || '').trim().toLowerCase();

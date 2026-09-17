@@ -15,6 +15,20 @@ export interface AdminRegistrationItem {
   correction_message: string | null;
   reviewed_at: string | null;
   created_at: string;
+  parking_details?: string | null;
+  parking_document_url?: string | null;
+  rental_agreement_url?: string | null;
+  family_members?: any;
+  vehicles?: any;
+  dob_month_year?: string | null;
+  age?: number | null;
+  blood_group?: string | null;
+  occupancy_status?: string | null;
+  tenant_name?: string | null;
+  tenant_email?: string | null;
+  tenant_mobile?: string | null;
+  lease_start_date?: string | null;
+  lease_end_date?: string | null;
   // Joined fields
   applicant_name?: string;
   applicant_email?: string;
@@ -124,34 +138,63 @@ export async function fetchUserRoles(): Promise<string[]> {
 }
 
 export async function fetchAdminRegistrations(): Promise<AdminRegistrationItem[]> {
-  const { data, error } = await supabase
-    .from('registration_requests')
-    .select(`
-      *,
-      profiles!registration_requests_user_id_fkey (
-        full_name,
-        email,
-        photo_url
-      ),
-      flats!registration_requests_flat_id_fkey (
-        flat_number,
-        bhk,
-        blocks!flats_block_id_fkey ( name )
-      )
-    `)
-    .order('created_at', { ascending: false });
+  const [{ data, error }, { data: docRows }] = await Promise.all([
+    supabase
+      .from('registration_requests')
+      .select(`
+        *,
+        profiles!registration_requests_user_id_fkey (
+          full_name,
+          email,
+          photo_url
+        ),
+        flats!registration_requests_flat_id_fkey (
+          flat_number,
+          bhk,
+          blocks!flats_block_id_fkey ( name )
+        )
+      `)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('parking_documents')
+      .select('registration_id, file_path, file_name'),
+  ]);
 
   if (error) throw error;
 
-  return (data || []).map((row: any) => ({
-    ...row,
-    applicant_name: row.profiles?.full_name || 'Unnamed',
-    applicant_email: row.profiles?.email || '',
-    applicant_photo: row.profiles?.photo_url || '',
-    flat_number: row.flats?.flat_number || '',
-    bhk: row.flats?.bhk || '',
-    block_name: row.flats?.blocks?.name || '',
-  }));
+  const docMap: Record<string, string> = {};
+  (docRows || []).forEach((d: any) => {
+    if (d.registration_id && d.file_path) {
+      const { data: pubData } = supabase.storage
+        .from('parking-documents')
+        .getPublicUrl(d.file_path);
+      docMap[d.registration_id] = pubData?.publicUrl || d.file_path;
+    }
+  });
+
+  return (data || []).map((row: any) => {
+    let resolvedName = row.profiles?.full_name;
+    if (row.remarks && typeof row.remarks === 'string') {
+      const match = row.remarks.match(/Applicant:\s*([^,\n;\r]+)/i);
+      if (match && match[1].trim()) {
+        resolvedName = match[1].trim();
+      }
+    }
+    if (!resolvedName || resolvedName === 'Unnamed') {
+      resolvedName = row.tenant_name || row.profiles?.full_name || 'Resident';
+    }
+
+    return {
+      ...row,
+      applicant_name: resolvedName,
+      applicant_email: row.profiles?.email || '',
+      applicant_photo: row.profiles?.photo_url || '',
+      flat_number: row.flats?.flat_number || '',
+      bhk: row.flats?.bhk || '',
+      block_name: row.flats?.blocks?.name || '',
+      parking_document_url: row.parking_document_url || docMap[row.id] || null,
+    };
+  });
 }
 
 export async function approveRegistrationRequest(registrationId: string): Promise<any> {
@@ -184,6 +227,90 @@ export async function requestRegistrationCorrection(registrationId: string, mess
   });
   if (error) throw error;
   return data;
+}
+
+export function generateRegistrationEmail(
+  action: 'approve' | 'reject' | 'correction',
+  item: AdminRegistrationItem,
+  customNote?: string
+): { to: string; subject: string; body: string; gmailUrl: string; mailtoUrl: string; from: string } {
+  const to = item.applicant_email || '';
+  const flat = item.flat_number || 'your unit';
+  const block = item.block_name ? ` (${item.block_name})` : '';
+
+  // Extract applicant name from item or application remarks
+  let name = item.applicant_name;
+  if (item.remarks && typeof item.remarks === 'string') {
+    const match = item.remarks.match(/Applicant:\s*([^,\n;\r]+)/i);
+    if (match && match[1].trim()) {
+      name = match[1].trim();
+    }
+  }
+  if (!name || name === 'Unnamed') {
+    name = item.tenant_name || 'Resident';
+  }
+
+  let subject = '';
+  let body = '';
+
+  if (action === 'approve') {
+    subject = `BPS Twin Towers — Resident Registration Approved for Flat ${flat}`;
+    body = `Dear ${name},\n\nCongratulations! Your resident registration application for Flat ${flat}${block} at BPS Twin Towers has been verified and approved by the Management Committee.\n\nYou now have active household access. You can log in to the portal to view society announcements, register visitors, book community facilities, and participate in society activities.\n\nPortal link: https://bpstwintowers.in\n\nWarm regards,\nBPS Twin Towers Management Committee\nbpstwintowers.society@gmail.com`;
+  } else if (action === 'correction') {
+    subject = `Action Required: Registration Correction for Flat ${flat} — BPS Twin Towers`;
+    body = `Dear ${name},\n\nThe Management Committee has reviewed your registration application for Flat ${flat}${block} and requires the following update or clarification:\n\n"${customNote || 'Please update your submitted details.'}"\n\nPlease log in to the resident portal to make the necessary corrections and re-submit for review:\nhttps://bpstwintowers.in/registration-status\n\nIf you have any questions, feel free to reply to this email.\n\nWarm regards,\nBPS Twin Towers Management Committee\nbpstwintowers.society@gmail.com`;
+  } else {
+    subject = `Update Regarding Registration for Flat ${flat} — BPS Twin Towers`;
+    body = `Dear ${name},\n\nYour resident registration application for Flat ${flat}${block} could not be approved at this time.\n\nReason: ${customNote || 'Application details could not be verified by administration.'}\n\nIf you believe this is an error or would like to provide updated documentation, please contact the Management Committee at bpstwintowers.society@gmail.com.\n\nWarm regards,\nBPS Twin Towers Management Committee`;
+  }
+
+  // Direct web Gmail compose URL targeted specifically to the society's official Gmail account
+  const fromEmail = 'bpstwintowers.society@gmail.com';
+  const gmailUrl = `https://mail.google.com/mail/u/${encodeURIComponent(fromEmail)}/?authuser=${encodeURIComponent(fromEmail)}&view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const mailtoUrl = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  return { to, subject, body, gmailUrl, mailtoUrl, from: fromEmail };
+}
+
+export async function sendRegistrationNotification(
+  userId: string,
+  type: 'APPROVED' | 'REJECTED' | 'CORRECTION',
+  flatNumber: string,
+  details?: string
+): Promise<void> {
+  try {
+    const titles = {
+      APPROVED: `Flat ${flatNumber} Registration Approved 🎉`,
+      REJECTED: `Flat ${flatNumber} Registration Rejected`,
+      CORRECTION: `Action Required: Flat ${flatNumber} Registration Update`,
+    };
+
+    const messages = {
+      APPROVED: `Congratulations! Your registration for Flat ${flatNumber} has been verified and approved. You now have full access to society amenities and resident services.`,
+      REJECTED: `Your registration for Flat ${flatNumber} was not approved.${details ? ` Reason: ${details}` : ''}`,
+      CORRECTION: `Admin requested updates for your Flat ${flatNumber} registration: "${details || 'Please update your details'}".`,
+    };
+
+    const actionUrls = {
+      APPROVED: '/profile',
+      REJECTED: '/registration-status',
+      CORRECTION: '/registration-status',
+    };
+
+    await supabase.from('notifications').insert({
+      recipient: userId,
+      notification_type: type,
+      category: 'REGISTRATION',
+      priority: type === 'CORRECTION' ? 'HIGH' : 'NORMAL',
+      title: titles[type],
+      message: messages[type],
+      action_url: actionUrls[type],
+      reference_type: 'registration_request',
+      is_read: false,
+    });
+  } catch (e) {
+    console.warn('Could not insert in-app notification:', e);
+  }
 }
 
 export async function fetchAdminResidents(): Promise<AdminResidentItem[]> {
@@ -276,14 +403,23 @@ export async function fetchAdminStats(): Promise<AdminStats> {
   const flatRows = flats.data || [];
   const memberRows = members.data || [];
 
+  const isStatus = (status: string | null | undefined, target: string) => {
+    const s = (status || '').toLowerCase().trim();
+    if (target === 'pending') return s.includes('pending');
+    if (target === 'correction') return s.includes('correction');
+    if (target === 'approved') return s.includes('approved');
+    if (target === 'rejected') return s.includes('rejected');
+    return false;
+  };
+
   return {
-    pendingCount: regRows.filter(r => r.status === 'Pending').length,
-    correctionCount: regRows.filter(r => r.status === 'Correction Required').length,
-    approvedCount: regRows.filter(r => r.status === 'Approved').length,
-    rejectedCount: regRows.filter(r => r.status === 'Rejected').length,
+    pendingCount: regRows.filter(r => isStatus(r.status, 'pending')).length,
+    correctionCount: regRows.filter(r => isStatus(r.status, 'correction')).length,
+    approvedCount: regRows.filter(r => isStatus(r.status, 'approved')).length,
+    rejectedCount: regRows.filter(r => isStatus(r.status, 'rejected')).length,
     totalFlats: flatRows.length,
-    occupiedFlats: memberRows.filter(m => m.status === 'Active').length,
-    totalResidents: memberRows.filter(m => m.status === 'Active').length,
+    occupiedFlats: memberRows.filter(m => (m.status || '').toLowerCase() === 'active').length,
+    totalResidents: memberRows.filter(m => (m.status || '').toLowerCase() === 'active').length,
   };
 }
 

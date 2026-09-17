@@ -322,6 +322,19 @@
   margin-bottom: 0.85rem;
 }
 
+.fund-sponsor-title-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sponsor-add-btn {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  box-shadow: 0 3px 10px rgba(217, 119, 6, 0.25) !important;
+}
+
 .fund-sponsor-subtitle {
   font-size: 0.85rem;
   color: #64748b;
@@ -342,6 +355,16 @@
   transition: all 0.2s ease;
 }
 
+.sponsor-card-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sponsor-element-icon {
+  font-size: 1.1rem;
+}
+
 /* Available Card */
 .sponsor-element-card.is-available {
   background: #ffffff;
@@ -355,7 +378,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #d97706, #f59e0b);
+  background: linear-gradient(90deg, #d97706, #f59e0b, #fbbf24);
 }
 
 .sponsor-card-top-row {
@@ -391,35 +414,39 @@
 }
 
 .sponsor-element-desc {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   color: #64748b;
   margin: 0 0 0.85rem 0;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .sponsor-this-btn {
   width: 100%;
-  background: #f1f5f9;
-  border: 1.5px solid #e2e8f0;
-  color: #1e293b;
-  padding: 0.55rem;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1.5px solid #fde68a;
+  color: #b45309;
+  padding: 0.6rem;
   border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
 }
 
 .sponsor-this-btn:hover {
-  background: #e2e8f0;
-  border-color: #cbd5e1;
+  background: #fde68a;
+  border-color: #f59e0b;
 }
 
 /* Sponsored State Card */
 .sponsor-element-card.is-sponsored {
   background: #ffffff;
   border: 1px solid rgba(226, 232, 240, 0.9);
-  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
 
 .sponsor-badge-sponsored {
@@ -436,17 +463,74 @@
 }
 
 .sponsor-acknowledgment {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   color: #334155;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  padding: 0.45rem 0.75rem;
-  border-radius: 10px;
-  margin-top: 0.25rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 12px;
+  margin-top: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.sponsor-acknowledgment strong {
+.sponsor-ack-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.sponsor-ack-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sponsor-ack-donor-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.sponsor-donor-name {
   color: #0f172a;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.sponsor-flat-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+}
+
+.sponsor-mode-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  padding: 0.2rem 0.55rem;
+  border-radius: 8px;
+}
+
+.fund-available-sponsors-divider {
+  margin: 1.25rem 0 0.35rem 0;
+  padding-bottom: 0.35rem;
+  border-bottom: 1.5px dashed #e2e8f0;
+}
+
+.fund-available-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #d97706;
+  letter-spacing: -0.01em;
 }
 
 /* ==========================================================================
